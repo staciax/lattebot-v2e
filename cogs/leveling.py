@@ -14,6 +14,7 @@ from io import BytesIO
 # Local
 from utils.xp_pillow import level_images
 from utils.paginator import SimplePages
+from utils.useful import RenlyEmbed
 
 # xp_channel
 chat_channel = 861883647070437386 , 840398821544296480 , 863438518981361686 , 859960606761549835 , 840405578618109952 #chat,game,anime,kdbot,game-chat
@@ -119,9 +120,9 @@ class Leveling(commands.Cog):
     @commands.guild_only()
     async def xp(self, ctx, member: discord.Member = None):
         if ctx.channel.id in chat_channel:
-            embed = discord.Embed(description="please use bot command in <#861874852050894868>" , color=self.bot.white_color)
-            await ctx.message.delete()
-            return await ctx.send(embed=embed , delete_after=10)
+            embed = RenlyEmbed.to_error(description="Please use bot command in <#861874852050894868>")
+            embed.color = self.bot.white_color
+            return await ctx.send(embed=embed , ephemeral=True)
         try:
             async with ctx.typing():
                 if not member:
@@ -130,7 +131,7 @@ class Leveling(commands.Cog):
                 stats = await self.bot.latte_level.find_by_custom({"id": member_id, "guild_id": ctx.guild.id})
                 if stats is None:
                     embed = discord.Embed(description="You haven't sent any messages, **no xp**!!",color=0xffffff)
-                    await ctx.channel.send(embed=embed)
+                    await ctx.send(embed=embed)
                 else:
                     xp = stats["xp"]
                     lvl = 0
@@ -151,7 +152,7 @@ class Leveling(commands.Cog):
                     embedlv = discord.Embed(title=f"{member.name}'s level stats | {ctx.guild.name}",color=0x77dd77)
                     embedlv.set_image(url="attachment://latte-level.png")
                     
-                    await ctx.channel.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
+                    await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
         except:
             raise commands.BadArgument('error')
   

@@ -227,7 +227,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         list_input = list(input_value.split())
 
         if len(list_input) == 1:
-            await ctx.send("There must be at least 2 split messages." , delete_after=15)
+            await ctx.send("There must be at least 2 split messages." , ephemeral=True)
             return
         #try_random
         try:
@@ -239,7 +239,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     async def poll(self, ctx, message= commands.Option(description="poll message")):
         if len(message) > 2000:
-            return await ctx.send('poll message is a maximum of 2000 characters.', delete_after=15)
+            return await ctx.send('poll message is a maximum of 2000 characters.', ephemeral=True)
 
         embed_color = ctx.author.color
         
@@ -307,7 +307,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 await member.move_to(channel=None)
         else:
             embed_c = discord.Embed(description="Cancelling sleep time!" , color=0xffffff)
-            await ctx.send(embed=embed_c , delete_after=10)
+            await ctx.send(embed=embed_c , ephemeral=True)
             await m.delete()
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])

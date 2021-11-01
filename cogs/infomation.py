@@ -365,7 +365,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(file=f, embed=embed)
         else:
             embed.description = f"this user don't have a banner."
-            await ctx.send(embed=embed, delete_after=10)
+            await ctx.send(embed=embed, ephemeral=True)
 
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
