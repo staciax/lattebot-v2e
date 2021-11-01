@@ -103,7 +103,6 @@ async def on_ready():
     print(f"\nName : {bot.user}\nActivity : {bot_avtivity}\nServers : {len(bot.guilds)}\nUsers : {len(set(bot.get_all_members()))}")
     print("\nCog loaded\n---------\n")
 
-#config_commands = message_command_only
 #bot.load_extension('jishaku')
 
 if __name__ == "__main__":
