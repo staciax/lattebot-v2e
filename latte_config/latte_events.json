@@ -1,0 +1,15 @@
+{
+    "server-log": 859789105507598346,
+    "message-log": 873690030751748206,
+    "voice-log": 870173863726682112,
+    "role-log": 873688581682634762,
+    "status-log": 886194032567525377,
+    "only-image": 865640540032991242,
+    "only-link": null,
+    "welcome_channel": 840379926792110120,
+    "leave_channel": 864227597696499713,
+    "welcome_image":"https://i.imgur.com/BLzUpzf.png",
+    "welcome_footer":"https://cdn.discordapp.com/emojis/902674566655139881.png",
+    "tempinvite": "f6adY5B8k2",
+    "help_thumbnail":"https://i.imgur.com/3jz8m3V.png"
+}
