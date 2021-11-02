@@ -18,6 +18,10 @@ class Reaction(commands.Cog):
     async def on_ready(self):
         print(f"{self.__class__.__name__}")
 
+    @property
+    def display_emoji(self) -> discord.PartialEmoji:
+        return discord.PartialEmoji(name='\N{PERSONAL COMPUTER}')
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         member = payload.member

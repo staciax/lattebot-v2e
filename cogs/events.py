@@ -56,6 +56,10 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
         self.join_guild = self.bot.get_channel(self.bot.bot_join)
         self.leave_guild = self.bot.get_channel(self.bot.bot_leave)
 
+    @property
+    def display_emoji(self) -> discord.PartialEmoji:
+        return discord.PartialEmoji(name='\N{PERSONAL COMPUTER}')
+
     @tasks.loop(minutes=30)
     async def counted(self):
         guild = self.bot.get_guild(self.bot.latte_guild_id)

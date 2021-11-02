@@ -12,13 +12,17 @@ from utils.paginator import RoboPages
 from utils.buttons import *
 from utils.custom_button import base_Button_URL , base_Button_URL2
 
-class Tesing(commands.Cog):
+class Testing(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__}")
+
+    @property
+    def display_emoji(self) -> discord.PartialEmoji:
+        return discord.PartialEmoji(name='\N{PERSONAL COMPUTER}')
 
     # @commands.command()
     # async def typings(self, ctx, type: Optional[Literal["a","b","c"]] = commands.Option(description="testing")):
@@ -124,4 +128,4 @@ class Tesing(commands.Cog):
 #     await ctx.send("Hello from message commands!")
 
 def setup(bot):
-    bot.add_cog(Tesing(bot))
+    bot.add_cog(Testing(bot))

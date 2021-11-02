@@ -15,6 +15,10 @@ class Error(commands.Cog, command_attrs = dict(slash_command=True)):
     async def on_ready(self):
         print(f"{self.__class__.__name__}")
     
+    @property
+    def display_emoji(self) -> discord.PartialEmoji:
+        return discord.PartialEmoji(name='\N{PERSONAL COMPUTER}')
+    
     @commands.Cog.listener()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def on_command_error(self , ctx, error):

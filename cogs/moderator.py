@@ -17,6 +17,7 @@ from utils.useful import RenlyEmbed
 
 class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     """Moderation related commands"""
+    
     def __init__(self, bot):
         self.bot = bot
 
@@ -185,8 +186,6 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         
     @commands.command(help="Mute member")
     @commands.guild_only()
-    # @commands.bot_has_permissions(manage_roles=True)
-    # @commands.has_permissions(administrator = True)
     @commands.has_guild_permissions(mute_members=True)
     @commands.bot_has_guild_permissions(manage_roles=True)
     async def mute(
@@ -258,8 +257,6 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Unmute member")
     @commands.guild_only()
-    # @commands.bot_has_permissions(manage_roles=True)
-    # @commands.has_permissions(mute_members=True)
     @commands.has_guild_permissions(mute_members=True)
     @commands.bot_has_guild_permissions(manage_roles=True)
     async def unmute(
@@ -335,8 +332,6 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         await ctx.send(embed=embed)
 
     @commands.command(help="Mutes the specified member with a specified reason.")
-    # @commands.has_permissions(mute_members=True)
-    # @commands.bot_has_permissions(mute_members=True)
     @commands.has_guild_permissions(mute_members=True)
     @commands.bot_has_guild_permissions(mute_members=True)
     @commands.guild_only()
@@ -366,57 +361,64 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             reason = "None"
         elif len(reason) > 500:
             reason = "Reason was exceeded the 500-character limit."
-            
-        await member.edit(mute=True, reason=reason)
-        embed = RenlyEmbed.to_success(title="Voice Mute", description=f"Successfully Voice muted `{member}`\n reason:**{reason}**")
-        if ctx.author.avatar is not None:
-            embed.set_footer(text=f"Muted by {ctx.author}", icon_url=ctx.author.avatar.url)
-        else:
-            embed.set_footer(text=f"Muted by {ctx.author}")
-        await ctx.send(embed=embed)
+
+        try:    
+            await member.edit(mute=True, reason=reason)
+            embed = RenlyEmbed.to_success(title="Voice Mute", description=f"Successfully Voice muted `{member}`\n reason:**{reason}**")
+            if ctx.author.avatar is not None:
+                embed.set_footer(text=f"Muted by {ctx.author}", icon_url=ctx.author.avatar.url)
+            else:
+                embed.set_footer(text=f"Muted by {ctx.author}")
+            await ctx.send(embed=embed)
+        except:
+            embed_error = RenlyEmbed.to_error(description=f"Target user is not connected to voice.")
+            await ctx.send(embed=embed_error, ephemeral=True)
+
 
     @commands.command(help="Deafens the specified member with a specified reason.")
-    # @commands.has_permissions(deafen_members=True)
-    # @commands.bot_has_permissions(deafen_members=True)
-    @commands.has_guild_permissions(deafen_members=True)
-    @commands.bot_has_guild_permissions(deafen_members=True)
     @commands.guild_only()
+    # @commands.has_guild_permissions(mute_members=True)
+    # @commands.bot_has_guild_permissions(mute_members=True)
     async def voice_deafen(
             self,
             ctx,
             member: discord.Member = commands.Option(description="Spectify member"),
             reason = commands.Option(default=None, description="reason")
         ):
-        
-        embed_error = discord.Embed(color=self.bot.error_color)
+        if ctx.author.guild_permissions.deafen_members:
+            embed_error = discord.Embed(color=self.bot.error_color)
 
-        if member.id == ctx.author.id:
-            embed_error.description = "You can't VC deafen yourself!"
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            if member.id == ctx.author.id:
+                embed_error.description = "You can't VC deafen yourself!"
+                return await ctx.send(embed=embed_error, ephemeral=True)
 
-        if isinstance(member, discord.Member):
-            if ctx.me.top_role < member.top_role:
-                embed_error.description = f"Can't deafen this member"
-                return await ctx.send(embed=embed_error, ephemeral=True)
-            elif ctx.me.top_role >= member.top_role:
-                pass
-            if member == ctx.guild.owner:
-                embed_error.description = f"Can't deafen The Owner"
-                return await ctx.send(embed=embed_error, ephemeral=True)
-        
-        if reason == None:
-            reason = "None"
-        elif len(reason) > 500:
-            reason = "Reason was exceeded the 500-character limit."
+            if isinstance(member, discord.Member):
+                if ctx.me.top_role < member.top_role:
+                    embed_error.description = f"Can't deafen this member"
+                    return await ctx.send(embed=embed_error, ephemeral=True)
+                elif ctx.me.top_role >= member.top_role:
+                    pass
+                if member == ctx.guild.owner:
+                    embed_error.description = f"Can't deafen The Owner"
+                    return await ctx.send(embed=embed_error, ephemeral=True)
             
-        await member.edit(deafen=True, reason=reason)
-        await member.edit(mute=True, reason=reason)
-        embed = RenlyEmbed.to_success(title="Voice Mute", description=f"Successfully Voice deafened `{member}`\n reason:**{reason}**")
-        if ctx.author.avatar is not None:
-            embed.set_footer(text=f"Deafened by {ctx.author}", icon_url=ctx.author.avatar.url)
+            if reason == None:
+                reason = "None"
+            elif len(reason) > 500:
+                reason = "Reason was exceeded the 500-character limit."
+            try:
+                await member.edit(deafen=True, reason=reason)
+                embed = RenlyEmbed.to_success(title="Voice Deafen", description=f"Successfully Voice deafened `{member}`\n reason:**{reason}**")
+                if ctx.author.avatar is not None:
+                    embed.set_footer(text=f"Deafened by {ctx.author}", icon_url=ctx.author.avatar.url)
+                else:
+                    embed.set_footer(text=f"Deafened by {ctx.author}")
+                await ctx.send(embed=embed)
+            except:
+                embed_error = RenlyEmbed.to_error(description=f"Target user is not connected to voice.")
+                await ctx.send(embed=embed_error, ephemeral=True)
         else:
-            embed.set_footer(text=f"Deafened by {ctx.author}")
-        await ctx.send(embed=embed)
+            raise commands.MissingPermissions(['Deafen Members'])
     
 def setup(bot):
     bot.add_cog(Mod(bot))

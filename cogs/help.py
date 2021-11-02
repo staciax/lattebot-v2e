@@ -21,7 +21,7 @@ class HelpDropdown(discord.ui.Select):
         # if ctx.channel.is_nsfw() == True:
         #     ignoredCogs = ['Tesing', 'reference', 'Events', 'Error', 'Reaction','Help','Owner','NSFW']
         # else:
-        ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Tesing']
+        ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Testing']
         botCogs = ctx.bot.cogs
         for cog in botCogs:
             if cog not in ignoredCogs:
@@ -135,24 +135,30 @@ class LatteBotHelp(commands.HelpCommand):
 
         cogs = []
         cogs_description = []
-        ignored_cogs = ['Help', 'Testing', 'Events','Owner','Reaction','NSFW']
+        ignored_cogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
         iter = 1
+        #if cog is None or cog.qualified_name in ignored_cogs: continue
         
         for cog, commands in mapping.items():
+            # print(cog.qualified_name)
             if cog is None or cog.qualified_name in ignored_cogs: continue
+            # print(cog.qualified_name)
             filtered = await self.filter_commands(commands, sort=True)
             command_signatures = [self.get_command_name(c) for c in filtered]
             if command_signatures:
-                cogs.append(f'{cog.display_emoji} {cog.qualified_name}') # [{len(commands)}]
+                cogs.append(f'{cog.display_emoji} {cog.qualified_name}')
                 cogs_description.append(cog.description)
                 # cogindex.append(cog.qualified_name)
                 # allcogs.append(f"**{cog.qualified_name}**{len(commands)} \n`{cog.description}`")
                 #allcogs.append(f"{cog.description} `help {cog.qualified_name}`")
                 iter+=1
         nl = '\n'
+
         # print(len(cogs))
+        # print(cogs)
+
         embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[0],cogs[3],cogs[6]) , inline=True)
-        embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[1],cogs[4],cogs[7]) , inline=True)
+        embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[1],cogs[4]) , inline=True)
         embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[2],cogs[5]) , inline=True)
 
         embed.set_image(url=(latte_read('latte_events'))['help_thumbnail'])
