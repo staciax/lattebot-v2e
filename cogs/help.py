@@ -158,7 +158,7 @@ class LatteBotHelp(commands.HelpCommand):
         # print(cogs)
 
         embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[0],cogs[3],cogs[6]) , inline=True)
-        embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[1],cogs[4]) , inline=True)
+        embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[1],cogs[4],cogs[7]) , inline=True)
         embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[2],cogs[5]) , inline=True)
 
         embed.set_image(url=(latte_read('latte_events'))['help_thumbnail'])
