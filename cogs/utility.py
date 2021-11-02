@@ -244,7 +244,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         embed_color = ctx.author.color
         
         embed = discord.Embed(title="POLL", description=f"{message}",color=0xffffff)
-        embed_success = RenlyEmbed.to_success(description="Poll created successful" ,timestamp=None)
+        embed_success = RenlyEmbed.to_success(description="Poll created successful")
         await ctx.send(embed=embed_success, ephemeral=True)
         msg = await ctx.channel.send(embed=embed)
         await msg.add_reaction(emoji_converter('greentick'))

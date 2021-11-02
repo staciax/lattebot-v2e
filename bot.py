@@ -25,7 +25,7 @@ setting_env = os.getenv('SETTING', None)
 
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
-        self.bot_version = "0.0.1s"
+        self.bot_version = "0.0.1s.post2"
         self.last_update = [2021, 11, 1]
         self.launch_time = datetime.utcnow()
         self.tester = ''
@@ -119,9 +119,9 @@ if __name__ == "__main__":
     #db_leveling
     bot.db_level = bot.mongo["discord"]
     bot.latte_level = Document(bot.db_level, "levelling")
-
+    
     for file in os.listdir("./cogs"):
         if file.endswith(".py") and not file.startswith("_"):
             bot.load_extension(f'cogs.{file[:-3]}')
-
+    
     bot.run(bot.token)

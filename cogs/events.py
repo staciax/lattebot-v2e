@@ -179,7 +179,9 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
             if message.author.id == user_id:
                 await message.author.edit(nick=self.bot.afk_user[user_id]['name'])
                 del self.bot.afk_user[user_id]
-                return await message.channel.send(f"Welcome back {message.author.mention} , i've removed your **AFK** status." , delete_after=10)
+                embed_back = discord.Embed(self.bot.white_color)
+                embed_back.description = f"Welcome back {message.author.mention} , i've removed your **AFK** status."
+                return await message.channel.send(embed=embed_back, delete_after=15)
             
             member = message.guild.get_member(user_id)
             if member.mentioned_in(message):

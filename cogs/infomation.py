@@ -147,12 +147,12 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed = discord.Embed(description="Guild banner not found" , color=self.bot.white_color)
             await ctx.send(embed=embed)
     
-    @server.command(name="splash",help="Shows the server invite banner.", aliases=["serversplash","ssp","invitebanner"], message_command=False)
+    @server.command(name="splash", help="Shows the server invite banner.", aliases=["serversplash","ssp","invitebanner"], message_command=False)
     @commands.guild_only()
     async def server_splash(self, ctx):
         guild = ctx.guild
         try:
-            embed = discord.Embed(title = f"{guild.name}'s Invite banner:", color=self.bot.white_color).set_image(url = guild.splash.url)
+            embed = discord.Embed(title = f"{guild.name}'s Splash banner:", color=self.bot.white_color).set_image(url = guild.splash.url)
             #start_view_button
             # view = discord.ui.View()
             # style = discord.ButtonStyle.gray
@@ -164,15 +164,15 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed = discord.Embed(description="Guild splash not found" , color=self.bot.white_color)
             await ctx.send(embed=embed)
 
-    @commands.group()
-    @commands.guild_only()
-    async def user(self, ctx):
-        pass
+    # @commands.group(aliases=['u'])
+    # @commands.guild_only()
+    # async def user(self, ctx):
+    #     pass
 
-    @user.command(name="info", help="Shows information about the specified member.", aliases=["userinfo","ui", "userinformation","memberinfo"])
+    @commands.command(name="userinfo", help="Shows information about the specified member.", aliases=["ui", "userinformation","memberinfo"])
     @commands.guild_only()
-    async def user_info(self, ctx, member: discord.Member = commands.Option(description="Mention member")):
-        member = member or ctx.author
+    async def userinfo(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+        member = member or ctx.guild.get_member(ctx.author.id)
         
         #member_status
         m_mobile = f"{status_converter(str(member.mobile_status))} Moblie"
@@ -553,7 +553,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(name="status", help="Shows status about the specified member.")
     @commands.guild_only()
-    async def status_(self, ctx, member: discord.Member = commands.Option(description="Mention member")):
+    async def status_(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+
+        member = member or ctx.guild.get_member(ctx.author.id)
 
         def status_converter(name):
             names_to_status = {
@@ -580,10 +582,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Shows info about the song the specified member is currently listening to.")
     @commands.guild_only()
-    async def spotify(self, ctx, member : discord.Member=commands.Option(default=None, description="Spectify member")): 
-        if member is None:
-            member = ctx.author
-
+    async def spotify(self, ctx, member: discord.Member=commands.Option(default=None, description="Spectify member")): 
+        
+        member = member or ctx.guild.get_member(ctx.author.id)
         spotify = discord.utils.find(lambda act: isinstance(act, discord.Spotify), member.activities)
 
         if spotify:

@@ -146,8 +146,9 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
             embed.description = f"{emoji_converter('greentick')} Load : `{extension}`"
             embed.color = 0x8be28b
         except Exception as e:
-            embed.description(f"Could not reload : `{extension}`")
+            embed.description(f"Could not load")
             embed.color = 0xFF7878
+            return await ctx.send(embed=embed)
 
         await ctx.send(embed=embed)
     
@@ -161,8 +162,9 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
             embed.description = f"{emoji_converter('greentick')} Unload : `{extension}`"
             embed.color = 0x8be28b
         except Exception as e:
-            embed.description(f"Could not reload : `{extension}`")
+            embed.description(f"Could not unload")
             embed.color = 0xFF7878
+            return await ctx.send(embed=embed)
 
         await ctx.send(embed=embed)
     
@@ -177,8 +179,9 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
             embed.description = f"{emoji_converter('greentick')} Reload : `{extension}`"
             embed.color = 0x8be28b
         except Exception as e:
-            embed.description(f"Could not reload : `{extension}`")
+            embed.description(f"Could not reload")
             embed.color = 0xFF7878
+            return await ctx.send(embed=embed)
 
         await ctx.send(embed=embed)
     

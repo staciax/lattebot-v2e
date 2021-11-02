@@ -185,8 +185,10 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         
     @commands.command(help="Mute member")
     @commands.guild_only()
-    @commands.bot_has_permissions(manage_roles=True)
-    @commands.has_permissions(administrator = True)
+    # @commands.bot_has_permissions(manage_roles=True)
+    # @commands.has_permissions(administrator = True)
+    @commands.has_guild_permissions(mute_members=True)
+    @commands.bot_has_guild_permissions(manage_roles=True)
     async def mute(
             self,
             ctx,
@@ -256,8 +258,10 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Unmute member")
     @commands.guild_only()
-    @commands.bot_has_permissions(manage_roles=True)
-    @commands.has_permissions(mute_members=True)
+    # @commands.bot_has_permissions(manage_roles=True)
+    # @commands.has_permissions(mute_members=True)
+    @commands.has_guild_permissions(mute_members=True)
+    @commands.bot_has_guild_permissions(manage_roles=True)
     async def unmute(
             self,
             ctx,
@@ -333,6 +337,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Mutes the specified member with a specified reason.")
     # @commands.has_permissions(mute_members=True)
     # @commands.bot_has_permissions(mute_members=True)
+    @commands.has_guild_permissions(mute_members=True)
+    @commands.bot_has_guild_permissions(mute_members=True)
     @commands.guild_only()
     async def voice_mute(
             self,
@@ -372,6 +378,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Deafens the specified member with a specified reason.")
     # @commands.has_permissions(deafen_members=True)
     # @commands.bot_has_permissions(deafen_members=True)
+    @commands.has_guild_permissions(deafen_members=True)
+    @commands.bot_has_guild_permissions(deafen_members=True)
     @commands.guild_only()
     async def voice_deafen(
             self,

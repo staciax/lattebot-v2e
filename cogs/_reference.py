@@ -6,7 +6,7 @@ from discord.ext import commands , tasks
 
 # Local
 
-class reference(commands.Cog, command_attrs = dict(slash_command=True)):
+class Reference(commands.Cog, command_attrs = dict(slash_command=True)):
     def __init__(self, bot):
         self.bot = bot
     
@@ -19,4 +19,4 @@ class reference(commands.Cog, command_attrs = dict(slash_command=True)):
         return discord.PartialEmoji(name='\N{PERSONAL COMPUTER}')
 
 def setup(bot):
-    bot.add_cog(reference(bot))
+    bot.add_cog(Reference(bot))

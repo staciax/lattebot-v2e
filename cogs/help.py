@@ -18,10 +18,10 @@ class HelpDropdown(discord.ui.Select):
         self.ctx = ctx
         self.view_ = view # i hope that works
         options = []
-        if ctx.channel.is_nsfw() == True:
-            ignoredCogs = ['Tesing', 'reference', 'Events', 'Error', 'Reaction','Help','Owner','NSFW']
-        else:
-            ignoredCogs = ['Tesing', 'reference', 'Events', 'Error', 'Reaction','Help','Owner','NSFW']
+        # if ctx.channel.is_nsfw() == True:
+        #     ignoredCogs = ['Tesing', 'reference', 'Events', 'Error', 'Reaction','Help','Owner','NSFW']
+        # else:
+        ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Tesing']
         botCogs = ctx.bot.cogs
         for cog in botCogs:
             if cog not in ignoredCogs:
