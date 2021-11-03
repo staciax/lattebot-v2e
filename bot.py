@@ -25,8 +25,8 @@ setting_env = os.getenv('SETTING', None)
 
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
-        self.bot_version = "0.0.1s.post2"
-        self.last_update = [2021, 11, 1]
+        self.bot_version = "0.0.1s.post3"
+        self.last_update = [2021, 11, 3]
         self.launch_time = datetime.utcnow()
         self.tester = ''
         self.github = ""
@@ -108,7 +108,7 @@ async def on_ready():
 if __name__ == "__main__":
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(bot.mongo_url))
 
-    #db_main
+    #db_tag
     bot.latte_db = bot.mongo["latteonly"]
     bot.latte_tags = Document(bot.latte_db, "tags")
 

@@ -109,9 +109,9 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
                 return await ctx.send(embed=embed_role, ephemeral=True)
             await member.add_roles(role)
             embed = discord.Embed(
-                description="Temp is ready\n`This role will disappear within 1 hour.`", color=self.bot.white_color)
+                description="Temp is ready\n`This role will disappear within 2 hour.`", color=self.bot.white_color)
             await ctx.send(embed=embed, ephemeral=True)
-            await asyncio.sleep(43200)
+            await asyncio.sleep(7200)
             await member.remove_roles(role)
 
 

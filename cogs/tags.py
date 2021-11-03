@@ -1,5 +1,6 @@
 # Standard
 import discord
+import asyncio
 from discord.ext import commands 
 from difflib import get_close_matches
 
@@ -57,13 +58,20 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed_r.description = f"Tag not found."
             return await ctx.send(embed=embed_r , ephemeral=True)
 
-        await ctx.send(message)
+        await ctx.send(f"`{tag}`: {message}")
 
     @commands.command(aliases=['create'], help="Creates a new tag owned by you.")
     @commands.guild_only()
-    async def tag_create(self, ctx, name:str = commands.Option(description="Input name"), content: commands.clean_content = commands.Option(description="Input content")):
-        # #find_data
+    async def tag_create(self, ctx, name:str = commands.Option(description="Input name")):
+        #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name})
+        
+        embed_error = discord.Embed(0xFF7878)
+
+        #check_data
+        if bool(data_check) == True:
+            embed_error.description = "This tag already exists. Please use another tag."
+            return await ctx.send(embed=embed_error, ephemeral=True)
 
         #data_count
         data_count = await self.bot.latte_tags.find_many_by_custom({})
@@ -73,14 +81,19 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             num_list.append(num)
         next_num = max(num_list)
 
-        #check_data
-        if bool(data_check) == True:
-            await ctx.send("can't use this tag!", ephemeral=True)
-            return
+        msg = await ctx.send("Please enter the content within your tag...")
+        try:
+            message_response = await self.bot.wait_for('message', timeout=120, check=lambda m:(ctx.author == m.author and ctx.channel == m.channel))
+        except asyncio.TimeoutError:
+            embed_error.description = 'Timeout Create'
+            return await ctx.send(embed=embed_error, ephemeral=True)
+        
+        content = message_response.content
 
         #when_content_more_2000
         if len(content) > 2000:
-            return await ctx.send('Tag content is a maximum of 2000 characters.', ephemeral=True)
+            embed_error.description = 'Tag content is a maximum of 2000 characters.'
+            return await ctx.send(embed=embed_error, ephemeral=True)
 
         #create_data
         data = {
@@ -98,7 +111,9 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
         #reponse
         embed = discord.Embed(description=f"Tag **{name}** successfully created.", color=0x77dd77)
-        await ctx.send(embed=embed)
+        await message_response.delete()
+        await msg.delete()
+        await ctx.channel.send(embed=embed)
 
     @commands.command(help="remove your tag")
     @commands.guild_only()
