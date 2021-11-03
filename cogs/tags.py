@@ -66,7 +66,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name})
         
-        embed_error = discord.Embed(0xFF7878)
+        embed_error = discord.Embed(color=0xFF7878)
 
         #check_data
         if bool(data_check) == True:
@@ -112,8 +112,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #reponse
         embed = discord.Embed(description=f"Tag **{name}** successfully created.", color=0x77dd77)
         await message_response.delete()
-        await msg.delete()
-        await ctx.channel.send(embed=embed)
+        await msg.edit(embed=embed)
 
     @commands.command(help="remove your tag")
     @commands.guild_only()
