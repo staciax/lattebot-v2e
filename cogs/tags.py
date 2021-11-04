@@ -3,11 +3,39 @@ import discord
 import asyncio
 from discord.ext import commands 
 from difflib import get_close_matches
+from typing import Optional
 
 # Third
 
 # Local
 from utils.paginator import SimplePages
+
+class Cancel_button(discord.ui.View):
+    def __init__(self, ctx):
+        super().__init__()
+        self.value = True
+        self.ctx = ctx
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user in (self.ctx.author, self.ctx.bot.renly):
+            return True
+        await interaction.response.send_message('This menus cannot be controlled by you, sorry!', ephemeral=True)
+        return False
+
+    async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        if interaction.response.is_done():
+            await interaction.followup.send('An unknown error occurred, sorry', ephemeral=True)
+        else:
+            await interaction.response.send_message('An unknown error occurred, sorry', ephemeral=True)
+
+    @discord.ui.button(label='Cancel', style=discord.ButtonStyle.grey)
+    async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.value = False
+        await self.message.delete()
+
+    async def on_timeout(self):
+        self.value = False
+        await self.message.edit(view=None)
 
 class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     """Commands to fetch something by a tag name"""
@@ -46,29 +74,28 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #found_or_not_found
         if check_data is not None:
             message = check_data['content']
+            await ctx.send(f"`{check_data['tag']}`\n{message}")
         else:
             not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
             names = (r['tag'] for r in not_found)
             matches = get_close_matches(tag , names)
-            embed_r = discord.Embed(colour=discord.Colour.blurple())
+            embed_r = discord.Embed(colour=self.bot.white_color)
             if matches:
                 matches = "\n".join(matches)
                 embed_r.description = f"Tag not found. Did you mean...\n`{matches}`"
             else:
                 embed_r.description = f"Tag not found."
-            return await ctx.send(embed=embed_r , ephemeral=True)
-
-        await ctx.send(f"`{tag}`: {message}")
+            await ctx.send(embed=embed_r , ephemeral=True)
 
     @commands.command(aliases=['create'], help="Creates a new tag owned by you.")
     @commands.guild_only()
     async def tag_create(self, ctx, name:str = commands.Option(description="Input name")):
+        #embed
+        embed_error = discord.Embed(color=0xFF7878)
+        embed = discord.Embed(color=0xfdfd96)
+
         #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name})
-        
-        embed_error = discord.Embed(color=0xFF7878)
-
-        #check_data
         if bool(data_check) == True:
             embed_error.description = "This tag already exists. Please use another tag."
             return await ctx.send(embed=embed_error, ephemeral=True)
@@ -81,43 +108,52 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             num_list.append(num)
         next_num = max(num_list)
 
-        msg = await ctx.send("Please enter the content within your tag...")
+        #response
+        view = Cancel_button(ctx)
+        embed.description = "Please enter the content within your tag (within 5 minutes)"
+        view.message = await ctx.send(embed=embed, view=view)
+        
         try:
-            message_response = await self.bot.wait_for('message', timeout=120, check=lambda m:(ctx.author == m.author and ctx.channel == m.channel))
+            message_response = await self.bot.wait_for('message', timeout=300, check=lambda m:(ctx.author == m.author and ctx.channel == m.channel))
         except asyncio.TimeoutError:
-            embed_error.description = 'Timeout Create'
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            embed_error.description = 'Create tag was canceled due to timeout.'
+            return await view.message.edit(embed=embed_error, view=None)
         
         content = message_response.content
-
         #when_content_more_2000
         if len(content) > 2000:
             embed_error.description = 'Tag content is a maximum of 2000 characters.'
             return await ctx.send(embed=embed_error, ephemeral=True)
+        
+        if not view.value:
+            return
+        elif view.value:
 
-        #create_data
-        data = {
-            "user_id": ctx.author.id,
-            "guild_id": ctx.guild.id,
-            "tag": name,
-            "content": content,
-            "tag_id": next_num + 1
-        }
+            #create_data
+            data = {
+                "user_id": ctx.author.id,
+                "guild_id": ctx.guild.id,
+                "tag": name,
+                "content": content,
+                "tag_id": next_num + 1
+            }
 
-        #update_data
-        await self.bot.latte_tags.update_by_custom(
-            {"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag": name}, data
-        )
+            #update_data
+            await self.bot.latte_tags.update_by_custom(
+                {"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag": name}, data
+            )
 
-        #reponse
-        embed = discord.Embed(description=f"Tag **{name}** successfully created.", color=0x77dd77)
-        await message_response.delete()
-        await msg.edit(embed=embed)
+            #reponse
+            embed_edit = discord.Embed(description=f"Tag **{name}** successfully created.", timestamp=discord.utils.utcnow(), color=0x77dd77)
+            await message_response.delete()
+            await view.message.edit(embed=embed_edit, view=None)
 
     @commands.command(help="remove your tag")
     @commands.guild_only()
     async def tag_remove(self, ctx, name = commands.Option(description="Input your tag name")):
-
+        #embed
+        embed_error = discord.Embed(color=0xFF7878)
+        
         isInt = True
         try:
             int(name)
@@ -132,8 +168,6 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(name)})
         
-        embed_error = discord.Embed(color=0xFF7878)
-
         #check_data
         if bool(data_check) == False:
             embed_error.description = "tag not found"
@@ -161,6 +195,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #delete_is_true_or_false
         if data_deleted and data_deleted.acknowledged:
             embed.description=f"You have successfully deleted **{data_check['tag']}**."
+            embed.timestamp = discord.utils.utcnow()
             return await ctx.send(embed=embed)
         else:
             embed.description = "I could not find tag"
@@ -195,6 +230,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
         #reponse
         embed = discord.Embed(description=f"You have successfully renamed **{name_old}** to **{data['tag']}**", color=0xFCFFA6)
+        embed.timestamp = discord.utils.utcnow()
         if ctx.author.avatar is not None:
             embed.set_footer(text=f"Rename by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
         else:
@@ -203,14 +239,18 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="edit your tag")
     @commands.guild_only()
-    async def tag_edit(self, ctx, tag=commands.Option(description="Input your tag name or id"), content: commands.clean_content=commands.Option(description="New conntent")):
+    async def tag_edit(self, ctx, tag=commands.Option(description="Input your tag name or id")):
+        #embed
+        embed_error = discord.Embed(color=0xFF7878)
+        embed = discord.Embed(color=0xfdfd96)
+        
+        #check_name_or_id
         isInt = True
         try:
             int(tag)
         except ValueError:
             isInt = False
         
-
         if isInt:
             data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag_id": int(tag)})
             type_data = 'int'
@@ -221,36 +261,57 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
             type_data = 'str'
         
-        embed_error = discord.Embed(color=0xFF7878)
-
         #check_data
         if bool(data_check) == False:
-            embed_error.description = "tag not found"
+            embed_error.description = "Tag not found"
             return await ctx.send(embed=embed_error, ephemeral=True)
 
         #check_owner_tag
         if data_check["user_id"] != ctx.author.id:
             embed_error.description = "You are not the owner of this tag."
             return await ctx.send(embed=embed_error, ephemeral=True)
-    
-        data_check["content"] = content
 
+        #response
+        view = Cancel_button(ctx)
+        embed.description = "Please enter the new content (within 5 minutes)"
+        view.message = await ctx.send(embed=embed)
 
-        if type_data == 'int':
-            await self.bot.latte_tags.update_by_custom(
-                {"guild_id": ctx.guild.id, "tag_id": int(tag)}, data_check
-            )
-        elif type_data in ['str','int_but_str']:
-            await self.bot.latte_tags.update_by_custom(
-                {"guild_id": ctx.guild.id, "tag": str(tag)}, data_check
-            )
-    
-        embed = discord.Embed(description=f"You have successfully edited **{data_check['tag']}**", color=0xFCFFA6)
-        if ctx.author.avatar is not None:
-            embed.set_footer(text=f"Edit by {ctx.author.name}", icon_url=ctx.author.avatar.url)
-        else:
-            embed.set_footer(text=f"Edit by {ctx.author.display_name}")
-        await ctx.send(embed=embed)
+        #waiting_message
+        try:
+            message_response = await self.bot.wait_for('message', timeout=300, check=lambda m:(ctx.author == m.author and ctx.channel == m.channel))
+        except asyncio.TimeoutError:
+            embed_error.description = 'Edit tag was canceled due to timeout.'
+            return await view.message.edit(embed=embed_error, view=None)
+
+        content = message_response.content
+        #when_content_more_2000
+        if len(content) > 2000:
+            embed_error.description = 'Tag content is a maximum of 2000 characters.'
+            return await ctx.send(embed=embed_error, ephemeral=True)
+
+        if not view.value:
+            return
+        elif view.value:
+            
+            data_check["content"] = content
+
+            if type_data == 'int':
+                await self.bot.latte_tags.update_by_custom(
+                    {"guild_id": ctx.guild.id, "tag_id": int(tag)}, data_check
+                )
+            elif type_data in ['str','int_but_str']:
+                await self.bot.latte_tags.update_by_custom(
+                    {"guild_id": ctx.guild.id, "tag": str(tag)}, data_check
+                )
+        
+            embed_edit = discord.Embed(description=f"You have successfully edited **{data_check['tag']}**", timestamp=discord.utils.utcnow())
+            embed_edit = 0x77dd77
+            if ctx.author.avatar is not None:
+                embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
+            else:
+                embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}")
+            await message_response.delete()
+            await view.messag.edit(embed=embed_edit)
 
     @commands.command(help="Show all tag in your server")
     @commands.guild_only()

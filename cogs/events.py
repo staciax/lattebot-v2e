@@ -181,7 +181,10 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
                     
         for user_id in self.bot.afk_user.keys():
             if message.author.id == user_id:
-                await message.author.edit(nick=self.bot.afk_user[user_id]['name'])
+                try:
+                    await message.author.edit(nick=self.bot.afk_user[user_id]['name'])
+                except:
+                    pass
                 del self.bot.afk_user[user_id]
                 embed_back = discord.Embed(self.bot.white_color)
                 embed_back.description = f"Welcome back {message.author.mention} , i've removed your **AFK** status."

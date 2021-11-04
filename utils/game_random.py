@@ -244,13 +244,13 @@ def apex_random_weapon(category):
 
     #list_of_weapon
     Assault_rifles = ["HAVOC Rifle", "VK-47 Flatline", "Hemlok Burst AR" , "R-301 Carbine"]
-    Submachine_guns = ["Alternator SMG","Prowler Burst PDW","R-99 SMG","Volt SMG"]
+    Submachine_guns = ["Alternator SMG","Prowler Burst PDW","R-99 SMG","Volt SMG","C.A.R. SMG"]
     Light_machine_guns = ["Devotion LMG" , "L-STAR EMG", "M600 Spitfire" , "Rampage"]
     Marksman_weapons = ["G7 Scout", "Triple Take", "30-30 Repeater", "Bocek Compound Bow"]
     Sniper_rifles = ["Charge Rifle", "Longbow DMR", "Kraber .50-Cal Sniper", "Sentinel"]
     Shotguns = ["EVA-8 Auto", "Mastiff Shotgun", "Mozambique Shotgun", "Peacekeeper"]
     Pistols = ["RE-45 Auto","P2020","Wingman"]
-    all_weapon = ["HAVOC Rifle", "VK-47 Flatline", "Hemlok Burst AR" , "R-301 Carbine","Alternator SMG","Prowler Burst PDW","R-99 SMG","Volt SMG","Devotion LMG" , "L-STAR EMG", "M600 Spitfire" , "Rampage","G7 Scout", "Triple Take", "30-30 Repeater", "Bocek Compound Bow","Charge Rifle", "Longbow DMR", "Kraber .50-Cal Sniper", "Sentinel","EVA-8 Auto", "Mastiff Shotgun", "Mozambique Shotgun", "Peacekeeper","RE-45 Auto","P2020","Wingman"]
+    all_weapon = ["HAVOC Rifle", "VK-47 Flatline", "Hemlok Burst AR" , "R-301 Carbine","Alternator SMG","Prowler Burst PDW","R-99 SMG","Volt SMG","C.A.R. SMG","Devotion LMG" , "L-STAR EMG", "M600 Spitfire" , "Rampage","G7 Scout", "Triple Take", "30-30 Repeater", "Bocek Compound Bow","Charge Rifle", "Longbow DMR", "Kraber .50-Cal Sniper", "Sentinel","EVA-8 Auto", "Mastiff Shotgun", "Mozambique Shotgun", "Peacekeeper","RE-45 Auto","P2020","Wingman"]
 
     #category
     if category == None:
@@ -287,6 +287,8 @@ def apex_random_weapon(category):
         embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/d/d5/R-99_SMG.png/revision/latest/scale-to-width-down/1000?cb=20190304180412")
     elif random_gun == "Volt SMG":
         embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/f/f5/Volt.png/revision/latest/scale-to-width-down/1000?cb=20210717062422")
+    elif random_gun == "C.A.R. SMG":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/1/13/C.A.R._SMG.png/revision/latest/scale-to-width-down/1000?cb=20211018182120")
     elif random_gun == "Devotion LMG":
         embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/8/8c/Devotion_LMG.png/revision/latest/scale-to-width-down/1000?cb=20190304180450")
     elif random_gun == "L-STAR EMG":
@@ -335,12 +337,14 @@ def apex_random_legends():
     embed = Embed(color=0xFFA500)
 
     #list_of_legends
-    legends_list = ['Bangalore','Bloodhound','Caustic','Crypto','Fuse','Gibraltar','Horizon','Lifeline','Loba','Mirage','Octane','Pathfinder','Rampart','Revenant','Seer','Valkyrie','Wattson','Wraith']
+    legends_list = ['Ash','Bangalore','Bloodhound','Caustic','Crypto','Fuse','Gibraltar','Horizon','Lifeline','Loba','Mirage','Octane','Pathfinder','Rampart','Revenant','Seer','Valkyrie','Wattson','Wraith']
     
     random_legends = random.choice(legends_list)
 
     #picture_of_agent
-    if random_legends == "Bangalore":
+    if random_legends == "Ash":
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/894059642601218098/905508288005799936/apex_Ash.jpg")
+    elif random_legends == "Bangalore":
         embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-bangalore.png.adapt.crop16x9.png")
     elif random_legends == "Bloodhound":
         embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-bloodhound.png.adapt.crop16x9.png")

@@ -80,7 +80,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 message_url = data[key]["url"]
                 view = base_Button_URL(label="Go to original message", url=message_url)
                 try:
-                    await channel.send(f"{member.mention}, {format_relative(raw_date)}: {message}", view=view)
+                    embed_response = discord.Embed(color=self.bot.white_color)
+                    embed_response.title = "Reminder"
+                    embed_response.description = f"{member.mention}, {format_relative(raw_date)}\n{message}"
+                    await channel.send(embed=embed_response, view=view)
                     del data[key]
                     latte_write(data, "remind")
                     break
@@ -114,7 +117,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             return await ctx.reply(embed=embed, ephemeral=True)
         
         self.bot.afk_user[member.id] = {"reason": reason, "name": member.display_name}
-        await member.edit(nick=f'[AFK] {member.display_name}')
+        try:
+            await member.edit(nick=f'[AFK] {member.display_name}')
+        except:
+            pass
         embed.title = f"{member.name} is now AFK"
         embed.description = f"I have set your afk: {reason}"
 
@@ -129,10 +135,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed = discord.Embed(color=self.bot.white_color)
         if member.id in self.bot.afk_user.keys() is not None:
-            if self.bot.afk_user[member.id]['name'] is not None:
-                await member.edit(nick=self.bot.afk_user[member.id]['name'])
-            else:
-                await member.edit(nick=None)
+            try:
+                if self.bot.afk_user[member.id]['name'] is not None:
+                    await member.edit(nick=self.bot.afk_user[member.id]['name'])
+                else:
+                    await member.edit(nick=None)
+            except:
+                pass
 
             del self.bot.afk_user[member.id]
             embed.description = f"Welcome back {member.mention} , i've removed your **AFK** status."
@@ -336,12 +345,15 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     async def remind(self, ctx, time:TimeConverter = commands.Option(description="specify duration") , message=commands.Option(default=None,description="message to remind") , channel: discord.TextChannel= commands.Option(default=None,description="spectify channel to remind")):
         if time == 0:
-            embed_time = RenlyEmbed.to_error(title="Remind error",description="Time is invalid")
+            embed_time = RenlyEmbed.to_error(title="Remind error", description="Time is invalid" , color=self.bot.error_color)
             return await ctx.send(embed=embed_time, ephemeral=True)
         if message is None:
             message = "..."
         elif len(message) > 2000:
-            return await ctx.send('remind message is a maximum of 2000 characters.', ephemeral=True)
+            embed_error = RenlyEmbed.to_error(title='Remind error', description='Remind message is a maximum of 2000 characters.')
+            embed_error.color = self.bot.error_color
+            return await ctx.send(embed=embed_error, ephemeral=True)
+        
         if channel is None:
             channel = ctx.channel
         
@@ -352,10 +364,12 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             remind_timed = remind_time.strftime("%d%m%Y%H%M")
             future_data = humanize.naturaldelta(future, minimum_unit='milliseconds')
         except:
-            embed_error = RenlyEmbed.to_error(title="Remind error",description="Time is invalid")
+            embed_error = RenlyEmbed.to_error(title="Remind error", description="Time is invalid")
             return await ctx.send(embed=embed_error)
         
-        msg = await ctx.send(f'Alright {ctx.author.mention}, {future_data} : {message}')
+        embed = discord.Embed(color=self.bot.white_color)
+        embed.description = f'Alright {ctx.author.mention}, {future_data} : {message}'
+        msg = await ctx.send(embed=embed)
 
         if time > 600:
             self.bot.reminding[str(ctx.author.id)] = {"message":message,"channel": channel.id,"url": msg.jump_url,"time": remind_timed}
@@ -364,7 +378,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             view = base_Button_URL(label="Go to original message", url=msg.jump_url)
             await discord.utils.sleep_until(remind_time)
-            await ctx.send(f"{ctx.author.mention}, {format_relative(remind_time)}: {message}" , view=view)
+            embed_response = discord.Embed(color=self.bot.white_color)
+            embed_response.title = "Reminder"
+            embed_response.description = f"{ctx.author.mention}, {format_relative(remind_time)}\n{message}"
+            await ctx.send(embed=embed_response, view=view)
 
     @commands.command(help="Disconnect timer for Voice channel")
     @commands.guild_only()

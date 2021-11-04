@@ -168,7 +168,7 @@ class NewSimpage(BaseNewButton):
         self.embed = discord.Embed(colour=discord.Colour.blurple())
 
 class Confirm(discord.ui.View):
-    def __init__(self , ctx):
+    def __init__(self, ctx):
         super().__init__()
         self.value = None
         self.ctx = ctx
