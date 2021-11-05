@@ -90,7 +90,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             color=self.bot.white_color
         )
         await ctx.channel.purge(limit=(int(amount) + 1))
-        await ctx.reply(embed=embed, ephemeral=True)
+        await ctx.send(embed=embed, ephemeral=True)
     
     # @commands.command(help="Cleanup the bot's messages")
     # @commands.guild_only()
@@ -145,7 +145,6 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             except:
                 embed.description=f"i can't cleanup embed"
                 
-
         if type == "custom emoji":
             custom_emoji = re.compile(r'<a?:[a-zA-Z0-9_]+:([0-9]+)>')
            
@@ -164,7 +163,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             except:
                 embed.description=f"i can't message"   
         
-        await ctx.reply(embed=embed , ephemeral=True)
+        await ctx.send(embed=embed , ephemeral=True)
 
     @commands.command(help="Cleanup member messages")
     @commands.guild_only()
@@ -182,7 +181,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
         except:
             embed.description=f"i can't cleanup messages"
-        await ctx.reply(embed=embed , ephemeral=True)
+        await ctx.send(embed=embed , ephemeral=True)
         
     @commands.command(help="Mute member")
     @commands.guild_only()
