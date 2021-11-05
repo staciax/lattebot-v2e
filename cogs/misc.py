@@ -48,7 +48,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def support(self, ctx):
         view = discord.ui.View()
-        support_button = discord.ui.Button(style=discord.ButtonStyle.gray , label="Server support", url=self.bot.latte_invite_url) 
+        support_button = discord.ui.Button(style=discord.ButtonStyle.gray , label="Server support", url=self.bot.latte_supprt_url) 
         view.add_item(item=support_button)
 
         embed = discord.Embed(title="Support server")
@@ -58,9 +58,13 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Shows the bot's prefixes")
     @commands.guild_only()
     async def prefix(self, ctx):
+        prefix = self.bot.defaul_prefix
+        if ctx.guild.id == self.bot.latte_guild_id:
+            prefix = "."
+
         embed = discord.Embed(color=self.bot.white_color)
         embed.title = "My prefixes for this server:"
-        embed.description = f"{self.bot.user.mention}\n/\n{self.bot.defaul_prefix}"
+        embed.description = f"{self.bot.user.mention}\n/\n{prefix}"
         await ctx.send(embed=embed, ephemeral=True)
     
     @commands.command(aliases=["botinfo"], help="Shows basic information about the bot.")

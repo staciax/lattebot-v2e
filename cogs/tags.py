@@ -9,6 +9,7 @@ from typing import Optional
 
 # Local
 from utils.paginator import SimplePages
+from utils.checks import is_latte_guild
 
 class Cancel_button(discord.ui.View):
     def __init__(self, ctx):
@@ -56,6 +57,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Tag command")
     @commands.guild_only()
+    @is_latte_guild()
     async def tag(self, ctx, tag=commands.Option(description="Input name or id")):
         isInt = True
         try:
@@ -89,6 +91,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(aliases=['create'], help="Creates a new tag owned by you.")
     @commands.guild_only()
+    @is_latte_guild()
     async def tag_create(self, ctx, name:str = commands.Option(description="Input name")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
@@ -150,6 +153,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="remove your tag")
     @commands.guild_only()
+    @is_latte_guild()
     async def tag_remove(self, ctx, name = commands.Option(description="Input your tag name")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
@@ -203,6 +207,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="rename your tag")
     @commands.guild_only()
+    @is_latte_guild()
     async def tag_rename(self, ctx, name_old:str= commands.Option(description="tag old name"), name_new:str=commands.Option(description="tag new name")):
         #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name_old})
@@ -239,6 +244,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="edit your tag")
     @commands.guild_only()
+    @is_latte_guild()
     async def tag_edit(self, ctx, tag=commands.Option(description="Input your tag name or id")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
@@ -305,7 +311,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
                 )
         
             embed_edit = discord.Embed(description=f"You have successfully edited **{data_check['tag']}**", timestamp=discord.utils.utcnow())
-            embed_edit = 0x77dd77
+            embed_edit.color = 0x77dd77
             if ctx.author.avatar is not None:
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
             else:
@@ -315,6 +321,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Show all tag in your server")
     @commands.guild_only()
+    @is_latte_guild()
     async def tag_list(self, ctx):
 
         #sort_tag
@@ -338,6 +345,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="search tag")
     @commands.guild_only()
+    @is_latte_guild()
     async def tag_search(self, ctx, name:str = commands.Option(description="Input tag name")):
 
         #find_name_tag
@@ -368,6 +376,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Total tag in your server")
     @commands.guild_only()
+    @is_latte_guild()
     async def tagcount(self, ctx):
         data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
         embed_error = discord.Embed(color=0xFF7878)

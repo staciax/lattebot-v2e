@@ -20,6 +20,7 @@ from utils.formats import format_dt , deltaconv
 from utils.custom_button import base_Button_URL
 from utils.useful import RenlyEmbed
 from utils.buttons import NewSimpage
+from utils.checks import is_latte_guild
 
 class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     """All informative commands"""
@@ -625,6 +626,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="latte server template")
     @commands.guild_only()
+    @is_latte_guild()
     async def latte_template(self, ctx):
         await ctx.send("https://discord.new/sFYKgkknRN5f")
 

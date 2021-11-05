@@ -381,7 +381,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             embed_response = discord.Embed(color=self.bot.white_color)
             embed_response.title = "Reminder"
             embed_response.description = f"{ctx.author.mention}, {format_relative(remind_time)}\n{message}"
-            await ctx.send(embed=embed_response, view=view)
+            await ctx.channel.send(embed=embed_response, view=view)
 
     @commands.command(help="Disconnect timer for Voice channel")
     @commands.guild_only()

@@ -173,7 +173,9 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
     async def on_message(self, message):
         if message.author.bot:
             return
-
+  
+        if message.content.startswith(f'.afk'):
+            return
         if message.content.startswith(f'{self.bot.defaul_prefix}afk'):
             return
         if message.content.startswith(f'/afk'):
@@ -643,19 +645,19 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
             #privete_temp_channel
             if after.channel is not None:
                 if after.channel.id == self.underworldx[0]:
-                    underworld_vc = member.guild.get_channel(self.bot.underworldx[1])
+                    underworld_vc = member.guild.get_channel(self.underworldx[1])
                     return await member.move_to(underworld_vc)
                     
                 if after.channel.id == self.moonlightx[0]:
-                    moonlight_vc = member.guild.get_channel(self.bot.moonlightx[1])
+                    moonlight_vc = member.guild.get_channel(self.moonlightx[1])
                     return await member.move_to(moonlight_vc)
                 
                 if after.channel.id == self.angelx[0]:
-                    angel_vc = member.guild.get_channel(self.bot.angelx[1])
+                    angel_vc = member.guild.get_channel(self.angelx[1])
                     return await member.move_to(angel_vc)
                 
                 if after.channel.id == self.deathx[0]:            
-                    death_vc = member.guild.get_channel(self.bot.deathx[1])
+                    death_vc = member.guild.get_channel(self.deathx[1])
                     return await member.move_to(death_vc)
                 
                 if after.channel.id == self.secret_channel:

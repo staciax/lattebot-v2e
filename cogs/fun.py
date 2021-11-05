@@ -8,6 +8,7 @@ from discord.ext import commands, tasks
 # Local
 from utils.custom_button import Random_member
 from utils.game_random import APEX_RANDOM, VALORANT_RANDOM
+from utils.checks import is_latte_guild
 
 class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     """Fun commands"""
@@ -96,6 +97,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
 
     @commands.command(help="lattte temp role")
     @commands.guild_only()
+    @is_latte_guild()
     async def latte_temp_role(self, ctx, member: discord.Member = commands.Option(default=None, description="Give role to member")):
         if ctx.guild.id == self.bot.latte_guild_id:
             if not member:

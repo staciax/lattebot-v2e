@@ -15,6 +15,7 @@ from io import BytesIO
 from utils.xp_pillow import level_images
 from utils.paginator import SimplePages
 from utils.useful import RenlyEmbed
+from utils.checks import is_latte_guild
 
 # xp_channel
 chat_channel = 861883647070437386 , 840398821544296480 , 863438518981361686 , 859960606761549835 , 840405578618109952 #chat,game,anime,kdbot,game-chat
@@ -80,6 +81,7 @@ class Leveling(commands.Cog):
             
     @commands.command(help="Level ranking", aliases=['rank','leaderboard'])
     @commands.guild_only()
+    @is_latte_guild()
     async def ranking(self, ctx):
         try:
             filter_member = await self.bot.latte_level.find_many_by_custom({"guild_id": ctx.guild.id})
@@ -118,6 +120,7 @@ class Leveling(commands.Cog):
 
     @commands.command(help="Shows exp the specified member.", aliases=['lvl' , 'exp'])
     @commands.guild_only()
+    @is_latte_guild()
     async def xp(self, ctx, member: discord.Member = None):
         if ctx.channel.id in chat_channel:
             embed = RenlyEmbed.to_error(description="Please use bot command in <#861874852050894868>")

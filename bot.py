@@ -23,14 +23,22 @@ dotenv_path = join(dirname(__file__), 'data/settings.env')
 load_dotenv(dotenv_path)
 setting_env = os.getenv('SETTING', None)
 
+async def get_prefix(bot, message):
+    if message.guild.id == 840379510704046151:
+        prefix = '.'
+    else:
+        prefix = 're'
+    
+    return commands.when_mentioned_or(prefix)(bot,message)
+
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
-        self.bot_version = "0.0.1s.post3"
-        self.last_update = [2021, 11, 3]
+        self.bot_version = "0.0.2s"
+        self.last_update = [2021, 11, 6]
         self.launch_time = datetime.utcnow()
         self.tester = ''
         self.github = ""
-        self.defaul_prefix = '.'
+        self.defaul_prefix = 're'
         self.blacklisted_users = []
         self.afk_user = {}
         self.sniped = {}
@@ -43,6 +51,7 @@ class LatteBot(commands.Bot):
         self.latte_id = 887274968012955679
         self.latte_guild_id = 840379510704046151
         self.latte_invite_url = "https://discord.gg/VTgJ3TxS68"
+        self.latte_supprt_url = "https://discord.gg/pmZt2T5ggb"
         self.new_members = {}
         self.bot_join = 893695417320087573
         self.bot_leave = 893695447309369345
@@ -50,7 +59,7 @@ class LatteBot(commands.Bot):
         self.error_color = 0xFF7878
         self.token = data["token"]
         self.mongo_url = data["mongo"]
-        super().__init__(command_prefix=commands.when_mentioned_or(self.defaul_prefix), *args, **kwargs)
+        super().__init__(command_prefix=get_prefix, *args, **kwargs)
     
     @property
     def renly(self) -> Optional[discord.User]:

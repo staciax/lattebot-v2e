@@ -18,10 +18,11 @@ class HelpDropdown(discord.ui.Select):
         self.ctx = ctx
         self.view_ = view # i hope that works
         options = []
-        # if ctx.channel.is_nsfw() == True:
-        #     ignoredCogs = ['Tesing', 'reference', 'Events', 'Error', 'Reaction','Help','Owner','NSFW']
-        # else:
-        ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Testing']
+        if ctx.guild.id == 840379510704046151:
+            ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Testing']
+        else:
+            ignoredCogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner','Reaction','Reference', 'Tags', 'Testing']
+
         botCogs = ctx.bot.cogs
         for cog in botCogs:
             if cog not in ignoredCogs:
@@ -103,6 +104,10 @@ class LatteBotHelp(commands.HelpCommand):
 
     async def send_bot_help(self, mapping):
         ctx = self.context
+        if ctx.guild.id in [840379510704046151, 887274968012955679]:
+            prefix_bot = '.'
+        else:
+            prefix_bot = 're'
 
         # emoji1 = discord.PartialEmoji(name='nono', id=890369747273793556, animated=True)
                     
@@ -111,6 +116,7 @@ class LatteBotHelp(commands.HelpCommand):
         embed.set_author(name=f'{ctx.bot.user.display_name} Help', icon_url=ctx.bot.user.avatar.url)
         embed.description = f"""
         Total commands: `{len(await self.filter_commands(list(self.context.bot.commands), sort=True))}`
+        Bot prefix: `/` , `{prefix_bot}`
         Use **Selection** for more informations about a category."""
 
         year, mouth, day = ctx.bot.last_update
@@ -135,7 +141,12 @@ class LatteBotHelp(commands.HelpCommand):
 
         cogs = []
         cogs_description = []
-        ignored_cogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
+
+        if ctx.guild.id in [840379510704046151, 887274968012955679]:
+            ignored_cogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Testing']
+        else:
+            ignored_cogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner','Reaction','Reference', 'Tags', 'Testing']
+        
         iter = 1
         #if cog is None or cog.qualified_name in ignored_cogs: continue
         
@@ -156,10 +167,14 @@ class LatteBotHelp(commands.HelpCommand):
 
         # print(len(cogs))
         # print(cogs)
-
-        embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[0],cogs[3],cogs[6]) , inline=True)
-        embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[1],cogs[4],cogs[7]) , inline=True)
-        embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[2],cogs[5]) , inline=True)
+        if ctx.guild.id == 840379510704046151:
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[0],cogs[3],cogs[6]) , inline=True)
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[1],cogs[4],cogs[7]) , inline=True)
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[2],cogs[5]) , inline=True)
+        else:
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[0],cogs[3]) , inline=True)
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[1],cogs[4]), inline=True)
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[2],cogs[5]), inline=True)
 
         embed.set_image(url=(latte_read('latte_events'))['help_thumbnail'])
     
