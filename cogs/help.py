@@ -19,9 +19,9 @@ class HelpDropdown(discord.ui.Select):
         self.view_ = view # i hope that works
         options = []
         if ctx.guild.id == 840379510704046151:
-            ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Testing']
+            ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
         else:
-            ignoredCogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner','Reaction','Reference', 'Tags', 'Testing']
+            ignoredCogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
 
         botCogs = ctx.bot.cogs
         for cog in botCogs:
@@ -143,9 +143,9 @@ class LatteBotHelp(commands.HelpCommand):
         cogs_description = []
 
         if ctx.guild.id in [840379510704046151, 887274968012955679]:
-            ignored_cogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner','Reaction','Reference', 'Testing']
+            ignored_cogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
         else:
-            ignored_cogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner','Reaction','Reference', 'Tags', 'Testing']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner','Reaction', 'Reference', 'Tags', 'Testing']
         
         iter = 1
         #if cog is None or cog.qualified_name in ignored_cogs: continue
