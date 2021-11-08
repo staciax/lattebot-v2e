@@ -6,6 +6,7 @@ import asyncio
 from typing import Any, Dict, Optional
 from discord.ext import commands
 from discord.ext.commands import Paginator as CommandPaginator
+from utils.useful import RenlyEmbed
 
 # Third
 from discord.ext import menus
@@ -27,6 +28,7 @@ class BaseNewButton(discord.ui.View):
         self.current_page: int = 0
         self.compact: bool = compact
         self.input_lock = asyncio.Lock()
+        self.is_command = ctx.command is not None
         self.clear_items()
         self.fill_items()
 
@@ -99,10 +101,24 @@ class BaseNewButton(discord.ui.View):
             pass
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user and interaction.user.id in (self.ctx.bot.owner_id, self.ctx.author.id):
+        """Only allowing the context author to interact with the view"""
+        ctx = self.ctx
+        author = ctx.author
+        mystic_role = discord.utils.get(interaction.user.roles, id=842304286737956876)
+        if interaction.user == ctx.bot.renly:
             return True
-        await interaction.response.send_message('This pagination menu cannot be controlled by you, sorry!', ephemeral=True)
-        return False
+        if bool(mystic_role) == True:
+            return True
+        if interaction.user != ctx.author:
+            if self.is_command:
+                command = ctx.bot.get_command_signature(ctx, ctx.command)
+                content = f"Only `{author}` can use this menu. If you want to use it, use `{command}`"
+            else:
+                content = f"Only `{author}` can use this."
+            embed = RenlyEmbed.to_error(description=content)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
+        return True
 
     async def on_timeout(self) -> None:
         if self.message:

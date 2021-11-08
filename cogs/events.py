@@ -188,7 +188,7 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
                 except:
                     pass
                 del self.bot.afk_user[user_id]
-                embed_back = discord.Embed(self.bot.white_color)
+                embed_back = discord.Embed(color=self.bot.white_color)
                 embed_back.description = f"Welcome back {message.author.mention} , i've removed your **AFK** status."
                 return await message.channel.send(embed=embed_back, delete_after=15)
             

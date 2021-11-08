@@ -158,7 +158,10 @@ class Leveling(commands.Cog):
                     
                     await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
         except:
-            raise commands.BadArgument('error')
+            embed_error = discord.Embed(color=self.bot.error_color)
+            embed_error.description='An unknown error occurred, please try again !'
+            await ctx.send(embed=embed_error, ephemeral=True)
+            # raise commands.BadArgument('error')
   
     # @commands.command(description="Crete xp role")
     # @commands.guild_only()

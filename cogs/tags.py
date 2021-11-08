@@ -337,7 +337,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             else:
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}")
             # await message_response.delete()
-            await view.message.edit(embed=embed_edit)
+            await view.message.edit(embed=embed_edit , view=None)
 
     @commands.command(help="Show all tag in your server")
     @commands.guild_only()

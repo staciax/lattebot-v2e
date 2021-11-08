@@ -60,10 +60,14 @@ class APEX_RANDOM(discord.ui.View):
         a_logging = str(embed.description.split('**' )[1])
         if self.embeds_legend is None:
             self.embeds_legend = await self.ctx.channel.send(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.logging += f'\n{self.counts}. {interaction.user.display_name}: {a_logging}'
         else:
             await self.embeds_legend.edit(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.logging += f'\n{self.counts}. {interaction.user.display_name}: {a_logging}'
     
@@ -80,10 +84,14 @@ class APEX_RANDOM(discord.ui.View):
         a_logging = str(embed.description.split('**' )[1])
         if self.embeds_weapon is None:
             self.embeds_weapon = await self.ctx.channel.send(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.logging += f'\n{self.counts}. {interaction.user.name}: {a_logging}'
         else:
             await self.embeds_weapon.edit(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.logging += f'\n{self.counts}. {interaction.user.name}: {a_logging}'
     
@@ -174,10 +182,14 @@ class VALORANT_RANDOM(discord.ui.View):
         a_logging = str(embed.description.split('**' )[1])
         if self.embeds_agent is None:
             self.embeds_agent = await self.ctx.channel.send(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.log_weapon += f'\n{self.counts}. {self.ctx.author.name}: {a_logging}'
         else:
             await self.embeds_agent.edit(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.log_weapon += f'\n{self.counts}. {self.ctx.author.name}: {a_logging}'
     
@@ -198,10 +210,14 @@ class VALORANT_RANDOM(discord.ui.View):
         w_logging = str(embed.description.split('**' )[1])
         if self.embeds_weapon is None:
             self.embeds_weapon = await self.ctx.channel.send(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.log_weapon += f'\n{self.counts}. {interaction.user.display_name}: {w_logging}'
         else:
             await self.embeds_weapon.edit(embed=embed)
+            if self.counts > 100:
+                return
             self.counts += 1
             self.log_weapon += f'\n{self.counts}. {interaction.user.display_name}: {w_logging}'
 
