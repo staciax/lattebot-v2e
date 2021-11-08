@@ -45,9 +45,13 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
     @commands.command(name="config_set", help="edit config files")
     @commands.guild_only()
     @commands.is_owner()
-    async def latte_config_set(self, ctx, file_target=commands.Option(description="file name"), keys= commands.Option(description="json key"), value=commands.Option(default=None,description="json value"),type:Literal['str','int']=commands.Option(description="type of value")):
-        if value is None:
-            await ctx.send(f"file : {file_target}\nkey: {str(keys)}\nvalue : None")
+    async def latte_config_set(
+            self,
+            ctx,
+            file_target:Literal['channel_sleep','latte_events','remind','sleeping'] = commands.Option(description="file name"),
+            keys = commands.Option(description="json key"), value=commands.Option(default=None, description="json value"),
+            type: Literal['str','int']=commands.Option(default=None, description="type of value")
+        ):
         data = latte_read(f"{str(file_target)}")
         if type == 'str':
             data[f"{str(keys)}"] = str(value)
@@ -55,6 +59,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
             data[f"{str(keys)}"] = int(value)
 
         embed = discord.Embed(color=self.bot.white_color)
+        
         try:
             latte_write(data, str(file_target))
             embed.add_field(name="file", value=f"```fix\n{file_target}.json```", inline=False)

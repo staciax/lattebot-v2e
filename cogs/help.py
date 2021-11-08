@@ -5,7 +5,7 @@ import asyncio
 import io
 import contextlib
 import re
-from discord.ext import commands , tasks
+from discord.ext import commands
 from typing import Any, Dict, List, Optional, Union
 from utils.formats import count_python
 from datetime import datetime, timedelta, timezone
@@ -46,8 +46,9 @@ class HelpDropdown(discord.ui.Select):
                 
         entries = cog.get_commands()
         command_signatures = [self.get_minimal_command_signature(c) for c in entries]
-        if command_signatures == ['/waifu_im_sfw <"waifu"|"maid"|"all">', '/waifu_im_nsfw <"ass"|"ecchi"|"ero"|"hentai"|"maid"|"milf"|"oppai"|"oral"|"paizuri"|"selfies"|"uniform">', '/waifu_pisc <"sfw"|"nsfw">']:
-            command_signatures = '/waifu_im_sfw <tags>', '/waifu_im_nsfw <tags>', '/waifu_pisc <"sfw"|"nsfw">'
+
+        if command_signatures == [f'{self.ctx.clean_prefix}waifu_im_sfw <"waifu"|"maid"|"all">', f'{self.ctx.clean_prefix}waifu_im_nsfw <"ass"|"ecchi"|"ero"|"hentai"|"maid"|"milf"|"oppai"|"oral"|"paizuri"|"selfies"|"uniform">', f'{self.ctx.clean_prefix}waifu_pisc <"sfw"|"nsfw">']:
+            command_signatures = f'{self.ctx.clean_prefix}waifu_im_sfw <tags>', f'{self.ctx.clean_prefix}waifu_im_nsfw <tags>', f'{self.ctx.clean_prefix}waifu_pisc <"sfw"|"nsfw">'
         if command_signatures:
             val = "\n".join(command_signatures)
             
@@ -88,13 +89,24 @@ class Stuff(discord.ui.View):
 class LatteBotHelp(commands.HelpCommand):
     """Help commands"""
 
-    def get_command_signature(self, command):
-        return '/{1.qualified_name} {1.signature}'.format(self, command)
+    def __init__(self):
+        attrs = {
+            'help': 'Help commands'
+        }
+        super().__init__(command_attrs=attrs)
+
+    def get_command_signature(self, command, ctx):
+        return '%s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
 
     def get_minimal_command_signature(self, command):
         if isinstance(command, commands.Group):
-            return '[G] %s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
-        return '(c) %s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
+            return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
+        return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
+    
+    def get_minimal_command_signature_custom(self, command, ctx):
+        if isinstance(command, commands.Group):
+            return '%s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
+        return '%s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
 
     def get_minimal_command_usage(self, command):
         return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
@@ -104,19 +116,13 @@ class LatteBotHelp(commands.HelpCommand):
 
     async def send_bot_help(self, mapping):
         ctx = self.context
-        if ctx.guild.id in [840379510704046151, 887274968012955679]:
-            prefix_bot = '.'
-        else:
-            prefix_bot = 're'
-
-        # emoji1 = discord.PartialEmoji(name='nono', id=890369747273793556, animated=True)
                     
         embed = discord.Embed(color=ctx.bot.white_color)
         #title=f"{ctx.bot.user.display_name} Help", 
         embed.set_author(name=f'{ctx.bot.user.display_name} Help', icon_url=ctx.bot.user.avatar.url)
         embed.description = f"""
         Total commands: `{len(await self.filter_commands(list(self.context.bot.commands), sort=True))}`
-        Bot prefix: `/` , `{prefix_bot}`
+        Bot prefix: `/` , `{ctx.clean_prefix}`
         Use **Selection** for more informations about a category."""
 
         year, mouth, day = ctx.bot.last_update
@@ -269,10 +275,20 @@ class LatteBotHelp(commands.HelpCommand):
         command_signatures = [self.get_minimal_command_signature(c) for c in entries]
         if command_signatures:
             val = "\n".join(command_signatures)
-            embed=discord.Embed(title=f"Help - {group.qualified_name}")
+            embed=discord.Embed(title=f"Help - {group.qualified_name}", color=0xffffff)
             # embed.description=f"""
             # Total commands: {len(group.commands)}
             # Commands usable by you (in this server): {len(await self.filter_commands(group.commands, sort=True))}"""
+            embed.add_field(name=f" Category: {group.qualified_name}", value=f"{group.short_doc}\n```yalm\n{val}\n```")
+            embed.set_footer(text="<> = required argument | [] = optional argument")
+            await ctx.send(embed = embed)
+    
+    async def send_group_help_custom(self, group, ctx):
+        entries = group.commands
+        command_signatures = [self.get_minimal_command_signature_custom(c, ctx) for c in entries]
+        if command_signatures:
+            val = "\n".join(command_signatures)
+            embed=discord.Embed(title=f"Help - {group.qualified_name}", color=0xffffff)
             embed.add_field(name=f" Category: {group.qualified_name}", value=f"{group.short_doc}\n```yalm\n{val}\n```")
             embed.set_footer(text="<> = required argument | [] = optional argument")
             await ctx.send(embed = embed)

@@ -22,10 +22,13 @@ class APEX_RANDOM(discord.ui.View):
             await self.message.edit(view=self)
 
     async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        embed_error = discord.Embed(color=0xffffff)
         if interaction.response.is_done():
-            await interaction.followup.send('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.followup.send(embed=embed_error, ephemeral=True)
         else:
-            await interaction.response.send_message('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.response.send_message(embed=embed_error, ephemeral=True)
 
     @discord.ui.select(custom_id="Select Weapon type", placeholder="Weapon type (default=random)", min_values=1, max_values=1, options=[        
         discord.SelectOption(label='Random', value="random"),
@@ -122,10 +125,13 @@ class VALORANT_RANDOM(discord.ui.View):
             await self.message.edit(view=self)
 
     async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        embed_error = discord.Embed(color=0xffffff)
         if interaction.response.is_done():
-            await interaction.followup.send('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.followup.send(embed=embed_error, ephemeral=True)
         else:
-            await interaction.response.send_message('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.response.send_message(embed=embed_error, ephemeral=True)
 
     @discord.ui.select(custom_id="Select Agent type", placeholder="Agent type (default=random)", min_values=1, max_values=1, options=[        
         discord.SelectOption(label='Random', value="random"),
@@ -343,7 +349,7 @@ def apex_random_legends():
 
     #picture_of_agent
     if random_legends == "Ash":
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/894059642601218098/905508288005799936/apex_Ash.jpg")
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/common/legends/ash/apex-grid-tile-legends-ash.png.adapt.crop16x9.png")
     elif random_legends == "Bangalore":
         embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-bangalore.png.adapt.crop16x9.png")
     elif random_legends == "Bloodhound":

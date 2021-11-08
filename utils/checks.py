@@ -73,3 +73,10 @@ def is_in_guilds(*guild_ids):
 def is_latte_guild():
     return is_in_guilds(840379510704046151)
 
+def bypass_for_owner(message):
+    # Bypasses cooldown, no cooldown for this specific user
+    if message.author.id == 240059262297047041:
+        return None
+    # Otherwise cooldown of 1 per 1 second
+    return commands.Cooldown(1,60)
+

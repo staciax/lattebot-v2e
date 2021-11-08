@@ -21,7 +21,6 @@ data = read_json('bot_var')
 
 dotenv_path = join(dirname(__file__), 'data/settings.env')
 load_dotenv(dotenv_path)
-setting_env = os.getenv('SETTING', None)
 
 async def get_prefix(bot, message):
     if message.guild.id == 840379510704046151:
@@ -33,11 +32,11 @@ async def get_prefix(bot, message):
 
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
-        self.bot_version = "0.0.2s"
-        self.last_update = [2021, 11, 6]
+        self.bot_version = "0.0.3s"
+        self.last_update = [2021, 11, 8]
         self.launch_time = datetime.utcnow()
         self.tester = ''
-        self.github = ""
+        self.github = "https://github.com/staciax"
         self.defaul_prefix = 're'
         self.blacklisted_users = []
         self.afk_user = {}
@@ -50,8 +49,8 @@ class LatteBot(commands.Bot):
         self.no_prefix = False
         self.latte_id = 887274968012955679
         self.latte_guild_id = 840379510704046151
-        self.latte_invite_url = "https://discord.gg/VTgJ3TxS68"
-        self.latte_supprt_url = "https://discord.gg/pmZt2T5ggb"
+        self.latte_invite_url = os.getenv('LATTE_URL', None)
+        self.latte_supprt_url = os.getenv('SUPPORT_URL', None)
         self.new_members = {}
         self.bot_join = 893695417320087573
         self.bot_leave = 893695447309369345
@@ -73,8 +72,8 @@ class LatteBot(commands.Bot):
                 raise Exception("Command does not exist for signature.")
         else:
             command = command_name
-        return self.help_command.get_command_signature(command)
-        # return self.help_command.get_command_signature(command, ctx)
+        #return self.help_command.get_command_signature(command)
+        return self.help_command.get_command_signature(command, ctx)
         
 bot = LatteBot(intents=discord.Intents(
     guild_reactions=True,  # reaction add/remove/clear

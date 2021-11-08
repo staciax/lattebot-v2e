@@ -41,7 +41,7 @@ def emoji_converter(name):
     "redtick":"<:redtick:902669996960919552>",
     "sleeping":"<a:sleeping:902960651272589363>",
     "spotify":"<:Spotify:904418859937828874>",
-    "latte_icon":"<:latte_icon:904510083822649374>",
+    "latte_icon":"<:latte_icon_new:907030425011109888>",
     "mongo":"<:mongo:904509654086864917>",
     "cursor":"<a:cursor:896576387002032159>",
     "python":"<:python:904565441761017907>",

@@ -51,7 +51,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
             if data[key]["time"] is None:
                 return
-            elif int(data[key]["time"]) == int(dt):
+            elif int(data[key]["time"]) <= int(dt):
                 member_sleep = guild.get_member(int(key))
                 if member_sleep:
                     try:
@@ -69,17 +69,15 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         raw_date = datetime.now(timezone.utc)
         if not data:
             return
-        for key in data.keys():
-            dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
-            if data[key]["time"] is None:
-                return
-            elif int(data[key]["time"]) == int(dt):
-                channel = guild.get_channel(int(data[key]["channel"]))
-                member = guild.get_member(int(key))
-                message = data[key]["message"]
-                message_url = data[key]["url"]
-                view = base_Button_URL(label="Go to original message", url=message_url)
-                try:
+        try:
+            for key in data.keys():
+                dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
+                if int(data[key]["time"]) <= int(dt):
+                    channel = guild.get_channel(int(data[key]["channel"]))
+                    member = guild.get_member(int(key))
+                    message = data[key]["message"]
+                    message_url = data[key]["url"]
+                    view = base_Button_URL(label="Go to original message", url=message_url)
                     embed_response = discord.Embed(color=self.bot.white_color)
                     embed_response.title = "Reminder"
                     embed_response.description = f"{member.mention}, {format_relative(raw_date)}\n{message}"
@@ -87,8 +85,9 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                     del data[key]
                     latte_write(data, "remind")
                     break
-                except:
-                    print("remind error")
+                   
+        except:
+            print("remind error")
 
     @sleeped.before_loop
     async def before_sleeped(self):

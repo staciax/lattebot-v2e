@@ -12,10 +12,19 @@ from utils.paginator import SimplePages
 from utils.checks import is_latte_guild
 
 class Cancel_button(discord.ui.View):
-    def __init__(self, ctx):
+    def __init__(self, ctx, content=None):
         super().__init__()
         self.value = True
         self.ctx = ctx
+        self.content = content
+        self.cooldown = commands.CooldownMapping.from_cooldown(1, 10, commands.BucketType.user)
+        self.clear_items()
+        self.fill_items()
+    
+    def fill_items(self) -> None:
+        if self.content is not None:
+            self.add_item(self.content_button)
+        self.add_item(self.cancel_button_)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
@@ -24,13 +33,22 @@ class Cancel_button(discord.ui.View):
         return False
 
     async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        embed_error = discord.Embed(color=0xffffff)
         if interaction.response.is_done():
-            await interaction.followup.send('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.followup.send(embed=embed_error, ephemeral=True)
         else:
-            await interaction.response.send_message('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.response.send_message(embed=embed_error, ephemeral=True)
+
+    @discord.ui.button(label="See old content", style=discord.ButtonStyle.green)
+    async def content_button(self, button, interaction):
+        data = self.content
+        if data:
+            await interaction.response.send_message(data, ephemeral=True)
 
     @discord.ui.button(label='Cancel', style=discord.ButtonStyle.grey)
-    async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def cancel_button_(self, button: discord.ui.Button, interaction: discord.Interaction):
         self.value = False
         await self.message.delete()
 
@@ -148,7 +166,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
             #reponse
             embed_edit = discord.Embed(description=f"Tag **{name}** successfully created.", timestamp=discord.utils.utcnow(), color=0x77dd77)
-            await message_response.delete()
+            # await message_response.delete()
             await view.message.edit(embed=embed_edit, view=None)
 
     @commands.command(help="remove your tag")
@@ -277,10 +295,12 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             embed_error.description = "You are not the owner of this tag."
             return await ctx.send(embed=embed_error, ephemeral=True)
 
+        old_content = data_check['content'] or None
+
         #response
-        view = Cancel_button(ctx)
+        view = Cancel_button(ctx, content=old_content)
         embed.description = "Please enter the new content (within 5 minutes)"
-        view.message = await ctx.send(embed=embed)
+        view.message = await ctx.send(embed=embed, view=view)
 
         #waiting_message
         try:
@@ -316,7 +336,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
             else:
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}")
-            await message_response.delete()
+            # await message_response.delete()
             await view.message.edit(embed=embed_edit)
 
     @commands.command(help="Show all tag in your server")

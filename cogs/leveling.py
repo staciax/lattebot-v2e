@@ -14,6 +14,7 @@ from io import BytesIO
 # Local
 from utils.xp_pillow import level_images
 from utils.paginator import SimplePages
+from utils.buttons import NewSimpage
 from utils.useful import RenlyEmbed
 from utils.checks import is_latte_guild
 
@@ -107,7 +108,7 @@ class Leveling(commands.Cog):
                     pass
                     
             #view_button
-            p = SimplePages(entries=filter_xp, per_page=5, ctx=ctx)
+            p = NewSimpage(entries=filter_xp, per_page=5, ctx=ctx)
             if ctx.guild.icon.url is not None:
                 p.embed.set_author(name=f"{ctx.guild.name} Rankings", url=ctx.guild.icon.url , icon_url=ctx.guild.icon.url)
             else:

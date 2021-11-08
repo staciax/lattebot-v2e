@@ -14,6 +14,7 @@ import requests
 from utils.mod_converter import do_removal , TimeConverter
 from utils.paginator import SimplePages
 from utils.useful import RenlyEmbed
+from utils.checks import bypass_for_owner
 
 class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     """Moderation related commands"""
@@ -33,6 +34,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(send_messages=True, embed_links=True, ban_members=True)
+    @commands.dynamic_cooldown(bypass_for_owner)
     async def kick(self, ctx, member: discord.Member = commands.Option(description="Member"), reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
             return await ctx.send(embed=discord.Embed(description="you can't kick bot",color=self.bot.white_color))
@@ -46,6 +48,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(send_messages=True, embed_links=True, ban_members=True)
+    @commands.dynamic_cooldown(bypass_for_owner)
     async def ban(self, ctx, member: discord.Member = commands.Option(description="Member"), reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
             return await ctx.send(embed=discord.Embed(description="you can't kick bot",color=self.bot.white_color))
@@ -84,6 +87,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
+    @commands.dynamic_cooldown(bypass_for_owner)
     async def purge(self, ctx, amount : int = commands.Option(description="Number to clear message")):
         embed = discord.Embed(
             description=f" `{ctx.channel.name}`: **{amount}** messages were cleared",
@@ -109,6 +113,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
+    @commands.dynamic_cooldown(bypass_for_owner)
     async def clear(
         self,
         ctx,
@@ -169,6 +174,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
+    @commands.dynamic_cooldown(bypass_for_owner)
     async def clear_member(
         self,
         ctx,
@@ -187,6 +193,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.has_guild_permissions(mute_members=True)
     @commands.bot_has_guild_permissions(manage_roles=True)
+    @commands.cooldown(5, 60, commands.BucketType.user)
     async def mute(
             self,
             ctx,
@@ -307,6 +314,11 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.has_permissions(manage_channels=True)
     @commands.bot_has_permissions(send_messages=True, embed_links=True, manage_channels=True)
     async def slowmode(self, ctx , time: TimeConverter = commands.Option(description="slowmode duration / time = 0s for disable")):
+        
+        if time == 0:
+            embed_time = RenlyEmbed.to_error(title="Slowmode error", description="Time is invalid" , color=self.bot.error_color)
+            return await ctx.send(embed=embed_time, ephemeral=True)
+        
         embed = discord.Embed(color=self.bot.white_color)
         
         if int(time) > 21600:
@@ -334,6 +346,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.has_guild_permissions(mute_members=True)
     @commands.bot_has_guild_permissions(mute_members=True)
     @commands.guild_only()
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def voice_mute(
             self,
             ctx,
@@ -378,6 +391,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     # @commands.has_guild_permissions(mute_members=True)
     # @commands.bot_has_guild_permissions(mute_members=True)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def voice_deafen(
             self,
             ctx,

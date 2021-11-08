@@ -35,13 +35,14 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='infomation', id=903339421758292008, animated=False)
 
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     @commands.guild_only()
     async def server(self, ctx):
-        pass
+        await self.bot.help_command.send_group_help_custom(self.server, ctx)
 
     @server.command(name="info", help="Show server infomation", aliases=["si", "serverinformation", "serverinformations" , "guildinfo" , "gi"])
     @commands.guild_only()
+    @commands.cooldown(1, 30, commands.BucketType.user)
     async def server_info(self, ctx):
 
         #afk_channel_check and timeout
@@ -172,6 +173,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(name="userinfo", help="Shows information about the specified member.", aliases=["ui", "userinformation","memberinfo"])
     @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def userinfo(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.guild.get_member(ctx.author.id)
         
@@ -249,7 +251,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
     async def avatar(self, ctx):
-        pass
+        await self.bot.help_command.send_group_help_custom(self.avatar, ctx)
 
     @avatar.command(name="user", help="Shows the user avatar of the specified member.", aliases=["av"])
     @commands.guild_only()
@@ -371,7 +373,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
     async def role(self, ctx):
-        pass
+        await self.bot.help_command.send_group_help_custom(self.role, ctx)
 
     @role.command(name="info",aliases=["ri"], help="Shows information about the specified role.")
     @commands.guild_only()
@@ -397,12 +399,12 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             role_member_list.append(member_role)
 
         view = roleinfo_view(ctx=ctx, embed=embed_role, entries=role_member_list, role=role)
-        await view.start()
+        view.message = await view.start()
     
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
     async def emoji(self, ctx):
-        pass
+        await self.bot.help_command.send_group_help_custom(self.emoji, ctx)
     
     @emoji.command(name="info", help="Shows information about a emoji.")
     @commands.guild_only()
@@ -476,6 +478,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @emoji.command(name="list",help="Shows you a list of emotes from the server.")
     @commands.guild_only()
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def emotelist(self, ctx):
         guild = ctx.guild
         guildEmotes = guild.emojis
@@ -524,10 +527,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         
         if str(channel.type) == 'text':
             view = channel_info_view(ctx=ctx, embed=embed, channel=channel, role_list=role_list, member_list=member_list)
-            await view.start_text()
+            view.message = await view.start_text()
         if str(channel.type) == 'voice':
             view = channel_info_view(ctx=ctx, embed=embed, channel=channel, role_list=role_list, member_list=member_list)
-            await view.start_voice()
+            view.message = await view.start_voice()
 
     @commands.command(help="Shows the first message of the specified channel.")
     @commands.guild_only()
@@ -612,6 +615,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(
     help="Shows you a list of members from the server.")
     @commands.guild_only()
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def memberlist(self, ctx):
         guild = ctx.guild
         guildMembers = guild.members

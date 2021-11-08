@@ -109,10 +109,13 @@ class BaseNewButton(discord.ui.View):
             await self.message.edit(view=None)
 
     async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        embed_error = discord.Embed(color=0xffffff)
         if interaction.response.is_done():
-            await interaction.followup.send('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.followup.send(embed=embed_error, ephemeral=True)
         else:
-            await interaction.response.send_message('An unknown error occurred, sorry', ephemeral=True)
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.response.send_message(embed=embed_error, ephemeral=True)
 
     async def start(self) -> None:
         if self.check_embeds and not self.ctx.channel.permissions_for(self.ctx.me).embed_links:
