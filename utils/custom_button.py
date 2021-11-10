@@ -246,3 +246,50 @@ class Random_member(BaseNewButton):
                 self.remove_item(item=items)
         self.embed = discord.Embed(colour=discord.Colour.blurple())
         self.add_item(item=button_random(ctx, member_list, 'Random'))
+
+class content_button(discord.ui.View):
+    def __init__(self, ctx, content=None):
+        super().__init__()
+        self.ctx = ctx
+        self.content = content
+        self.is_command = ctx.command is not None
+        self.cooldown = commands.CooldownMapping.from_cooldown(1, 10, commands.BucketType.user)
+        self.clear_items()
+        self.fill_items()
+        
+    def fill_items(self) -> None:
+        if self.content is not None:
+            self.add_item(self.content_button)
+    
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """Only allowing the context author to interact with the view"""
+        ctx = self.ctx
+        author = ctx.author
+        mystic_role = discord.utils.get(interaction.user.roles, id=842304286737956876)
+        if interaction.user == ctx.bot.renly:
+            return True
+        if bool(mystic_role) == True:
+            return True
+        if interaction.user != ctx.author:
+            if self.is_command:
+                command = ctx.bot.get_command_signature(ctx, ctx.command)
+                content = f"Only `{author}` can use this menu. If you want to use it, use `{command}`"
+            else:
+                content = f"Only `{author}` can use this."
+            embed = RenlyEmbed.to_error(description=content)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
+        return True
+
+    async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        embed_error = discord.Embed(color=0xffffff)
+        if interaction.response.is_done():
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.followup.send(embed=embed_error, ephemeral=True)
+        else:
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.response.send_message(embed=embed_error, ephemeral=True)
+        
+    @discord.ui.button(label="Content", style=discord.ButtonStyle.primary)
+    async def content_button(self, button, interaction):
+        await interaction.response.send_message(self.content, ephemeral=True)

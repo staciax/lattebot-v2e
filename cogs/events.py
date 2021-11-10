@@ -25,8 +25,8 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
         if not hasattr(self.bot, 'commands_used'):
             self.bot.commands_used = 0
         self.json_read = latte_read("latte_events")
-        self.latte_chat = [861883647070437386 , 840398821544296480]
-        self.latte_bot = [861874852050894868 , 840381588704591912 , 844462710526836756]
+        self.latte_chat = [861883647070437386, 840398821544296480]
+        self.latte_bot = [861874852050894868, 840381588704591912, 844462710526836756]
         self.secret_channel = 886966133176017017
         self.secret_users = [240059262297047041, 240137834349068290, 188653422864498688, 371230466319187969, 240350375201341442, 687174446263304324, 507870438135955464]
         self.underworldx = [873677543453126676, 873679362082369546]
@@ -318,7 +318,7 @@ class Events(commands.Cog, command_attrs = dict(slash_command=True)):
         if message.author.bot:
             return
         
-        if message.channel.id == 844462710526836756: #in self.latte_chat
+        if message.channel.id in self.latte_chat:
             im = None
             # if message.guild.id == self.bot.latte_guild_id:
             embed = discord.Embed(color=0xDC143C , timestamp=datetime.now(timezone.utc))

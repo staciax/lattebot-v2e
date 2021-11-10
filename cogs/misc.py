@@ -26,12 +26,13 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def invite(self, ctx):
+        invite_url = f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot%20applications.commands"
         view = discord.ui.View()
-        invite_button = discord.ui.Button(style=discord.ButtonStyle.gray, label="Invite me", url=f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot%20applications.commands") 
+        invite_button = discord.ui.Button(style=discord.ButtonStyle.gray, label="Invite me", url=invite_url) 
         view.add_item(item=invite_button)
-        embed = discord.Embed(title="Support server")
-        embed.description = "Note: `some features may not be available, sorry.`"
-        embed.color = self.bot.white_color
+
+        embed = discord.Embed(color=self.bot.white_color)
+        embed.set_author(name=f"{self.bot.user.name} Invite", icon_url=self.bot.user.avatar.url, url=invite_url)
         await ctx.send(embed=embed, view=view)
     
     # @commands.command(help="Vote for me")
@@ -48,11 +49,11 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def support(self, ctx):
         view = discord.ui.View()
-        support_button = discord.ui.Button(style=discord.ButtonStyle.gray , label="Server support", url=self.bot.latte_supprt_url) 
+        support_button = discord.ui.Button(style=discord.ButtonStyle.gray , label="Click to join", url=self.bot.latte_supprt_url) 
         view.add_item(item=support_button)
 
-        embed = discord.Embed(title="Support server")
-        embed.color = self.bot.white_color
+        embed = discord.Embed(color=self.bot.white_color)
+        embed.set_author(name=f"{self.bot.user.name} Support server", icon_url=self.bot.user.avatar.url, url=self.bot.latte_supprt_url)
         await ctx.send(embed=embed, view=view)
 
     @commands.command(help="Shows the bot's prefixes")

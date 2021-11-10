@@ -10,6 +10,8 @@ from typing import Optional
 # Local
 from utils.paginator import SimplePages
 from utils.checks import is_latte_guild
+from utils.useful import RenlyEmbed
+from utils.custom_button import content_button
 
 class Cancel_button(discord.ui.View):
     def __init__(self, ctx, content=None):
@@ -337,15 +339,27 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             else:
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}")
             # await message_response.delete()
-            await view.message.edit(embed=embed_edit , view=None)
+            await view.message.edit(embed=embed_edit, view=None)
 
-    @commands.command(help="Show all tag in your server")
+    @commands.command(help="Show all tag in your server or member")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_list(self, ctx):
+    async def tag_list(self, ctx, member: discord.Member = commands.Option(default=None, description="Spectify member")):
+        #embed
+        embed_error = discord.Embed(color=0xFF7878)
 
-        #sort_tag
-        data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
+        if member is None:
+            #sort_tag
+            data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
+            data_check = "Not found tag from this server." #check_data
+        else:
+            data = await self.bot.latte_tags.find_many_by_custom({"user_id": member.id})
+            data_check = f"Not found tag from member: {member.display_name}." #check_data
+
+        #check_data
+        if bool(data) == False:
+            embed_error.description = data_check
+            return await ctx.send(embed=embed_error, ephemeral=True)
         
         #count_tag
         all_tag = []
@@ -393,6 +407,49 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             #reponse
             embed = discord.Embed(description=f"**{name}** This tag not found", color=0x77dd77)
             await ctx.send(embed=embed, ephemeral=True)
+
+    @commands.command(help="Shows information about the specified tag.")
+    @commands.guild_only()
+    @is_latte_guild()
+    async def tag_info(self, ctx, tag=commands.Option(description="Input your tag name or id")):
+        isInt = True
+        try:
+            int(tag)
+        except ValueError:
+            isInt = False
+
+        #check_int_true_or_false
+        if isInt:
+            data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag_id": int(tag)})
+            if bool(data) == False:
+                data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
+        else:
+            data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
+        
+        #found_or_not_found
+        if data is not None:
+            view = content_button(ctx=ctx , content=data['content'])
+            owner_tag = ctx.guild.get_member(int(data['user_id']))
+
+            embed = discord.Embed(color=self.bot.white_color)
+            embed.title = f"{data['tag']} Info"
+            embed.description = f"Tag name : {data['tag']}\n"
+            embed.description += f"Author : {owner_tag.mention}\n"
+            embed.set_footer(text=f"ID : {data['tag_id']}")
+
+            await ctx.send(embed=embed, view=view)
+
+        else:
+            not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
+            names = (r['tag'] for r in not_found)
+            matches = get_close_matches(tag , names)
+            embed_r = discord.Embed(colour=self.bot.white_color)
+            if matches:
+                matches = "\n".join(matches)
+                embed_r.description = f"Tag not found. Did you mean...\n`{matches}`"
+            else:
+                embed_r.description = f"Tag not found."
+            await ctx.send(embed=embed_r , ephemeral=True)
 
     @commands.command(help="Total tag in your server")
     @commands.guild_only()

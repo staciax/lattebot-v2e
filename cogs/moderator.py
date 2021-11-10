@@ -6,6 +6,8 @@ import re
 from discord.ext import commands , tasks
 from datetime import datetime, timedelta, timezone
 from typing import Literal
+import aiohttp
+from io import BytesIO
 
 # Third
 import requests
@@ -15,6 +17,7 @@ from utils.mod_converter import do_removal , TimeConverter
 from utils.paginator import SimplePages
 from utils.useful import RenlyEmbed
 from utils.checks import bypass_for_owner
+from utils.emoji import emoji_converter
 
 class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     """Moderation related commands"""
@@ -29,6 +32,48 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @property
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='mod', id=903339681779966042, animated=False)
+    
+    @commands.command(help="Create custom emoji with url")
+    @commands.guild_only()
+    @commands.cooldown(5, 60, commands.BucketType.user)
+    async def emoji_create(self, ctx, url:str = commands.Option(description="URL"), name = commands.Option(description="Emoji name")):
+        guild = ctx.guild
+        embed = discord.Embed()
+        async with aiohttp.ClientSession() as ses:
+            async with ses.get(url) as r:
+                try:
+                    img_or_gif = BytesIO(await r.read())
+                    b_value = img_or_gif.getvalue()
+                    if r.status in range(200, 299):
+                        emoji = await guild.create_custom_emoji(image=b_value, name=name)
+                        embed.color = 0x77dd77
+                        embed.description = f'Successfully created emoji: <:{name}:{emoji.id}>'
+                        await ctx.send(embed=embed)
+                        await ses.close()
+                    else:
+                        embed.color = 0xFF7878
+                        embed.description = f'Error when making request | {r.status} response.'
+                        await ctx.send(embed=embed, ephemeral=True)
+                        await ses.close()
+                except discord.HTTPException:
+                    embed.color = 0xFF7878
+                    embed.description = f'File size is too big!'
+                    await ctx.send(embed=embed, ephemeral=True)
+    
+    @commands.command(help="Remove custom emoji from server")
+    @commands.guild_only()
+    @commands.cooldown(5, 60, commands.BucketType.user)
+    async def emoji_remove(self, ctx, emoji:discord.Emoji = commands.Option(description="Spectify Emoji")):
+        embed = discord.Embed()
+        try:
+            emoji.color = 0x77dd77
+            embed.description = f'Successfully deleted : {emoji}'
+            await ctx.send(embed=embed)
+            await emoji.delete()
+        except:
+            embed.color = 0xFF7878
+            embed.description = 'error delete emoji!'
+            await ctx.send(embed=embed, ephemeral=True)
 
     @commands.command(name="kick", help="kick member from your server")
     @commands.guild_only()
@@ -433,5 +478,27 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             raise commands.MissingPermissions(['Deafen Members'])
     
+    # @commands.command(help="Remove permissions for members to send messages in a channel")
+    # @commands.guild_only()
+    # @commands.has_permissions(manage_channels=True)
+    # @commands.bot_has_guild_permissions(manage_channels=True)
+    # async def lock(self, ctx, channel: discord.TextChannel=commands.Option(default=None, description="Spectify channel")):
+    #     channel = channel or ctx.channel
+    #     embed = discord.Embed(color=0xFF7878)
+    #     embed.description = f"{channel.mention} : is **lockdown.**"
+    #     await channel.set_permissions(ctx.guild.default_role, reason=f"{ctx.author.name} locked {channel.name}", send_messages=False)
+    #     await ctx.send(embed=embed)
+
+    # @commands.command(help="Remove lockdown a channel")
+    # @commands.guild_only()
+    # @commands.has_permissions(manage_channels=True)
+    # @commands.bot_has_guild_permissions(manage_channels=True)
+    # async def unlock(self, ctx, channel: discord.TextChannel=commands.Option(default=None, description="Spectify channel")):
+    #     channel = channel or ctx.channel
+    #     embed = discord.Embed(color=0x8be28b)
+    #     embed.description = f"{channel.mention} : **Removed lockdown!**"
+    #     await channel.set_permissions(ctx.guild.default_role, reason=f"{ctx.author.name} unlocked {channel.name}", send_messages=True)
+    #     await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(Mod(bot))

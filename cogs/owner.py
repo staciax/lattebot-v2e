@@ -121,25 +121,37 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
         embed = discord.Embed(title="Status Changed!",description=f"**type:** {type}\n**status:** `{status}`", color=self.bot.white_color)
         await ctx.send(embed=embed)
     
-    @commands.command(help="enable command")
-    @commands.guild_only()
-    @commands.is_owner()
-    async def enable(self, ctx, command = commands.Option(description="command name")):
-        command = self.bot.get_command(command)
-        if command.enabled:
-            return await ctx.send(f"`{command}` is already enabled.")
-        command.enabled = True
-        await ctx.send(f"Successfully enabled the `{command.name}` command.")
+    # @commands.command(help="enable command")
+    # @commands.guild_only()
+    # @commands.is_owner()
+    # async def enable(self, ctx, command = commands.Option(description="command name")):
+    #     command = self.bot.get_command(command)
+    #     if command.enabled:
+    #         return await ctx.send(f"`{command}` is already enabled.")
+    #     command.enabled = True
+    #     await ctx.send(f"Successfully enabled the `{command.name}` command.")
     
-    @commands.command(help="disable command")
+    # @commands.command(help="disable command")
+    # @commands.guild_only()
+    # @commands.is_owner()
+    # async def disable(self, ctx, command = commands.Option(description="command name")):
+    #     command = self.bot.get_command(command)
+    #     if not command.enabled:
+    #         return await ctx.send(f"`{command}` is already disabled.")
+    #     command.enabled = False
+    #     await ctx.send(f"Successfully disabled the `{command.name}` command.")
+
+    @commands.command(help="Toggle command")
     @commands.guild_only()
     @commands.is_owner()
-    async def disable(self, ctx, command = commands.Option(description="command name")):
+    async def toggle(self, ctx, command = commands.Option(description="Command name")):
         command = self.bot.get_command(command)
-        if not command.enabled:
-            return await ctx.send(f"`{command}` is already disabled.")
-        command.enabled = False
-        await ctx.send(f"Successfully disabled the `{command.name}` command.")
+        command.enabled = not command.enabled
+        ternary = "Enabled" if command.enabled else "disabled"
+        toggle_color = 0x8be28b if command.enabled else 0xFF7878
+        embed = discord.Embed(color=toggle_color)
+        embed.description = f"Successfully {ternary} the `{command.name}` command."
+        await ctx.send(embed=embed)
 
     @commands.command(help="load cog")
     @commands.guild_only()

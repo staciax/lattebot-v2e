@@ -32,6 +32,8 @@ class Error(commands.Cog, command_attrs = dict(slash_command=True)):
                 cm_error = f"I couldn't find that command. Did you mean...\n`{matches}`"
             else:
                 return
+        elif isinstance(error, commands.DisabledCommand):
+            cm_error = f"Command is disabled"
         elif isinstance(error, commands.CommandOnCooldown):
             cm_error = f"You are on cooldown, try again in {error.retry_after:.0f} seconds"
         elif isinstance(error, commands.MessageNotFound):

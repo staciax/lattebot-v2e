@@ -18,19 +18,18 @@ class HelpDropdown(discord.ui.Select):
         self.ctx = ctx
         self.view_ = view # i hope that works
         options = []
-        if ctx.guild.id == 840379510704046151:
+        if ctx.guild.id == ctx.bot.latte_guild_id:
             ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
         else:
-            ignoredCogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
+            ignoredCogs = ['Error', 'Events', 'Help', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
 
         botCogs = ctx.bot.cogs
         for cog in botCogs:
             if cog not in ignoredCogs:
                 cog = ctx.bot.get_cog(cog)
                 options.append(discord.SelectOption(label=cog.qualified_name, description=cog.description, emoji=cog.display_emoji))
-
         super().__init__(placeholder='Select a category...', min_values=1, max_values=1, options=options)
-        
+                    
     def get_minimal_command_signature(self, command):
         if isinstance(command, commands.Group):
             return '%s%s %s' % (self.ctx.clean_prefix, command.qualified_name, command.signature)
@@ -116,14 +115,20 @@ class LatteBotHelp(commands.HelpCommand):
 
     async def send_bot_help(self, mapping):
         ctx = self.context
+
+        guild_prefix = await ctx.bot.command_prefix(ctx.bot, ctx.message)
                     
         embed = discord.Embed(color=ctx.bot.white_color)
         #title=f"{ctx.bot.user.display_name} Help", 
         embed.set_author(name=f'{ctx.bot.user.display_name} Help', icon_url=ctx.bot.user.avatar.url)
-        embed.description = f"""
-        Total commands: `{len(await self.filter_commands(list(self.context.bot.commands), sort=True))}`
-        Bot prefix: `/` , `{ctx.clean_prefix}`
-        Use **Selection** for more informations about a category."""
+        embed.description = f"Total commands: `{len(await self.filter_commands(list(self.context.bot.commands), sort=True))}`\n"
+        embed.description += f"Bot prefix: `/`, `{guild_prefix[2]}`\n"
+        embed.description += "Use **Selection** for more informations about a category."
+        
+        # embed.description = f"""
+        # Total commands: `{len(await self.filter_commands(list(self.context.bot.commands), sort=True))}`
+        # Bot prefix: `/` , `{ctx.clean_prefix}`
+        # Use **Selection** for more informations about a category."""
 
         year, mouth, day = ctx.bot.last_update
         lastup = datetime(year, mouth, day)
@@ -148,10 +153,10 @@ class LatteBotHelp(commands.HelpCommand):
         cogs = []
         cogs_description = []
 
-        if ctx.guild.id in [840379510704046151, 887274968012955679]:
+        if ctx.guild.id == ctx.bot.latte_guild_id:
             ignored_cogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
         else:
-            ignored_cogs = ['Error', 'Events', 'Help', 'Leveling', 'NSFW', 'Owner','Reaction', 'Reference', 'Tags', 'Testing']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Latte', 'Leveling', 'NSFW', 'Owner','Reaction', 'Reference', 'Tags', 'Testing']
         
         iter = 1
         #if cog is None or cog.qualified_name in ignored_cogs: continue
@@ -173,10 +178,10 @@ class LatteBotHelp(commands.HelpCommand):
 
         # print(len(cogs))
         # print(cogs)
-        if ctx.guild.id == 840379510704046151:
+        if ctx.guild.id == ctx.bot.latte_guild_id:
             embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[0],cogs[3],cogs[6]) , inline=True)
             embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[1],cogs[4],cogs[7]) , inline=True)
-            embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[2],cogs[5]) , inline=True)
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[2],cogs[5],cogs[8]) , inline=True)
         else:
             embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[0],cogs[3]) , inline=True)
             embed.add_field(name=f'** **', value='•**%s**\n•**%s**' % (cogs[1],cogs[4]), inline=True)

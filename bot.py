@@ -27,13 +27,12 @@ async def get_prefix(bot, message):
         prefix = '.'
     else:
         prefix = 're'
-    
     return commands.when_mentioned_or(prefix)(bot,message)
 
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.bot_version = "0.0.3s.fix1"
-        self.last_update = [2021, 11, 8]
+        self.last_update = [2021, 11, 10]
         self.launch_time = datetime.utcnow()
         self.tester = ''
         self.github = "https://github.com/staciax"
@@ -49,6 +48,7 @@ class LatteBot(commands.Bot):
         self.no_prefix = False
         self.latte_id = 887274968012955679
         self.latte_guild_id = 840379510704046151
+        self.latte_sup_guild_id = 887274968012955679
         self.latte_invite_url = os.getenv('LATTE_URL', None)
         self.latte_supprt_url = os.getenv('SUPPORT_URL', None)
         self.new_members = {}

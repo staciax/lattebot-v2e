@@ -8,7 +8,6 @@ from discord.ext import commands, tasks
 # Local
 from utils.custom_button import Random_member
 from utils.game_random import APEX_RANDOM, VALORANT_RANDOM
-from utils.checks import is_latte_guild
 
 class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     """Fun commands"""
@@ -94,28 +93,6 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     @commands.guild_only()
     async def color(self, ctx):
         await ctx.send("https://www.color-hex.com/")
-
-    @commands.command(help="lattte temp role")
-    @commands.guild_only()
-    @is_latte_guild()
-    async def latte_temp_role(self, ctx, member: discord.Member = commands.Option(default=None, description="Give role to member")):
-        if ctx.guild.id == self.bot.latte_guild_id:
-            if not member:
-                member = ctx.author
-            role = discord.utils.get(ctx.guild.roles, id=879258879987449867)
-            member_role = discord.utils.get(
-                member.roles, id=879258879987449867)
-            if member_role:
-                embed_role = discord.Embed(
-                    description=f"{member.name} is already a temp role!", color=self.bot.white_color)
-                return await ctx.send(embed=embed_role, ephemeral=True)
-            await member.add_roles(role)
-            embed = discord.Embed(
-                description="Temp is ready\n`This role will disappear within 2 hour.`", color=self.bot.white_color)
-            await ctx.send(embed=embed, ephemeral=True)
-            await asyncio.sleep(7200)
-            await member.remove_roles(role)
-
 
 def setup(bot):
     bot.add_cog(Fun(bot))
