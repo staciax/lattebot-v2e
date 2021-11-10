@@ -66,7 +66,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def emoji_remove(self, ctx, emoji:discord.Emoji = commands.Option(description="Spectify Emoji")):
         embed = discord.Embed()
         try:
-            emoji.color = 0x77dd77
+            embed.color = 0x77dd77
             embed.description = f'Successfully deleted : {emoji}'
             await ctx.send(embed=embed)
             await emoji.delete()

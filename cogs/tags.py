@@ -432,9 +432,9 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             owner_tag = ctx.guild.get_member(int(data['user_id']))
 
             embed = discord.Embed(color=self.bot.white_color)
-            embed.title = f"{data['tag']} Info"
-            embed.description = f"Tag name : {data['tag']}\n"
-            embed.description += f"Author : {owner_tag.mention}\n"
+            embed.title = f"Tag Info"
+            embed.description = f"**Tag name:** {data['tag']}\n"
+            embed.description += f"**Author:** {owner_tag.mention}\n"
             embed.set_footer(text=f"ID : {data['tag_id']}")
 
             await ctx.send(embed=embed, view=view)

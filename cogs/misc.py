@@ -87,7 +87,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         fields = [
             ("About Developer" , f"Owner: [{owner_bot}](https://discord.com/users/{owner_bot.id})" , False),
             ("Stats " , f"{emoji_converter('cursor')} Line count : `{count_python('.'):,}`\n{emoji_converter('latte_icon')} Servers : `{serverCount}`\n{emoji_converter('member')} Users : `{memberCount}`\n{emoji_converter('bot_commands')} Commands : `{totalcommands}`" , False), #{platform.system()}
-            ("Bot Info" , f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Enhanced-discord.py : `{discord.__version__}`\n{emoji_converter('mongo')} Database : `MongoDB`" , False),
+            ("Bot Info" , f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`\n{emoji_converter('mongo')} Database : `MongoDB`" , False),
             ]
         
         for name , value , inline in fields:
