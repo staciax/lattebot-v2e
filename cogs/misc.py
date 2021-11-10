@@ -59,13 +59,11 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Shows the bot's prefixes")
     @commands.guild_only()
     async def prefix(self, ctx):
-        prefix = self.bot.defaul_prefix
-        if ctx.guild.id == self.bot.latte_guild_id:
-            prefix = "."
+        prefix = await self.bot.command_prefix(self.bot, ctx.message)
 
         embed = discord.Embed(color=self.bot.white_color)
-        embed.title = "My prefixes for this server:"
-        embed.description = f"{self.bot.user.mention}\n/\n{prefix}"
+        embed.set_author(name=f"{self.bot.user.name} prefixes:" , icon_url=self.bot.user.avatar.url)
+        embed.description = f"{self.bot.user.mention}\n/\n{prefix[2]}"
         await ctx.send(embed=embed, ephemeral=True)
     
     @commands.command(aliases=["botinfo"], help="Shows basic information about the bot.")
@@ -84,11 +82,15 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         # totalcogs = len(self.bot.cogs)
         totalcommands = len(self.bot.commands)
 
+        latte_db = "\u200B"
+        if ctx.guild.id == self.bot.latte_guild_id:
+            latte_db = f"\n{emoji_converter('mongo')} Database : `MongoDB`"
+
         fields = [
             ("About Developer" , f"Owner: [{owner_bot}](https://discord.com/users/{owner_bot.id})" , False),
             ("Stats " , f"{emoji_converter('cursor')} Line count : `{count_python('.'):,}`\n{emoji_converter('latte_icon')} Servers : `{serverCount}`\n{emoji_converter('member')} Users : `{memberCount}`\n{emoji_converter('bot_commands')} Commands : `{totalcommands}`" , False), #{platform.system()}
-            ("Bot Info" , f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`\n{emoji_converter('mongo')} Database : `MongoDB`" , False),
-            ]
+            ("Bot Info" , f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`{latte_db}" , False),
+        ]
         
         for name , value , inline in fields:
            embed.add_field(name=name , value=value , inline=inline)
@@ -143,7 +145,8 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         embed = discord.Embed(color=self.bot.white_color)
         embed.add_field(name=f"{emoji_converter('latte_icon')} Latency", value=f"```nim\n{bot_latency} ms```", inline=True)
         embed.add_field(name=f"{emoji_converter('cursor')} Typing", value=f"```nim\n{typingms} ms```", inline=True)
-        embed.add_field(name=f"{emoji_converter('mongo')} Database", value=f"```nim\n{(dbend-dbstart)*1000:,.0f} ms```", inline=True)
+        if ctx.guild.id == self.bot.latte_guild_id:
+            embed.add_field(name=f"{emoji_converter('mongo')} Database", value=f"```nim\n{(dbend-dbstart)*1000:,.0f} ms```", inline=True)
         await ctx.send(embed=embed)
 
 def setup(bot):
