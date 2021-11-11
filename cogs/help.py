@@ -1,13 +1,9 @@
 # Standard
 import discord
-import random
-import asyncio
-import io
 import contextlib
-import re
 from discord.ext import commands
-from typing import Any, Dict, List, Optional, Union
 from utils.formats import count_python
+from typing import Any, Dict, List, Optional, Union
 from datetime import datetime, timedelta, timezone
 
 # Local
@@ -19,9 +15,9 @@ class HelpDropdown(discord.ui.Select):
         self.view_ = view # i hope that works
         options = []
         if ctx.guild.id == ctx.bot.latte_guild_id:
-            ignoredCogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
+            ignoredCogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
         else:
-            ignoredCogs = ['Error', 'Events', 'Help', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
+            ignoredCogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
 
         botCogs = ctx.bot.cogs
         for cog in botCogs:
@@ -154,9 +150,9 @@ class LatteBotHelp(commands.HelpCommand):
         cogs_description = []
 
         if ctx.guild.id == ctx.bot.latte_guild_id:
-            ignored_cogs = ['Error', 'Events', 'Help', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
         else:
-            ignored_cogs = ['Error', 'Events', 'Help', 'Latte', 'Leveling', 'NSFW', 'Owner','Reaction', 'Reference', 'Tags', 'Testing']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
         
         iter = 1
         #if cog is None or cog.qualified_name in ignored_cogs: continue

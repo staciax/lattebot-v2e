@@ -2,6 +2,7 @@
 import discord
 import os
 import datetime
+import asyncio
 from discord.ext import commands
 from os import environ
 from os.path import join, dirname
@@ -11,9 +12,10 @@ from datetime import datetime
 # Third party
 from dotenv import load_dotenv
 import motor.motor_asyncio
+import asyncpg
 
 # Local
-from utils.json_loader import latte_read, read_json , write_json
+from utils.json_loader import read_json
 from utils.mongo import Document
 
 #json_loader
@@ -32,12 +34,12 @@ async def get_prefix(bot, message):
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.bot_version = "0.0.1s"
-        self.last_update = [2021, 11, 10]
+        self.last_update = [2021, 11, 11]
         self.launch_time = datetime.utcnow()
         self.tester = ''
         self.github = "https://github.com/staciax"
         self.defaul_prefix = 're'
-        self.blacklisted_users = []
+        self.blacklist = {}
         self.afk_user = {}
         self.sniped = {}
         self.sniped_embed = {}
@@ -72,7 +74,6 @@ class LatteBot(commands.Bot):
                 raise Exception("Command does not exist for signature.")
         else:
             command = command_name
-        #return self.help_command.get_command_signature(command)
         return self.help_command.get_command_signature(command, ctx)
         
 bot = LatteBot(intents=discord.Intents(
@@ -96,7 +97,6 @@ bot = LatteBot(intents=discord.Intents(
 # botdata = {
 #     "token": "this token",
 #     "color": 0xffcccb,
-#     "wtf": "testing",
 # }
 # a = testing(**botdata)
 
@@ -111,7 +111,39 @@ async def on_ready():
     print(f"\nName : {bot.user}\nActivity : {bot_avtivity}\nServers : {len(bot.guilds)}\nUsers : {len(set(bot.get_all_members()))}")
     print("\nCog loaded\n---------\n")
 
-#bot.load_extension('jishaku')
+async def create_db_pool():
+    bot.pg_con = await asyncpg.create_pool(host=data['dbhost'], user=data['dbuser'], password=data['dbpassword'], database=data['database'], min_size=1, max_size=5)
+    print("Connected to PostgreSQL")
+
+async def run_once_when_ready():
+    await bot.wait_until_ready()
+    banuser = await bot.pg_con.fetch("SELECT user_id, is_blacklisted FROM public.blacklist;")
+    for value in banuser:
+        bot.blacklist[value['user_id']] = (value['is_blacklisted'] or False)
+    print("\nBlacklist database loaded")
+
+@bot.check
+def blacklist(ctx):
+    try:
+        is_blacklisted = bot.blacklist[ctx.author.id]
+    except KeyError:
+        is_blacklisted = False
+    
+    if ctx.author.id == bot.owner_id:
+        is_blacklisted = False
+    
+    if is_blacklisted is False:
+        return True
+    else:
+        raise commands.CheckFailure
+
+# @bot.check
+# async def blacklist(ctx):
+#     if ctx.author.id in blacklisted:
+#         return False # or raise an error
+#     return True
+
+bot.load_extension('jishaku')
 
 if __name__ == "__main__":
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(bot.mongo_url))
@@ -132,4 +164,6 @@ if __name__ == "__main__":
         if file.endswith(".py") and not file.startswith("_"):
             bot.load_extension(f'cogs.{file[:-3]}')
     
+    bot.loop.run_until_complete(create_db_pool())
+    bot.loop.create_task(run_once_when_ready())
     bot.run(bot.token)

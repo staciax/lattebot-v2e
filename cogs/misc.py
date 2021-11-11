@@ -141,12 +141,17 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         dbstart = time.monotonic()
         await self.bot.latte_ping.find_by_custom({"stacia_id": 240059262297047040})
         dbend = time.monotonic()
+
+        sqlstart = time.monotonic()
+        await self.bot.pg_con.fetch("SELECT * FROM public.blacklist;")
+        sqlend = time.monotonic()
        
         embed = discord.Embed(color=self.bot.white_color)
         embed.add_field(name=f"{emoji_converter('latte_icon')} Latency", value=f"```nim\n{bot_latency} ms```", inline=True)
         embed.add_field(name=f"{emoji_converter('cursor')} Typing", value=f"```nim\n{typingms} ms```", inline=True)
         if ctx.guild.id == self.bot.latte_guild_id:
             embed.add_field(name=f"{emoji_converter('mongo')} Database", value=f"```nim\n{(dbend-dbstart)*1000:,.0f} ms```", inline=True)
+        embed.add_field(name=f"{emoji_converter('postgresql')} Postgresql", value=f"```nim\n{round((sqlstart-sqlend)*1000)} ms```", inline=True)
         await ctx.send(embed=embed)
 
 def setup(bot):

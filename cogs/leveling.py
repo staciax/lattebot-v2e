@@ -1,19 +1,11 @@
 # Standard 
 import discord
-import random
-import asyncio
-import json
 from discord.ext import commands 
-from datetime import datetime, timedelta, timezone
 
 # Third party
-import requests
-from PIL import Image, ImageDraw , ImageFont , ImageEnhance , ImageFilter
-from io import BytesIO
 
 # Local
 from utils.xp_pillow import level_images
-from utils.paginator import SimplePages
 from utils.buttons import NewSimpage
 from utils.useful import RenlyEmbed
 from utils.checks import is_latte_guild

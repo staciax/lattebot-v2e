@@ -17,7 +17,6 @@ from utils.mod_converter import do_removal , TimeConverter
 from utils.paginator import SimplePages
 from utils.useful import RenlyEmbed
 from utils.checks import bypass_for_owner
-from utils.emoji import emoji_converter
 
 class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     """Moderation related commands"""
@@ -162,8 +161,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def clear(
         self,
         ctx,
-        type: Literal["message without pinned","bot","attachments","embed","custom emoji","all"] = commands.Option(description="choose type to clean message"),
-        search:int = commands.Option(default=30, description="amount to search message / default = 30")
+        type: Literal["all","message without pinned","bot","attachments","embed","custom emoji"] = commands.Option(description="choose type to clean message"),
+        search:int = commands.Option(default=15, description="amount to search message / default = 15")
     ):
         embed = discord.Embed(color=self.bot.white_color)
 
@@ -224,7 +223,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         self,
         ctx,
         member:discord.Member = commands.Option(description="Mention member"),
-        search:int = commands.Option(default=30, description="amount to search message / default = 30")
+        search:int = commands.Option(default=15, description="amount to search message / default = 15")
     ):
         embed = discord.Embed(color=self.bot.white_color)
         try:
@@ -248,10 +247,6 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         ):
 
         embed = discord.Embed(color=self.bot.white_color)
-
-        if member == self.bot.user:
-            embed.description = "can't mute bot"
-            return await ctx.send(embed=embed, ephemeral=True)
 
         # #Remind me to delete this after release
         # if time is not None and int(time) > 21600:

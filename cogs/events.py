@@ -6,17 +6,15 @@ import io
 import asyncio
 from discord import Embed
 from discord.ext import commands , tasks
-from datetime import datetime, timezone , timedelta
-from typing import Literal
+from datetime import datetime, timezone
 from re import search
 
 # Third
 from googletrans import Translator
 
 # Local
-from utils.json_loader import latte_read, latte_write
+from utils.json_loader import latte_read
 from utils.converter import status_icon
-from utils.emoji import emoji_converter
 
 class Events(commands.Cog, command_attrs = dict(slash_command=True)):
     def __init__(self, bot):

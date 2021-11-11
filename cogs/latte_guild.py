@@ -21,13 +21,13 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='latte_icon_new', id=907030425011109888, animated=False)
     
-    @commands.command(help="latte server template")
+    @commands.command(aliases=['lt'], help="latte server template")
     @commands.guild_only()
     @is_latte_guild()
     async def latte_template(self, ctx):
         await ctx.send("https://discord.new/sFYKgkknRN5f")
 
-    @commands.command(help="lattte temp role")
+    @commands.command(aliases=['ls'], help="lattte temp role")
     @commands.guild_only()
     @is_latte_guild()
     async def latte_temp_role(self, ctx, member: discord.Member = commands.Option(default=None, description="Give role to member")):

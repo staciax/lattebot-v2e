@@ -46,7 +46,8 @@ def emoji_converter(name):
     "cursor":"<a:cursor:896576387002032159>",
     "python":"<:python:904565441761017907>",
     "bot_commands":"<:bot_commands:904565707981852723>",
-    "dpy":"<:dpy:904565466633211925>"
+    "dpy":"<:dpy:904565466633211925>",
+    "postgresql":"<:postgresql:908211369743122443>"
   }
   return names_to_emojis.get(name)
 

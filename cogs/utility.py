@@ -14,7 +14,7 @@ from googletrans import Translator
 
 # Local
 from utils.json_loader import latte_read, latte_write
-from utils.converter import FutureTime_converter , TimeConverter
+from utils.converter import TimeConverter
 from utils.formats import format_dt , format_relative
 from utils.buttons import Confirm
 from utils.useful import RenlyEmbed
@@ -293,7 +293,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         elif view.value:
             view.clear_items()
             embed_edit = discord.Embed(color=member.colour , timestamp=futuredate)
-            embed_edit.description = f"**TIME TO SLEEP** <a:b_hitopotatosleep:864921119538937968>\n{format_dt(futuredate, style='f')}({format_dt(futuredate, style='R')})"
+            embed_edit.description = f"**TIME TO SLEEP** {emoji_converter('sleeping')}\n{format_dt(futuredate, style='f')}({format_dt(futuredate, style='R')})"
             if member.avatar.url is not None:
                 embed_edit.set_footer(text=member , icon_url=member.avatar.url)
             else:

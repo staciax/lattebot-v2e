@@ -10,7 +10,6 @@ from typing import Optional
 # Local
 from utils.paginator import SimplePages
 from utils.checks import is_latte_guild
-from utils.useful import RenlyEmbed
 from utils.custom_button import content_button
 
 class Cancel_button(discord.ui.View):
@@ -57,6 +56,13 @@ class Cancel_button(discord.ui.View):
     async def on_timeout(self):
         self.value = False
         await self.message.edit(view=None)
+
+    async def delete_message(self):  
+        self.value = False
+        try:
+            await self.message.delete()
+        except:
+            return
 
 class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     """Commands to fetch something by a tag name"""
@@ -109,7 +115,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed_r.description = f"Tag not found."
             await ctx.send(embed=embed_r , ephemeral=True)
 
-    @commands.command(aliases=['create'], help="Creates a new tag owned by you.")
+    @commands.command(help="Creates a new tag owned by you.")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_create(self, ctx, name:str = commands.Option(description="Input name")):
@@ -169,7 +175,9 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             #reponse
             embed_edit = discord.Embed(description=f"Tag **{name}** successfully created.", timestamp=discord.utils.utcnow(), color=0x77dd77)
             # await message_response.delete()
-            await view.message.edit(embed=embed_edit, view=None)
+            # await view.message.edit(embed=embed_edit, view=None)
+            await view.delete_message()
+            await ctx.channel.send(embed=embed_edit)
 
     @commands.command(help="remove your tag")
     @commands.guild_only()
@@ -339,7 +347,9 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             else:
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}")
             # await message_response.delete()
-            await view.message.edit(embed=embed_edit, view=None)
+            # await view.message.edit(embed=embed_edit, view=None)
+            await view.delete_message()
+            await ctx.channel.send(embed=embed_edit)
 
     @commands.command(help="Show all tag in your server or member")
     @commands.guild_only()
