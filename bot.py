@@ -92,7 +92,7 @@ bot = LatteBot(intents=discord.Intents(
     invites=True,  # invite create/delete
     emojis=True,  # emoji update
     bans=True  # member ban/unban
-),help_command = None, case_insensitive = True , slash_commands = True, owner_id=240059262297047041) #, slash_command_guilds=[840379510704046151]
+),help_command = None, case_insensitive = True, slash_commands = True, owner_id=240059262297047041) #, slash_command_guilds=[840379510704046151]
  
 # botdata = {
 #     "token": "this token",
@@ -112,15 +112,17 @@ async def on_ready():
     print("\nCog loaded\n---------\n")
 
 async def create_db_pool():
-    bot.pg_con = await asyncpg.create_pool(host=data['dbhost'], user=data['dbuser'], password=data['dbpassword'], database=data['database'], min_size=1, max_size=5)
-    print("Connected to PostgreSQL")
+    if not bot.tester or len(bot.tester) == 0:
+        bot.pg_con = await asyncpg.create_pool(host=data['dbhost'], user=data['dbuser'], password=data['dbpassword'], database=data['database'], min_size=1, max_size=5)
+        print("Connected to PostgreSQL")
 
 async def run_once_when_ready():
     await bot.wait_until_ready()
-    banuser = await bot.pg_con.fetch("SELECT user_id, is_blacklisted FROM public.blacklist;")
-    for value in banuser:
-        bot.blacklist[value['user_id']] = (value['is_blacklisted'] or False)
-    print("\nBlacklist database loaded")
+    if not bot.tester or len(bot.tester) == 0:
+        banuser = await bot.pg_con.fetch("SELECT user_id, is_blacklisted FROM public.blacklist;")
+        for value in banuser:
+            bot.blacklist[value['user_id']] = (value['is_blacklisted'] or False)
+        print("\nBlacklist database loaded")
 
 @bot.check
 def blacklist(ctx):
@@ -143,7 +145,7 @@ def blacklist(ctx):
 #         return False # or raise an error
 #     return True
 
-bot.load_extension('jishaku')
+# bot.load_extension('jishaku')
 
 if __name__ == "__main__":
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(bot.mongo_url))
