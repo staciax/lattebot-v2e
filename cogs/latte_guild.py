@@ -40,7 +40,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
             if member_role:
                 embed_role = discord.Embed(
                     description=f"{member.name} is already a temp role!", color=self.bot.white_color)
-                return await ctx.send(embed=embed_role, ephemeral=True)
+                return await ctx.send(embed=embed_role, ephemeral=True, delete_after=15)
             await member.add_roles(role)
             embed = discord.Embed(
                 description="Temp is ready\n`This role will disappear within 2 hour.`", color=self.bot.white_color)

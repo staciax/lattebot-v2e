@@ -28,11 +28,15 @@ class RenlyEmbed(discord.Embed):
         return instance
 
     @classmethod
-    def to_error(cls, title: Optional[str] = "Error",
-                 color: Union[discord.Color, int] = 0xffffff, **kwargs) -> "RenlyEmbed":
-        return cls(title=title, color=color, **kwargs)
+    def to_error(cls, color: Union[discord.Color, int] = 0xFF7878, **kwargs) -> "RenlyEmbed":
+        return cls(color=color, **kwargs)
     
     @classmethod
     def to_success(cls, color: Union[discord.Color, int] = 0xffffff, **kwargs) -> "RenlyEmbed":
         return cls(color=color, **kwargs)
+    
+    # @classmethod
+    # def to_error(cls, title: Optional[str] = "Error",
+    #              color: Union[discord.Color, int] = 0xFF7878, **kwargs) -> "RenlyEmbed":
+    #     return cls(title=title, color=color, **kwargs)
 

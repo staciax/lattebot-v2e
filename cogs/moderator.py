@@ -138,7 +138,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             color=self.bot.white_color
         )
         await ctx.channel.purge(limit=(int(amount) + 1))
-        await ctx.send(embed=embed, ephemeral=True)
+        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
     
     # @commands.command(help="Cleanup the bot's messages")
     # @commands.guild_only()
@@ -212,7 +212,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             except:
                 embed.description=f"i can't message"   
         
-        await ctx.send(embed=embed , ephemeral=True)
+        await ctx.send(embed=embed , ephemeral=True, delete_after=15)
 
     @commands.command(help="Cleanup member messages")
     @commands.guild_only()
@@ -231,7 +231,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
         except:
             embed.description=f"i can't cleanup messages"
-        await ctx.send(embed=embed , ephemeral=True)
+        await ctx.send(embed=embed , ephemeral=True, delete_after=15)
         
     @commands.command(help="Mute member")
     @commands.guild_only()
@@ -258,15 +258,15 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
         if not role:
             embed.description = "Your server don't have : **`Muted Role`**"
-            return await ctx.send(embed=embed, ephemeral=True)
+            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
         if member == self.bot.user:
             embed.description = "You cannot mute the bot"
-            return await ctx.send(embed=embed, ephemeral=True)
+            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
         
         if member == ctx.author:
             embed.description = "You cannot mute yourself."
-            return await ctx.send(embed=embed, ephemeral=True)
+            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
                 
         member_role = discord.utils.get(member.roles, name="⠀ mute ♡ ₊˚")
         if member_role:
@@ -356,8 +356,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def slowmode(self, ctx , time: TimeConverter = commands.Option(description="slowmode duration / time = 0s for disable")):
         
         if time == 0:
-            embed_time = RenlyEmbed.to_error(title="Slowmode error", description="Time is invalid" , color=self.bot.error_color)
-            return await ctx.send(embed=embed_time, ephemeral=True)
+            embed_time = RenlyEmbed.to_error(description="Time is invalid")
+            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
         
         embed = discord.Embed(color=self.bot.white_color)
         
@@ -397,17 +397,17 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
         if member.id == ctx.author.id:
             embed_error.description = "You can't Voice mute yourself!"
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         if isinstance(member, discord.Member):
             if ctx.me.top_role < member.top_role:
                 embed_error.description = f"Can't mute this member"
-                return await ctx.send(embed=embed_error, ephemeral=True)
+                return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
             elif ctx.me.top_role >= member.top_role:
                 pass
             if member == ctx.guild.owner:
                 embed_error.description = f"Can't mute The Owner"
-                return await ctx.send(embed=embed_error, ephemeral=True)
+                return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
         if reason == None:
             reason = "None"
@@ -424,7 +424,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed)
         except:
             embed_error = RenlyEmbed.to_error(description=f"Target user is not connected to voice.")
-            await ctx.send(embed=embed_error, ephemeral=True)
+            await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
 
     @commands.command(help="Deafens the specified member with a specified reason.")
@@ -443,17 +443,17 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
             if member.id == ctx.author.id:
                 embed_error.description = "You can't VC deafen yourself!"
-                return await ctx.send(embed=embed_error, ephemeral=True)
+                return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
             if isinstance(member, discord.Member):
                 if ctx.me.top_role < member.top_role:
                     embed_error.description = f"Can't deafen this member"
-                    return await ctx.send(embed=embed_error, ephemeral=True)
+                    return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
                 elif ctx.me.top_role >= member.top_role:
                     pass
                 if member == ctx.guild.owner:
                     embed_error.description = f"Can't deafen The Owner"
-                    return await ctx.send(embed=embed_error, ephemeral=True)
+                    return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
             
             if reason == None:
                 reason = "None"
@@ -469,7 +469,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 await ctx.send(embed=embed)
             except:
                 embed_error = RenlyEmbed.to_error(description=f"Target user is not connected to voice.")
-                await ctx.send(embed=embed_error, ephemeral=True)
+                await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         else:
             raise commands.MissingPermissions(['Deafen Members'])
     

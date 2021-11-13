@@ -367,7 +367,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(file=f, embed=embed)
         else:
             embed.description = f"this user don't have a banner."
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
@@ -472,8 +472,8 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed , view=view)
 
         else:
-            embed = RenlyEmbed.to_error(title="Emoji info error",description=f"{emoji} <- This is unicode emoji")
-            await ctx.send(embed=embed, ephemeral=True)
+            embed = RenlyEmbed.to_error(description=f"{emoji} <- This is unicode emoji")
+            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
     @emoji.command(name="list",help="Shows you a list of emotes from the server.")
     @commands.guild_only()
@@ -581,7 +581,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.set_author(name=member)
         embed.description = f"{d} Desktop\n{m} Mobile\n{w} Web"
 
-        await ctx.send(embed=embed , ephemeral=True)
+        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
     @commands.command(help="Shows info about the song the specified member is currently listening to.")
     @commands.guild_only()
@@ -609,7 +609,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
         else:
             embed = RenlyEmbed.to_success(description="That member doesn't have a spotify status!")
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
             
     @commands.command(
     help="Shows you a list of members from the server.")

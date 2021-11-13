@@ -42,7 +42,7 @@ class Cancel_button(discord.ui.View):
             embed_error.description='An unknown error occurred, sorry'
             await interaction.response.send_message(embed=embed_error, ephemeral=True)
 
-    @discord.ui.button(label="See old content", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Content before edit", style=discord.ButtonStyle.green)
     async def content_button(self, button, interaction):
         data = self.content
         if data:
@@ -111,9 +111,11 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             if matches:
                 matches = "\n".join(matches)
                 embed_r.description = f"Tag not found. Did you mean...\n`{matches}`"
+                cooldown = 30
             else:
                 embed_r.description = f"Tag not found."
-            await ctx.send(embed=embed_r , ephemeral=True)
+                cooldown = 15
+            await ctx.send(embed=embed_r , ephemeral=True, delete_after=cooldown)
 
     @commands.command(help="Creates a new tag owned by you.")
     @commands.guild_only()
@@ -126,8 +128,8 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name})
         if bool(data_check) == True:
-            embed_error.description = "This tag already exists. Please use another tag."
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            embed_error.description = "This tag already exists, please use another tag."
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         #data_count
         data_count = await self.bot.latte_tags.find_many_by_custom({})
@@ -152,7 +154,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #when_content_more_2000
         if len(content) > 2000:
             embed_error.description = 'Tag content is a maximum of 2000 characters.'
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
         if not view.value:
             return
@@ -203,12 +205,12 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #check_data
         if bool(data_check) == False:
             embed_error.description = "tag not found"
-            return await ctx.send(embeb=embed_error, ephemeral=True)
+            return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
 
         #check_owner_tag
         if data_check["user_id"] != ctx.author.id:
             embed_error.description = "You are not the owner of the tag"
-            return await ctx.send(embed=embed_error , ephemeral=True)
+            return await ctx.send(embed=embed_error , ephemeral=True, delete_after=15)
         
         #deletd_data
         if isInt:
@@ -231,7 +233,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             return await ctx.send(embed=embed)
         else:
             embed.description = "I could not find tag"
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
     @commands.command(help="rename your tag")
     @commands.guild_only()
@@ -245,12 +247,12 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #check_data
         if bool(data_check) == False:
             embed_error.description = "tag not found"
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         #check_owner_tag
         if str(data_check["user_id"]) != str(ctx.author.id):
             embed_error.description = "You are not the owner of the tag"
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         #find_again
         data = await self.bot.latte_tags.find_by_custom({"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag": name_old})
@@ -298,12 +300,12 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #check_data
         if bool(data_check) == False:
             embed_error.description = "Tag not found"
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         #check_owner_tag
         if data_check["user_id"] != ctx.author.id:
             embed_error.description = "You are not the owner of this tag."
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         old_content = data_check['content'] or None
 
@@ -323,7 +325,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #when_content_more_2000
         if len(content) > 2000:
             embed_error.description = 'Tag content is a maximum of 2000 characters.'
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         if not view.value:
             return
@@ -369,7 +371,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #check_data
         if bool(data) == False:
             embed_error.description = data_check
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
         #count_tag
         all_tag = []
@@ -385,7 +387,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             #reponse
             embed = discord.Embed(description=f"This server doesn't have any tags.", color=0xFF7878)
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
     @commands.command(help="search tag")
     @commands.guild_only()
@@ -416,7 +418,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             #reponse
             embed = discord.Embed(description=f"**{name}** This tag not found", color=0x77dd77)
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
     @commands.command(help="Shows information about the specified tag.")
     @commands.guild_only()
@@ -457,9 +459,11 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             if matches:
                 matches = "\n".join(matches)
                 embed_r.description = f"Tag not found. Did you mean...\n`{matches}`"
+                cooldown = 30
             else:
                 embed_r.description = f"Tag not found."
-            await ctx.send(embed=embed_r , ephemeral=True)
+                cooldown = 15
+            await ctx.send(embed=embed_r , ephemeral=True, delete_after=cooldown)
 
     @commands.command(help="Total tag in your server")
     @commands.guild_only()
@@ -469,7 +473,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         embed_error = discord.Embed(color=0xFF7878)
         if bool(data) == False:
             embed_error.description = "This server doesn't have any tags."
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
         embed = discord.Embed(description=f"Total tags : `{len(data)}`",color=0x77dd77)
         await ctx.send(embed=embed)

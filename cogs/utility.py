@@ -105,22 +105,22 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             member = ctx.author
 
         if member.id in self.bot.afk_user.keys():
-            embed_time = RenlyEmbed.to_error(title="You already have afk status",description=f"**reason:** {self.bot.afk_user[member.id]['reason']}")
-            return await ctx.send(embed=embed_time, ephemeral=True)
+            embed_time = RenlyEmbed.to_error(title="You already have afk status", description=f"**reason:** {self.bot.afk_user[member.id]['reason']}")
+            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
 
         embed = Embed(color=self.bot.white_color)
         if reason is None:
             reason = "personal problems"
         elif len(reason) > 100:
             embed.description = "**reason** is a maximum of 100 characters."
-            return await ctx.reply(embed=embed, ephemeral=True)
+            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
         
         self.bot.afk_user[member.id] = {"reason": reason, "name": member.display_name}
         try:
             await member.edit(nick=f'[AFK] {member.display_name}')
         except:
             pass
-        embed.title = f"{member.name} is now AFK"
+        # embed.title = f"{member.name} is now AFK"
         embed.description = f"I have set your afk: {reason}"
 
         await ctx.send(embed=embed)
@@ -144,7 +144,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
             del self.bot.afk_user[member.id]
             embed.description = f"Welcome back {member.mention} , i've removed your **AFK** status."
-            return await ctx.send(embed=embed, ephemeral=True)
+            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
     @commands.command(help="your message to saybot")
     @commands.guild_only()
@@ -164,7 +164,8 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         webhooks = await ctx.channel.webhooks()
         for webhook in webhooks:
             await webhook.delete()
-            await ctx.send("\u200b", ephemeral=True)
+            if ctx.clean_prefix == "/":
+                await ctx.send("\u200b", ephemeral=True)
 
     @commands.command(help="snipe message")
     @commands.guild_only()
@@ -180,7 +181,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 message , content, author, channel , time = self.bot.sniped[ctx.guild.id]
             except:
                 embed.description = "Couldn't find a message to snipe!"
-                return await ctx.send(embed=embed, ephemeral=True)
+                return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
             embed.timestamp = time
                             
@@ -203,7 +204,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed_snipe = self.bot.sniped_embed[ctx.guild.id]
             except:
                 embed.description = "Couldn't find a embed to snipe!"
-                return await ctx.send(embed=embed, ephemeral=True)
+                return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
             await ctx.send(embed=embed_snipe , ephemeral=True)
 
@@ -235,7 +236,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         list_input = list(input_value.split())
 
         if len(list_input) == 1:
-            await ctx.send("There must be at least 2 split messages." , ephemeral=True)
+            await ctx.send("There must be at least 2 split messages." , ephemeral=True, delete_after=15)
             return
         #try_random
         try:
@@ -246,14 +247,17 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="create poll")
     @commands.guild_only()
     async def poll(self, ctx, message= commands.Option(description="poll message")):
+        embed_error = RenlyEmbed.to_error()
         if len(message) > 2000:
-            return await ctx.send('poll message is a maximum of 2000 characters.', ephemeral=True)
+            embed_error.description = 'poll message is a maximum of 2000 characters.'
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         embed_color = ctx.author.color
         
         embed = discord.Embed(title="POLL", description=f"{message}",color=0xffffff)
         embed_success = RenlyEmbed.to_success(description="Poll created successful")
-        await ctx.send(embed=embed_success, ephemeral=True)
+        if ctx.clean_prefix == "/":
+            await ctx.send(embed=embed_success, ephemeral=True)
         msg = await ctx.channel.send(embed=embed)
         await msg.add_reaction(emoji_converter('greentick'))
         await msg.add_reaction(emoji_converter('redtick'))
@@ -265,8 +269,8 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             member = ctx.author
 
         if int(time) > 86400:
-            embed_time = RenlyEmbed.to_error(title="Timer error",description="You can't set timer duration more than 24 hours")
-            return await ctx.send(embed=embed_time, ephemeral=True)
+            embed_time = RenlyEmbed.to_error(description="You can't set timer duration more than 24 hours")
+            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
 
         timewait = int(time)
         futuredate = datetime.now(timezone.utc) + timedelta(seconds=timewait) 
@@ -315,7 +319,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 await member.move_to(channel=None)
         else:
             embed_c = discord.Embed(description="Cancelling sleep time!" , color=0xffffff)
-            await ctx.send(embed=embed_c , ephemeral=True)
+            await ctx.send(embed=embed_c , ephemeral=True, delete_after=15)
             await m.delete()
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])
@@ -344,14 +348,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     async def remind(self, ctx, time:TimeConverter = commands.Option(description="specify duration") , message=commands.Option(default=None,description="message to remind") , channel: discord.TextChannel= commands.Option(default=None,description="spectify channel to remind")):
         if time == 0:
-            embed_time = RenlyEmbed.to_error(title="Remind error", description="Time is invalid" , color=self.bot.error_color)
-            return await ctx.send(embed=embed_time, ephemeral=True)
+            embed_time = RenlyEmbed.to_error(description="Time is invalid")
+            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
         if message is None:
             message = "..."
         elif len(message) > 2000:
-            embed_error = RenlyEmbed.to_error(title='Remind error', description='Remind message is a maximum of 2000 characters.')
-            embed_error.color = self.bot.error_color
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            embed_error = RenlyEmbed.to_error(description='Remind message is a maximum of 2000 characters.')
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
         if channel is None:
             channel = ctx.channel
@@ -363,7 +366,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             remind_timed = remind_time.strftime("%d%m%Y%H%M")
             future_data = humanize.naturaldelta(future, minimum_unit='milliseconds')
         except:
-            embed_error = RenlyEmbed.to_error(title="Remind error", description="Time is invalid")
+            embed_error = RenlyEmbed.to_error(description="Time is invalid")
             return await ctx.send(embed=embed_error)
         
         embed = discord.Embed(color=self.bot.white_color)
@@ -390,12 +393,12 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.color = self.bot.white_color
 
         if int(time) > 86400:
-            embed_time = RenlyEmbed.to_error(title="Timer error",description="You can't set timer duration more than 24 hours")
-            return await ctx.send(embed=embed_time, ephemeral=True)
+            embed_time = RenlyEmbed.to_error(description="You can't set timer duration more than 24 hours")
+            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
 
         if time == 0:
-            embed_time = RenlyEmbed.to_error(title="Timer error", description="Time is invalid")
-            return await ctx.send(embed=embed_time, ephemeral=True)
+            embed_time = RenlyEmbed.to_error(description="Time is invalid")
+            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
 
         if channel is None:
             try:
@@ -403,13 +406,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 in_channel = ctx.author.voice.channel.members
             except:
                 embed.description = 'You must join a voice channel first.'
-                return await ctx.send(embed=embed , ephemeral=True)
+                return await ctx.send(embed=embed , ephemeral=True, delete_after=15)
         else:
             in_channel = channel.members
         
         if channel and len(in_channel) == 0:
             embed.description = f'No members found in {channel.mention}'
-            return await ctx.send(embed=embed , ephemeral=True)
+            return await ctx.send(embed=embed , ephemeral=True, delete_after=15)
 
         timewait = int(time)
         futuredate = datetime.now(timezone.utc) + timedelta(seconds=timewait) 
@@ -456,7 +459,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                     await member.move_to(channel=None)
         else:
             embed_c = discord.Embed(description="*Cancelling!*" , color=self.bot.white_color)
-            await ctx.send(embed=embed_c , ephemeral=True)
+            await ctx.send(embed=embed_c, ephemeral=True, delete_after=15)
             await m.delete()
     
     @commands.command(help="Stop disconnect timer")
@@ -472,14 +475,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 del data[str(channel.id)]
                 latte_write(data, "channel_sleep")
                 embed = discord.Embed(description=f"{channel.mention} has stopped the timer." , color=self.bot.white_color)
-                await ctx.send(embed=embed)
+                return await ctx.send(embed=embed)
             except:
                 embed = discord.Embed(description="Error stop timer" , color=0xde3163)
-                await ctx.send(embed=embed)
-                return
+                return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
         else:
             em_error = discord.Embed(description=f"Timer not found", color=0xde3163)
-            await ctx.send(embed=em_error)
+            await ctx.send(embed=em_error, ephemeral=True, delete_after=15)
 
     @commands.command(aliases=["trans"], help="Translate your message")
     @commands.guild_only()
@@ -488,21 +490,21 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
         if len(source) > 2000:
             embed_error.description = f"The message character a maximum of 2000 characters."
-            return await ctx.send(embed=embed_error , ephemeral=True)
+            return await ctx.send(embed=embed_error , ephemeral=True, delete_after=15)
     
         translator = Translator()
         try:
             a = translator.detect(str(source))
         except:
             embed_error.description = f"**{to_lang}** <- This language is not found"
-            return await ctx.send(embed=embed_error , ephemeral=True)
+            return await ctx.send(embed=embed_error , ephemeral=True, delete_after=15)
 
         try:
             result =  translator.translate(f'{source}' , dest=f'{to_lang}')
             b = translator.detect(str(result.text))
         except:
             embed_error.description = "An unknown error occurred, sorry"
-            return await ctx.send(embed=embed_error , ephemeral=True)
+            return await ctx.send(embed=embed_error , ephemeral=True, delete_after=15)
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name="Translate" , icon_url="https://upload.wikimedia.org/wikipedia/commons/d/db/Google_Translate_Icon.png")

@@ -11,7 +11,7 @@ from utils.useful import RenlyEmbed
 from utils.checks import is_latte_guild
 
 # xp_channel
-chat_channel = 861883647070437386 , 840398821544296480 , 863438518981361686 , 859960606761549835 , 840405578618109952 #chat,game,anime,kdbot,game-chat
+chat_channel = 861883647070437386 , 840398821544296480 , 863438518981361686 , 859960606761549835 #chat,game,anime,kdbot
 
 # lvl_data
 level = ["level 3 ꮺ","level 5 ꮺ","level 10 ꮺ","level 20 ꮺ","level 25 ꮺ","level 30 ꮺ","level 40 ꮺ","level 45 ꮺ","level 50 ꮺ","Nebula ꮺ"]
@@ -115,10 +115,6 @@ class Leveling(commands.Cog):
     @commands.guild_only()
     @is_latte_guild()
     async def xp(self, ctx, member: discord.Member = None):
-        if ctx.channel.id in chat_channel:
-            embed = RenlyEmbed.to_error(description="Please use bot command in <#861874852050894868>")
-            embed.color = self.bot.white_color
-            return await ctx.send(embed=embed , ephemeral=True)
         try:
             async with ctx.typing():
                 if not member:
@@ -147,12 +143,15 @@ class Leveling(commands.Cog):
                     
                     embedlv = discord.Embed(title=f"{member.name}'s level stats | {ctx.guild.name}",color=0x77dd77)
                     embedlv.set_image(url="attachment://latte-level.png")
-                    
+                    if ctx.channel.id in chat_channel:
+                        if ctx.clean_prefix != "/":
+                            await ctx.message.delete()
+                        return await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15)
                     await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
         except:
-            embed_error = discord.Embed(color=self.bot.error_color)
+            embed_error = RenlyEmbed.to_error()
             embed_error.description='An unknown error occurred, please try again !'
-            await ctx.send(embed=embed_error, ephemeral=True)
+            await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
             # raise commands.BadArgument('error')
   
     # @commands.command(description="Crete xp role")
