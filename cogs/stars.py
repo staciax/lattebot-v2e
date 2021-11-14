@@ -87,7 +87,7 @@ class Star(commands.Cog):
             if str(payload.emoji) != '\N{WHITE MEDIUM STAR}':
                 return
             message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-            if not message.author.bot and payload.member.id != message.author.id:
+            if not message.author.bot and payload.member.id != message.author.id or payload.member == self.bot.renly:
                 data = await self.bot.latte_stars.find_by_custom({"message_id": message.id})            
                 if data is None:
                     count = 1
@@ -116,7 +116,7 @@ class Star(commands.Cog):
             if str(payload.emoji) != '\N{WHITE MEDIUM STAR}':
                 return
             message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-            if not message.author.bot and payload.user_id != message.author.id:
+            if not message.author.bot and payload.user_id != message.author.id or payload.user_id == self.bot.renly:
                 data = await self.bot.latte_stars.find_by_custom({"message_id": message.id})          
                 if data is not None:
                     message_bot = await self.bot.get_channel(data["channel_bot_id"]).fetch_message(data["message_bot"])

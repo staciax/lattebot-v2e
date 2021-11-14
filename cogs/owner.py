@@ -297,7 +297,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
     async def load(
             self,
             ctx,
-            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','nsfw','owner','reaction','tags','testing','utility'] = commands.Option(description="extension")
+            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")
         ):
         embed = discord.Embed()
         try:
@@ -317,7 +317,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
     async def unload(
             self,
             ctx,
-            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','nsfw','owner','reaction','tags','testing','utility'] = commands.Option(description="extension")
+            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")
         ):
         embed = discord.Embed()
         try:
