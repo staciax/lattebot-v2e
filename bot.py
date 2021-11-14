@@ -51,6 +51,7 @@ class LatteBot(commands.Bot):
         self.latte_id = 887274968012955679
         self.latte_guild_id = 840379510704046151
         self.latte_sup_guild_id = 887274968012955679
+        self.latte_log_id = 909301335743143946
         self.latte_invite_url = os.getenv('LATTE_URL', None)
         self.latte_supprt_url = os.getenv('SUPPORT_URL', None)
         self.new_members = {}
@@ -75,7 +76,7 @@ class LatteBot(commands.Bot):
         else:
             command = command_name
         return self.help_command.get_command_signature(command, ctx)
-        
+            
 bot = LatteBot(intents=discord.Intents(
     guild_reactions=True,  # reaction add/remove/clear
     guild_messages=True,  # message create/update/delete
@@ -153,6 +154,8 @@ if __name__ == "__main__":
     #db_tag
     bot.latte_db = bot.mongo["latteonly"]
     bot.latte_tags = Document(bot.latte_db, "tags")
+    bot.latte_todo = Document(bot.latte_db, "todo")
+    bot.latte_stars = Document(bot.latte_db, "stars")
 
     #db_testing
     bot.db_ping = bot.mongo["lattebot"]

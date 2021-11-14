@@ -10,7 +10,7 @@ import aiohttp
 # Local
 from utils.paginator import RoboPages
 from utils.buttons import *
-from utils.custom_button import base_Button_URL , base_Button_URL2
+from utils.custom_button import base_Button_URL , Button_URL
 
 class Testing(commands.Cog):
     def __init__(self, bot):
@@ -38,7 +38,7 @@ class Testing(commands.Cog):
     #         "facebook":"https://www.facebook.com/",
     #         "youtube":"https://www.youtube.com/"
     #     }
-    #     view = base_Button_URL2(label=data.keys(), url=data.values())
+    #     view = Button_URL(label=data.keys(), url=data.values())
     #     await ctx.send("testing", view=view)
 
     # @commands.command(slash_command_guilds=[840379510704046151])

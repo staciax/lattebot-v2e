@@ -15,9 +15,9 @@ class HelpDropdown(discord.ui.Select):
         self.view_ = view # i hope that works
         options = []
         if ctx.guild.id == ctx.bot.latte_guild_id:
-            ignoredCogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
+            ignoredCogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Testing']
         else:
-            ignoredCogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
+            ignoredCogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Tags', 'Testing', 'Todo']
 
         botCogs = ctx.bot.cogs
         for cog in botCogs:
@@ -150,9 +150,9 @@ class LatteBotHelp(commands.HelpCommand):
         cogs_description = []
 
         if ctx.guild.id == ctx.bot.latte_guild_id:
-            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Testing']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Testing']
         else:
-            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Tags', 'Testing']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Tags', 'Testing', 'Todo']
         
         iter = 1
         #if cog is None or cog.qualified_name in ignored_cogs: continue
@@ -175,7 +175,7 @@ class LatteBotHelp(commands.HelpCommand):
         # print(len(cogs))
         # print(cogs)
         if ctx.guild.id == ctx.bot.latte_guild_id:
-            embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[0],cogs[3],cogs[6]) , inline=True)
+            embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**\n•**%s**' % (cogs[0],cogs[3],cogs[6],cogs[9]) , inline=True)
             embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[1],cogs[4],cogs[7]) , inline=True)
             embed.add_field(name=f'** **', value='•**%s**\n•**%s**\n•**%s**' % (cogs[2],cogs[5],cogs[8]) , inline=True)
         else:

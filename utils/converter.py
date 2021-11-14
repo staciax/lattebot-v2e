@@ -1,6 +1,7 @@
 # Standard 
 import discord
 import re
+import requests
 from discord.ext import commands
 from datetime import datetime, timedelta
 
@@ -130,3 +131,10 @@ def FutureTime_converter(time):
         timewait = time * 604800
 
     return timewait
+
+def is_url_image(image_url):
+    image_formats = ("image/png", "image/jpeg", "image/jpg", "image/gif")
+    r = requests.head(image_url)
+    if r.headers["content-type"] in image_formats:
+        return True
+    return False

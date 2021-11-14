@@ -7,7 +7,7 @@ from difflib import get_close_matches
 
 # Local
 
-class Error(commands.Cog, command_attrs = dict(slash_command=True)):
+class Error(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     

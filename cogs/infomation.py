@@ -34,10 +34,12 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='infomation', id=903339421758292008, animated=False)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(help="Server commands")
     @commands.guild_only()
     async def server(self, ctx):
-        await self.bot.help_command.send_group_help_custom(self.server, ctx)
+        if ctx.invoked_subcommand is None:
+            await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
+        # await self.bot.help_command.send_group_help_custom(self.server, ctx)
 
     @server.command(name="info", help="Show server infomation", aliases=["si", "serverinformation", "serverinformations" , "guildinfo" , "gi"])
     @commands.guild_only()
@@ -247,10 +249,12 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
         await ctx.send(embed=embed , view=view)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(help="Avatar commands")
     @commands.guild_only()
     async def avatar(self, ctx):
-        await self.bot.help_command.send_group_help_custom(self.avatar, ctx)
+        if ctx.invoked_subcommand is None:
+            await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
+        # await self.bot.help_command.send_group_help_custom(self.avatar, ctx)
 
     @avatar.command(name="user", help="Shows the user avatar of the specified member.", aliases=["av"])
     @commands.guild_only()
@@ -369,10 +373,12 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.description = f"this user don't have a banner."
             await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(help="Role commands")
     @commands.guild_only()
     async def role(self, ctx):
-        await self.bot.help_command.send_group_help_custom(self.role, ctx)
+        if ctx.invoked_subcommand is None:
+            await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
+        # await self.bot.help_command.send_group_help_custom(self.role, ctx)
 
     @role.command(name="info",aliases=["ri"], help="Shows information about the specified role.")
     @commands.guild_only()
@@ -400,10 +406,12 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         view = roleinfo_view(ctx=ctx, embed=embed_role, entries=role_member_list, role=role)
         view.message = await view.start()
     
-    @commands.group(invoke_without_command=True)
+    @commands.group(help="Emoji commands")
     @commands.guild_only()
     async def emoji(self, ctx):
-        await self.bot.help_command.send_group_help_custom(self.emoji, ctx)
+        if ctx.invoked_subcommand is None:
+            await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
+        # await self.bot.help_command.send_group_help_custom(self.emoji, ctx)
     
     @emoji.command(name="info", help="Shows information about a emoji.")
     @commands.guild_only()

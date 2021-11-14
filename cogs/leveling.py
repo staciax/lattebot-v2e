@@ -51,8 +51,7 @@ class Leveling(commands.Cog):
                     await message.author.add_roles(lvl_bar)
 
                 xp = data["xp"]
-                # print(xp)
-                data["xp"] += 5
+                data["xp"] += 10
                 await self.bot.latte_level.update_by_custom(
                     {"id": message.author.id, "guild_id": message.guild.id}, data
                 )
@@ -64,12 +63,12 @@ class Leveling(commands.Cog):
                     lvl += 1
                 xp -= ((50*((lvl-1)**2))+(50*(lvl-1)))
                 if xp == 0:
-                    emlvup = discord.Embed(description=f"**Congratulations**, {message.author.mention} you leveled up to **level {lvl}.**!",color=0xffffff)
+                    emlvup = discord.Embed(description=f"{message.author.mention} you leveled up to **level {lvl}.**!",color=0xffffff)
                     msg = await message.channel.send(embed=emlvup)
                     for i in range(len(level)):
                         if lvl == levelnum[i]:
                             await message.author.add_roles(discord.utils.get(message.author.guild.roles, name=level[i]))
-                            embed = discord.Embed(description=f"**Congratulations**, {message.author.mention} you leveled up to **level {lvl}.**!\nyou have gotten role **{level[i]}**!!!",color=0xffffff)
+                            embed = discord.Embed(description=f"{message.author.mention} you leveled up to **level {lvl}.**!\nyou have gotten role **{level[i]}**!!!",color=0xffffff)
                             await msg.edit(embed=embed)
             
     @commands.command(help="Level ranking", aliases=['rank','leaderboard'])

@@ -184,7 +184,7 @@ class base_Button_URL(discord.ui.View):
         if self.label and self.url:
             self.add_item(discord.ui.Button(label=self.label, url=self.url))
 
-class base_Button_URL2(discord.ui.View):
+class Button_URL(discord.ui.View):
     def __init__(self, label, url):
         super().__init__()
         self.label = label

@@ -11,6 +11,7 @@ from typing import Optional
 from utils.paginator import SimplePages
 from utils.checks import is_latte_guild
 from utils.custom_button import content_button
+from utils.converter import is_url_image
 
 class Cancel_button(discord.ui.View):
     def __init__(self, ctx, content=None):
@@ -102,7 +103,15 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         #found_or_not_found
         if check_data is not None:
             message = check_data['content']
-            await ctx.send(f"`{check_data['tag']}`\n{message}")
+            # try:
+            #     check_img = is_url_image(image_url=message)
+            # except Exception:
+            #     check_img = False
+            # if ctx.clean_prefix != "/" or check_img is True:
+            #     return await ctx.send(message)
+            if ctx.clean_prefix != "/" or message.lower().endswith(('png','jpeg','jpg','gif','webp','mp4')):
+                return await ctx.send(message)
+            await ctx.send(f"**`{check_data['tag']}`**\n{message}")
         else:
             not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
             names = (r['tag'] for r in not_found)
@@ -117,7 +126,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
                 cooldown = 15
             await ctx.send(embed=embed_r , ephemeral=True, delete_after=cooldown)
 
-    @commands.command(help="Creates a new tag owned by you.")
+    @commands.command(aliases=['tagcreate','tagc'], help="Creates a new tag owned by you.")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_create(self, ctx, name:str = commands.Option(description="Input name")):
@@ -132,12 +141,22 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         #data_count
-        data_count = await self.bot.latte_tags.find_many_by_custom({})
-        num_list = []
-        for x in data_count:     
-            num = x['tag_id']
-            num_list.append(num)
-        next_num = max(num_list)
+        data_tags = await self.bot.latte_tags.find_many_by_custom({})
+        data_count = reversed(data_tags)
+        
+        #create_id
+        try:
+            some_id = []
+            i = 0
+            for x in data_count:
+                i += 1 
+                next_id = x['tag_id']
+                some_id.append(next_id)
+                if i == 3:
+                    break
+            next_num = max(some_id)
+        except:
+            next_num = 1
 
         #response
         view = Cancel_button(ctx)
@@ -160,19 +179,11 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             return
         elif view.value:
 
-            #create_data
-            data = {
-                "user_id": ctx.author.id,
-                "guild_id": ctx.guild.id,
-                "tag": name,
-                "content": content,
-                "tag_id": next_num + 1
-            }
+            tag_filter = {"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag_id": next_num + 1}
+            tag_data = {"tag": name, "content": content}
 
-            #update_data
-            await self.bot.latte_tags.update_by_custom(
-                {"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag": name}, data
-            )
+            #upsert_data
+            await self.bot.latte_tags.upsert_custom(tag_filter, tag_data)
 
             #reponse
             embed_edit = discord.Embed(description=f"Tag **{name}** successfully created.", timestamp=discord.utils.utcnow(), color=0x77dd77)
@@ -181,7 +192,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             await view.delete_message()
             await ctx.channel.send(embed=embed_edit)
 
-    @commands.command(help="remove your tag")
+    @commands.command(aliases=['tagremove','tagr','tagdelete'],help="remove your tag")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_remove(self, ctx, name = commands.Option(description="Input your tag name")):
@@ -204,7 +215,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         
         #check_data
         if bool(data_check) == False:
-            embed_error.description = "tag not found"
+            embed_error.description = "Tag not found"
             return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
 
         #check_owner_tag
@@ -220,10 +231,10 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             data_deleted = await self.bot.latte_tags.delete_by_custom({"guild_id": ctx.guild.id, "tag": str(name)})
         
-        #check_data_deleted?
-        if bool(data_deleted) == False:
-            print("data deleted false")
-            return
+        # #check_data_deleted?
+        # if bool(data_deleted) == False:
+        #     print("data deleted false")
+        #     return
 
         embed = discord.Embed(color=0xFF7878)
         #delete_is_true_or_false
@@ -235,7 +246,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.description = "I could not find tag"
             await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
-    @commands.command(help="rename your tag")
+    @commands.command(aliases=['tagrename','tagre'], help="rename your tag")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_rename(self, ctx, name_old:str= commands.Option(description="tag old name"), name_new:str=commands.Option(description="tag new name")):
@@ -272,7 +283,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.set_footer(text=f"Rename by {ctx.author.display_name}")
         await ctx.send(embed=embed)
 
-    @commands.command(help="edit your tag")
+    @commands.command(aliases=['tagedit','tage'], help="edit your tag")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_edit(self, ctx, tag=commands.Option(description="Input your tag name or id")):
@@ -353,7 +364,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             await view.delete_message()
             await ctx.channel.send(embed=embed_edit)
 
-    @commands.command(help="Show all tag in your server or member")
+    @commands.command(aliases=['taglist','tagl'], help="Show all tag in your server or member")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_list(self, ctx, member: discord.Member = commands.Option(default=None, description="Spectify member")):
@@ -389,7 +400,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             embed = discord.Embed(description=f"This server doesn't have any tags.", color=0xFF7878)
             await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
-    @commands.command(help="search tag")
+    @commands.command(aliases=['tagsearch','tags'], help="search tag")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_search(self, ctx, name:str = commands.Option(description="Input tag name")):
@@ -420,7 +431,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             embed = discord.Embed(description=f"**{name}** This tag not found", color=0x77dd77)
             await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
-    @commands.command(help="Shows information about the specified tag.")
+    @commands.command(aliases=['taginfo','tagi'], help="Shows information about the specified tag.")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_info(self, ctx, tag=commands.Option(description="Input your tag name or id")):
@@ -465,7 +476,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
                 cooldown = 15
             await ctx.send(embed=embed_r , ephemeral=True, delete_after=cooldown)
 
-    @commands.command(help="Total tag in your server")
+    @commands.command(aliases=['tag_count'], help="Total tag in your server")
     @commands.guild_only()
     @is_latte_guild()
     async def tagcount(self, ctx):
