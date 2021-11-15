@@ -25,7 +25,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
 
     @commands.command(name="voice_random", aliases=["rnv"], help="random members in voice channel")
     @commands.guild_only()
-    async def random_voice_member(self, ctx, *, channel: discord.VoiceChannel = commands.Option(default=None, description="spectify channel")):
+    async def random_voice_member(self, ctx, channel: discord.VoiceChannel = commands.Option(default=None, description="spectify channel")):
 
         # check
         if channel is None:

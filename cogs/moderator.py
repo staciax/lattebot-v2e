@@ -62,7 +62,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Remove custom emoji from server")
     @commands.guild_only()
     @commands.cooldown(5, 60, commands.BucketType.user)
-    async def emoji_remove(self, ctx, *, emoji:discord.Emoji = commands.Option(description="Spectify Emoji")):
+    async def emoji_remove(self, ctx, emoji:discord.Emoji = commands.Option(description="Spectify Emoji")):
         embed = discord.Embed()
         try:
             embed.color = 0x77dd77

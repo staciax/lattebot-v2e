@@ -127,7 +127,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="clear afk status")
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
-    async def afk_clear(self, ctx, *,member:discord.Member=commands.Option(default=None,description="spectify member")):
+    async def afk_clear(self, ctx, member:discord.Member=commands.Option(default=None,description="spectify member")):
         if member is None:
             member = ctx.author
 
@@ -263,7 +263,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Member sleep timer", aliases=['sl'])
     @commands.guild_only()
-    async def sleep(self, ctx, time:TimeConverter = commands.Option(description="specify duration"), *, member: discord.Member = commands.Option(default=None, description="specify member")):    
+    async def sleep(self, ctx, time:TimeConverter = commands.Option(description="specify duration"), member: discord.Member = commands.Option(default=None, description="specify member")):    
         if member is None:
             member = ctx.author
 
@@ -323,7 +323,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])
     @commands.guild_only()
-    async def sleep_stop(self, ctx, *, member: discord.Member = commands.Option(default=None, description="specify member")):
+    async def sleep_stop(self, ctx, member: discord.Member = commands.Option(default=None, description="specify member")):
         if member is None:
             member = ctx.author
 

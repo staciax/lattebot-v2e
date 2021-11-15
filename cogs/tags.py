@@ -391,7 +391,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=['taglist','tagl'], help="Lists all the tags that belong to you or someone else.")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_list(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Spectify member")):
+    async def tag_list(self, ctx, member: discord.Member = commands.Option(default=None, description="Spectify member")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
 
@@ -399,12 +399,12 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             member = ctx.author
 
         data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id, "user_id": member.id})
-        data_check = f"{member.display_name} doesn't have any tags."#check_data
 
         #check_data
         if bool(data) == False:
-            embed_error.description = data_check
+            embed_error.description = f"{member.display_name} doesn't have any tags."#
             return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+        data = sorted(data, key=lambda x: x["tag"])
         
         #count_tag
         all_tag = []
@@ -435,6 +435,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         if bool(data) == False:
             embed_error.description = "Not found tag from this server." #check_data
             return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+        data = sorted(data, key=lambda x: x["tag"])
         
         #count_tag
         all_tag = []
@@ -444,7 +445,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
         
         #view_button
         if all_tag:
-            p = SimplePages(entries=all_tag, per_page=10, ctx=ctx)
+            p = SimplePages(entries=all_tag, ctx=ctx)
             p.embed.color = 0xBFA2DB
             await p.start()
         else:
