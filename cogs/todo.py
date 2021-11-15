@@ -17,7 +17,7 @@ class TodoListView(BaseNewButton):
         super().__init__(TodoPageSource(entries, per_page=per_page), ctx=ctx)
         self.embed = discord.Embed(colour=0xffffff)
 
-class Todo(commands.Cog):
+class Todo(commands.Cog, command_attrs = dict(slash_command=True)):
     """Todo commands"""
     def __init__(self, bot):
         self.bot = bot
@@ -67,7 +67,7 @@ class Todo(commands.Cog):
 
         #upsert_data
         await self.bot.latte_todo.upsert_custom(todo_filter, todo_data)
-        embed = discord.Embed(title="Added to your todo list:", description=content)
+        embed = discord.Embed(title="Added to your todo list:", description=content , color=self.bot.white_color)
         await ctx.send(embed=embed)
 
     # @todo.command(name="list", help="Sends a list of your tasks.")

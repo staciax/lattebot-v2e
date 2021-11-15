@@ -94,7 +94,7 @@ bot = LatteBot(intents=discord.Intents(
     invites=True,  # invite create/delete
     emojis=True,  # emoji update
     bans=True  # member ban/unban
-),help_command = None, case_insensitive = True, slash_commands = True, owner_id=240059262297047041) #, slash_command_guilds=[840379510704046151]
+),help_command = None, case_insensitive = True, owner_id=240059262297047041) #slash_commands = True, slash_command_guilds=[840379510704046151]
  
 # botdata = {
 #     "token": "this token",
@@ -149,7 +149,10 @@ def blacklist(ctx):
 #         return False # or raise an error
 #     return True
 
-# bot.load_extension('jishaku')
+bot.load_extension('jishaku')
+os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
+os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
+os.environ["JISHAKU_HIDE"] = "True"
 
 if __name__ == "__main__":
     

@@ -86,7 +86,8 @@ class LatteBotHelp(commands.HelpCommand):
 
     def __init__(self):
         attrs = {
-            'help': 'Help commands'
+            'help': 'Help commands',
+            'slash_command': True
         }
         super().__init__(command_attrs=attrs)
 
