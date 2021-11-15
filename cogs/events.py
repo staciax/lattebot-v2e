@@ -52,8 +52,6 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__}")
-        self.join_guild = self.bot.get_channel(self.bot.bot_join)
-        self.leave_guild = self.bot.get_channel(self.bot.bot_leave)
 
     @property
     def display_emoji(self) -> discord.PartialEmoji:
@@ -784,7 +782,8 @@ class Events(commands.Cog):
         else:
             pass
 
-        await self.join_guild.send(embed=embed)
+        join_guild = self.bot.get_channel(self.bot.bot_join)
+        await join_guild.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
@@ -809,7 +808,9 @@ class Events(commands.Cog):
 
         embed.add_field(name='Amount of Channels:',value=f"{len(channels)}")
         embed.add_field(name='Amount of Roles:',value=f"{len(roles)}")
-        await self.leave_guild.send(embed=embed)
+        
+        leave_guild = self.bot.get_channel(self.bot.bot_leave)
+        await leave_guild.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Events(bot))

@@ -113,7 +113,7 @@ class Leveling(commands.Cog):
     @commands.command(help="Shows exp the specified member.", aliases=['lvl' , 'exp'])
     @commands.guild_only()
     @is_latte_guild()
-    async def xp(self, ctx, member: discord.Member = None):
+    async def xp(self, ctx, *, member: discord.Member = None):
         try:
             async with ctx.typing():
                 if not member:

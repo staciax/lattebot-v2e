@@ -14,6 +14,10 @@ class Star(commands.Cog):
     @property
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='\N{WHITE MEDIUM STAR}')
+
+    async def get_starboard(self, message_id):
+        data = await self.bot.latte_stars.find_by_custom({"message_id": message_id})    
+        return data
     
     def star_emoji(self, stars):
         if 5 > stars >= 0:
@@ -28,7 +32,6 @@ class Star(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__}")
-        self.starboard_channel = self.bot.get_channel(909485607359758337)
 
     def star_gradient_colour(self, stars):
         p = stars / 13
@@ -92,7 +95,8 @@ class Star(commands.Cog):
                 if data is None:
                     count = 1
                     content, embed = self.get_emoji_message(message, stars=count)
-                    msg = await self.starboard_channel.send(content=content, embed=embed)
+                    starboard_channel = self.bot.get_channel(self.bot.latte_starbot_id)
+                    msg = await starboard_channel.send(content=content, embed=embed)
 
                     data = {
                         "stars": 1,
@@ -116,7 +120,7 @@ class Star(commands.Cog):
             if str(payload.emoji) != '\N{WHITE MEDIUM STAR}':
                 return
             message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-            if not message.author.bot and payload.user_id != message.author.id or payload.user_id == self.bot.renly:
+            if not message.author.bot and payload.user_id != message.author.id or payload.user_id == self.bot.renly.id:
                 data = await self.bot.latte_stars.find_by_custom({"message_id": message.id})          
                 if data is not None:
                     message_bot = await self.bot.get_channel(data["channel_bot_id"]).fetch_message(data["message_bot"])
@@ -129,21 +133,72 @@ class Star(commands.Cog):
                     await message_bot.edit(content=content,embed=embed)
                     return await self.bot.latte_stars.update_by_custom({"message_id": message.id}, {"stars": count})
 
+    # @commands.Cog.listener()
+    # async def on_message_delete(self, message):
+    #     if message.guild.id == self.bot.latte_guild_id:
+    #         data = await self.bot.latte_stars.find_by_custom({"message_id": message.id})
+    #         if data is not None:
+    #             try:
+    #                 star_message = data["message_id"]
+    #                 if message.id == star_message:
+    #                     message_bot = await self.bot.get_channel(data["channel_bot_id"]).fetch_message(data["message_bot"])
+    #                     await self.bot.latte_stars.delete_by_custom({"message_id": message.id})
+    #                     await message_bot.delete()
+    #             except TypeError: 
+    #                 pass
+    #             except KeyError: 
+    #                 pass
+    
     @commands.Cog.listener()
-    async def on_message_delete(self, message):
-        if message.guild.id == self.bot.latte_guild_id:
-            data = await self.bot.latte_stars.find_by_custom({"message_id": message.id})
+    async def on_raw_message_delete(self, payload):
+        if payload.guild_id == self.bot.latte_guild_id:
+            data = await self.get_starboard(message_id=payload.message_id)
             if data is not None:
                 try:
                     star_message = data["message_id"]
-                    if message.id == star_message:
+                    if payload.message_id == star_message:
                         message_bot = await self.bot.get_channel(data["channel_bot_id"]).fetch_message(data["message_bot"])
-                        await self.bot.latte_stars.delete_by_custom({"message_id": message.id})
+                        await self.bot.latte_stars.delete_by_custom({"message_id": payload.message_id})
                         await message_bot.delete()
                 except TypeError: 
                     pass
                 except KeyError: 
                     pass
+
+    @commands.Cog.listener()
+    async def on_raw_bulk_message_delete(self, payload):    
+        if payload.guild_id == self.bot.latte_guild_id:
+            for msg_id in payload.message_ids:
+                data = await self.get_starboard(message_id=msg_id)
+                if data is not None:
+                    try:
+                        star_message = data["message_id"]
+                        if msg_id == star_message:
+                            message_bot = await self.bot.get_channel(data["channel_bot_id"]).fetch_message(data["message_bot"])
+                            await self.bot.latte_stars.delete_by_custom({"message_id": msg_id})
+                            await message_bot.delete()
+                    except TypeError: 
+                        pass
+                    except KeyError: 
+                        pass
+    
+    @commands.Cog.listener()
+    async def on_raw_reaction_clear(self, payload):
+        if payload.guild_id == self.bot.latte_guild_id:
+            data = await self.get_starboard(message_id=payload.message_id)
+            if data is not None:
+                try:
+                    star_message = data["message_id"]
+                    if payload.message_id == star_message:
+                        message_bot = await self.bot.get_channel(data["channel_bot_id"]).fetch_message(data["message_bot"])
+                        await self.bot.latte_stars.delete_by_custom({"message_id": payload.message_id})
+                        await message_bot.delete()
+                except TypeError: 
+                    pass
+                except KeyError: 
+                    pass
+
+    """NEXT DAY"""
             
 def setup(bot):
     bot.add_cog(Star(bot))

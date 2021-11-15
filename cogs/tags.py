@@ -65,6 +65,30 @@ class Cancel_button(discord.ui.View):
         except:
             return
 
+class TagName(commands.clean_content):
+    def __init__(self, *, lower=False):
+        self.lower = lower
+        super().__init__()
+
+    async def convert(self, ctx, argument):
+        converted = await super().convert(ctx, argument)
+        lower = converted.lower().strip()
+
+        if not lower:
+            raise commands.BadArgument('Missing tag name.')
+
+        if len(lower) > 100:
+            raise commands.BadArgument('Tag name is a maximum of 100 characters.')
+
+        first_word, _, _ = lower.partition(' ')
+
+        # # get tag command.
+        # root = ctx.bot.get_command('tag')
+        # if first_word in root.all_commands:
+        #     raise commands.BadArgument('This tag name starts with a reserved word.')
+
+        return converted if not self.lower else lower
+
 class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     """Commands to fetch something by a tag name"""
     def __init__(self, bot):
@@ -85,7 +109,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Tag command")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag(self, ctx, tag=commands.Option(description="Input name or id")):
+    async def tag(self, ctx, *, tag:TagName =commands.Option(description="Input name or id")):
         isInt = True
         try:
             int(tag)
@@ -129,7 +153,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=['tagcreate','tagc'], help="Creates a new tag owned by you.")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_create(self, ctx, name:str = commands.Option(description="Input name")):
+    async def tag_create(self, ctx, *, name: TagName(lower=True) = commands.Option(description="Input name")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
         embed = discord.Embed(color=0xfdfd96)
@@ -152,9 +176,9 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
                 i += 1 
                 next_id = x['tag_id']
                 some_id.append(next_id)
-                if i == 3:
+                if i == 10:
                     break
-            next_num = max(some_id)
+            next_num = max(some_id) + 1
         except:
             next_num = 1
 
@@ -179,7 +203,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             return
         elif view.value:
 
-            tag_filter = {"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag_id": next_num + 1}
+            tag_filter = {"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag_id": next_num}
             tag_data = {"tag": name, "content": content}
 
             #upsert_data
@@ -192,10 +216,10 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             await view.delete_message()
             await ctx.channel.send(embed=embed_edit)
 
-    @commands.command(aliases=['tagremove','tagr','tagdelete'],help="remove your tag")
+    @commands.command(aliases=['tagremove','tagr','tagdelete'], help="remove your tag")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_remove(self, ctx, name = commands.Option(description="Input your tag name")):
+    async def tag_remove(self, ctx, *, name: TagName = commands.Option(description="Input your tag name")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
         
@@ -249,7 +273,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=['tagrename','tagre'], help="rename your tag")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_rename(self, ctx, name_old:str= commands.Option(description="tag old name"), name_new:str=commands.Option(description="tag new name")):
+    async def tag_rename(self, ctx, name_old:TagName = commands.Option(description="tag old name"), *, name_new:TagName=commands.Option(description="tag new name")):
         #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name_old})
         
@@ -286,7 +310,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=['tagedit','tage'], help="edit your tag")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_edit(self, ctx, tag=commands.Option(description="Input your tag name or id")):
+    async def tag_edit(self, ctx, *, tag:TagName =commands.Option(description="Input your tag name or id")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
         embed = discord.Embed(color=0xfdfd96)
@@ -364,20 +388,18 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             await view.delete_message()
             await ctx.channel.send(embed=embed_edit)
 
-    @commands.command(aliases=['taglist','tagl'], help="Show all tag in your server or member")
+    @commands.command(aliases=['taglist','tagl'], help="Lists all the tags that belong to you or someone else.")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_list(self, ctx, member: discord.Member = commands.Option(default=None, description="Spectify member")):
+    async def tag_list(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Spectify member")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
 
         if member is None:
-            #sort_tag
-            data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
-            data_check = "Not found tag from this server." #check_data
-        else:
-            data = await self.bot.latte_tags.find_many_by_custom({"user_id": member.id})
-            data_check = f"Not found tag from member: {member.display_name}." #check_data
+            member = ctx.author
+
+        data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id, "user_id": member.id})
+        data_check = f"{member.display_name} doesn't have any tags."#check_data
 
         #check_data
         if bool(data) == False:
@@ -397,13 +419,43 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             await p.start()
         else:
             #reponse
+            embed = discord.Embed(description=f"{member.display_name} doesn't have any tags.", color=0xFF7878)
+            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+    
+    @commands.command(aliases=['tagall'], help="Lists all server-specific tags for this server.")
+    @commands.guild_only()
+    @is_latte_guild()
+    async def tag_all(self, ctx):
+        #embed
+        embed_error = discord.Embed(color=0xFF7878)
+
+        data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
+
+        #check_data
+        if bool(data) == False:
+            embed_error.description = "Not found tag from this server." #check_data
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+        
+        #count_tag
+        all_tag = []
+        for x in data:
+            tags = f'{x["tag"]} (ID : {x["tag_id"]})'
+            all_tag.append(tags)
+        
+        #view_button
+        if all_tag:
+            p = SimplePages(entries=all_tag, per_page=10, ctx=ctx)
+            p.embed.color = 0xBFA2DB
+            await p.start()
+        else:
+            #reponse
             embed = discord.Embed(description=f"This server doesn't have any tags.", color=0xFF7878)
             await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
-    @commands.command(aliases=['tagsearch','tags'], help="search tag")
+    @commands.command(aliases=['tagsearch','tags'], help="Searches for a tag.")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_search(self, ctx, name:str = commands.Option(description="Input tag name")):
+    async def tag_search(self, ctx, *, name:TagName(lower=True) = commands.Option(description="Input tag name")):
 
         #find_name_tag
         not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
@@ -434,7 +486,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=['taginfo','tagi'], help="Shows information about the specified tag.")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_info(self, ctx, tag=commands.Option(description="Input your tag name or id")):
+    async def tag_info(self, ctx, *, tag:TagName =commands.Option(description="Input your tag name or id")):
         isInt = True
         try:
             int(tag)

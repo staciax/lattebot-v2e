@@ -30,7 +30,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=['ls'], help="lattte temp role")
     @commands.guild_only()
     @is_latte_guild()
-    async def latte_temp_role(self, ctx, member: discord.Member = commands.Option(default=None, description="Give role to member")):
+    async def latte_temp_role(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Give role to member")):
         if ctx.guild.id == self.bot.latte_guild_id:
             if not member:
                 member = ctx.author

@@ -34,7 +34,7 @@ async def get_prefix(bot, message):
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.bot_version = "0.0.1s"
-        self.last_update = [2021, 11, 11]
+        self.last_update = [2021, 11, 15]
         self.launch_time = datetime.utcnow()
         self.tester = ''
         self.github = "https://github.com/staciax"
@@ -52,6 +52,7 @@ class LatteBot(commands.Bot):
         self.latte_guild_id = 840379510704046151
         self.latte_sup_guild_id = 887274968012955679
         self.latte_log_id = 909301335743143946
+        self.latte_starbot_id = 909485607359758337
         self.latte_invite_url = os.getenv('LATTE_URL', None)
         self.latte_supprt_url = os.getenv('SUPPORT_URL', None)
         self.new_members = {}
@@ -62,7 +63,7 @@ class LatteBot(commands.Bot):
         self.token = data["token"]
         self.mongo_url = data["mongo"]
         super().__init__(command_prefix=get_prefix, *args, **kwargs)
-    
+
     @property
     def renly(self) -> Optional[discord.User]:
         """Returns discord.User of the owner"""
@@ -127,18 +128,20 @@ async def run_once_when_ready():
 
 @bot.check
 def blacklist(ctx):
-    try:
-        is_blacklisted = bot.blacklist[ctx.author.id]
-    except KeyError:
-        is_blacklisted = False
-    
-    if ctx.author.id == bot.owner_id:
-        is_blacklisted = False
-    
-    if is_blacklisted is False:
-        return True
-    else:
-        raise commands.CheckFailure
+    if not bot.tester or len(bot.tester) == 0:
+        try:
+            is_blacklisted = bot.blacklist[ctx.author.id]
+        except KeyError:
+            is_blacklisted = False
+        
+        if ctx.author.id == bot.owner_id:
+            is_blacklisted = False
+        
+        if is_blacklisted is False:
+            return True
+        else:
+            raise commands.CheckFailure
+    return True
 
 # @bot.check
 # async def blacklist(ctx):
@@ -149,6 +152,7 @@ def blacklist(ctx):
 # bot.load_extension('jishaku')
 
 if __name__ == "__main__":
+    
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(bot.mongo_url))
 
     #db_tag

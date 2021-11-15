@@ -25,6 +25,10 @@ class Testing(commands.Cog):
         return discord.PartialEmoji(name='\N{PERSONAL COMPUTER}')
 
     # @commands.command()
+    # async def testingstar(self,ctx):
+    #     print(self.bot.renly.id)
+
+    # @commands.command()
     # async def typings(self, ctx, type: Optional[Literal["a","b","c"]] = commands.Option(description="testing")):
     #     print(type)
     

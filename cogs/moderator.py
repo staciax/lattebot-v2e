@@ -35,7 +35,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Create custom emoji with url")
     @commands.guild_only()
     @commands.cooldown(5, 60, commands.BucketType.user)
-    async def emoji_create(self, ctx, url:str = commands.Option(description="URL"), name = commands.Option(description="Emoji name")):
+    async def emoji_create(self, ctx, url:str = commands.Option(description="URL"), *, name = commands.Option(description="Emoji name")):
         guild = ctx.guild
         embed = discord.Embed()
         async with aiohttp.ClientSession() as ses:
@@ -62,7 +62,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Remove custom emoji from server")
     @commands.guild_only()
     @commands.cooldown(5, 60, commands.BucketType.user)
-    async def emoji_remove(self, ctx, emoji:discord.Emoji = commands.Option(description="Spectify Emoji")):
+    async def emoji_remove(self, ctx, *, emoji:discord.Emoji = commands.Option(description="Spectify Emoji")):
         embed = discord.Embed()
         try:
             embed.color = 0x77dd77
@@ -79,7 +79,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(send_messages=True, embed_links=True, ban_members=True)
     @commands.dynamic_cooldown(bypass_for_owner)
-    async def kick(self, ctx, member: discord.Member = commands.Option(description="Member"), reason= commands.Option(default=None, description="Reason")):
+    async def kick(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
             return await ctx.send(embed=discord.Embed(description="you can't kick bot",color=self.bot.white_color))
 
@@ -93,7 +93,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(send_messages=True, embed_links=True, ban_members=True)
     @commands.dynamic_cooldown(bypass_for_owner)
-    async def ban(self, ctx, member: discord.Member = commands.Option(description="Member"), reason= commands.Option(default=None, description="Reason")):
+    async def ban(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
             return await ctx.send(embed=discord.Embed(description="you can't kick bot",color=self.bot.white_color))
         
@@ -243,6 +243,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             ctx,
             member: discord.Member = commands.Option(description="Mention member"),
             time: TimeConverter = commands.Option(default=None, description="duration such as 10m , 30m , 3h"),
+            *,
             reason: str = commands.Option(default=None, description="reason")   
         ):
 
@@ -344,7 +345,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=["nick"], help="change nickname")
     @commands.guild_only()
     @commands.has_permissions(manage_nicknames=True)
-    async def change_nick(self, ctx , member: discord.Member = commands.Option(description="mention member"), nick:str = commands.Option(description="New nickname")):
+    async def change_nick(self, ctx , member: discord.Member = commands.Option(description="mention member"), *, nick:str = commands.Option(description="New nickname")):
         await member.edit(nick=nick)
         embed = discord.Embed(description=f"{member.mention} : Nickname was changed for `{member.display_name}`", color=self.bot.white_color)
         await ctx.send(embed=embed)
@@ -391,6 +392,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             self,
             ctx,
             member: discord.Member = commands.Option(description="Spectify member"),
+            *,
             reason = commands.Option(default=None, description="reason")
         ):
         embed_error = discord.Embed(color=self.bot.error_color)
@@ -436,6 +438,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             self,
             ctx,
             member: discord.Member = commands.Option(description="Spectify member"),
+            *,
             reason = commands.Option(default=None, description="reason")
         ):
         if ctx.author.guild_permissions.deafen_members:

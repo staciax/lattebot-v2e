@@ -175,7 +175,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(name="userinfo", help="Shows information about the specified member.", aliases=["ui", "userinformation","memberinfo"])
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def userinfo(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    async def userinfo(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.guild.get_member(ctx.author.id)
         
         #member_status
@@ -258,7 +258,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @avatar.command(name="user", help="Shows the user avatar of the specified member.", aliases=["av"])
     @commands.guild_only()
-    async def avatar_user(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    async def avatar_user(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.author
 
         #dominant_colour_avatar
@@ -289,7 +289,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @avatar.command(name="server",help="Shows the server avatar of the specified member.", aliases=["sav"], message_command=False)
     @commands.guild_only()
-    async def avatar_server(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    async def avatar_server(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.author
 
         embed = discord.Embed()
@@ -327,7 +327,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Shows the banner of the specified member.", aliases=["bn"])
     @commands.guild_only()
-    async def banner(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    async def banner(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.author
         fetch_member = await self.bot.fetch_user(member.id)
 
@@ -382,7 +382,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @role.command(name="info",aliases=["ri"], help="Shows information about the specified role.")
     @commands.guild_only()
-    async def role_info(self, ctx, role: discord.Role = commands.Option(description="Mention role")):
+    async def role_info(self, ctx, *, role: discord.Role = commands.Option(description="Mention role")):
         embed_role = discord.Embed(color=role.color)
         role_perm_string = ', '.join([str(p[0]).replace("_", " ").title() for p in role.permissions if p[1]])
         info = f"""
@@ -415,7 +415,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @emoji.command(name="info", help="Shows information about a emoji.")
     @commands.guild_only()
-    async def emoji_info(self, ctx, emoji: Union[discord.Emoji, discord.PartialEmoji, UnicodeEmojiConverter] = commands.Option(description="Emoji")):
+    async def emoji_info(self, ctx, *, emoji: Union[discord.Emoji, discord.PartialEmoji, UnicodeEmojiConverter] = commands.Option(description="Emoji")):
         if isinstance(emoji, discord.Emoji):
             try:
                 emoji = await emoji.guild.fetch_emoji(emoji.id)
@@ -504,7 +504,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         
     @commands.command(help="Shows information about the specified channel.")
     @commands.guild_only()
-    async def channel_info(self, ctx, channel: Union[discord.TextChannel, discord.VoiceChannel] = commands.Option(description="Channel infomation")):
+    async def channel_info(self, ctx, *, channel: Union[discord.TextChannel, discord.VoiceChannel] = commands.Option(description="Channel infomation")):
         embed = Embed(color=self.bot.white_color)
         embed.title = f"{channel.name}'s Info"
         if str(channel.type) == "voice": embed.add_field(
@@ -541,7 +541,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Shows the first message of the specified channel.")
     @commands.guild_only()
-    async def first_message(self, ctx, channel : discord.TextChannel = commands.Option(description="mention channel")):
+    async def first_message(self, ctx, *, channel : discord.TextChannel = commands.Option(description="mention channel")):
         async for message in channel.history(limit=1, oldest_first=True):
             content = message.content
             if len(content) > 25:
@@ -564,7 +564,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(name="status", help="Shows status about the specified member.")
     @commands.guild_only()
-    async def status_(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    async def status_(self, ctx, *, member: discord.Member = commands.Option(default=None, description="Mention member")):
 
         member = member or ctx.guild.get_member(ctx.author.id)
 
@@ -593,7 +593,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Shows info about the song the specified member is currently listening to.")
     @commands.guild_only()
-    async def spotify(self, ctx, member: discord.Member=commands.Option(default=None, description="Spectify member")): 
+    async def spotify(self, ctx, *, member: discord.Member=commands.Option(default=None, description="Spectify member")): 
         
         member = member or ctx.guild.get_member(ctx.author.id)
         spotify = discord.utils.find(lambda act: isinstance(act, discord.Spotify), member.activities)

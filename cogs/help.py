@@ -293,6 +293,15 @@ class LatteBotHelp(commands.HelpCommand):
             embed.add_field(name=f" Category: {group.qualified_name}", value=f"{group.short_doc}\n```yalm\n{val}\n```")
             embed.set_footer(text="<> = required argument | [] = optional argument")
             await ctx.send(embed = embed)
+    
+    async def send_group_help_user(self, signatures, ctx, command_name, description):
+        command_signatures = signatures
+        if command_signatures:
+            val = "\n".join(command_signatures)
+            embed=discord.Embed(title=f"Help - {str(command_name).capitalize()}", color=0xffffff)
+            embed.add_field(name=f" Category: {str(command_name).capitalize()}", value=f"{description}\n```yalm\n{val}\n```")
+            embed.set_footer(text="<> = required argument | [] = optional argument")
+            await ctx.send(embed = embed)
 
     async def send_error_message(self, error):
         pass

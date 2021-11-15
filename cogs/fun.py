@@ -25,7 +25,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
 
     @commands.command(name="voice_random", aliases=["rnv"], help="random members in voice channel")
     @commands.guild_only()
-    async def random_voice_member(self, ctx, channel: discord.VoiceChannel = commands.Option(default=None, description="spectify channel")):
+    async def random_voice_member(self, ctx, *, channel: discord.VoiceChannel = commands.Option(default=None, description="spectify channel")):
 
         # check
         if channel is None:
@@ -64,7 +64,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
 
     @commands.command(help="Message something you give latte to say.")
     @commands.guild_only()
-    async def latte_say(self, ctx, message=commands.Option(description="message to be latte say")):
+    async def latte_say(self, ctx, *, message=commands.Option(description="message to be latte say")):
         if ctx.clean_prefix == "/":
             await ctx.send('** **', ephemeral=True)
         await ctx.channel.send(f'{message}')

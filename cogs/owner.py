@@ -56,6 +56,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
     async def blacklist_add(self,
             ctx,
             user : Union[discord.User, discord.Member] = commands.Option(description="Spectify member"),
+            *,
             reason = commands.Option(default=None, description="Reason to blacklist")
         ):
         embed_error = discord.Embed(color=0xFF7878)
@@ -334,7 +335,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
     @commands.command(help="reload cog")
     @commands.guild_only()
     @commands.is_owner()
-    async def reload(self, ctx, extension= commands.Option(description="extension")):
+    async def reload(self, ctx, extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")):
         embed = discord.Embed()
         try:
             self.bot.unload_extension(f'cogs.{extension}')

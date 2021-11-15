@@ -100,9 +100,8 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Set your afk")
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
-    async def afk(self, ctx, reason=commands.Option(default=None, description="Reason (default = personal problems)"), member:discord.Member=commands.Option(default=None,description="spectify member")):
-        if member is None:
-            member = ctx.author
+    async def afk(self, ctx, *, reason=commands.Option(default=None, description="Reason (default = personal problems)")):
+        member = ctx.author
 
         if member.id in self.bot.afk_user.keys():
             embed_time = RenlyEmbed.to_error(title="You already have afk status", description=f"**reason:** {self.bot.afk_user[member.id]['reason']}")
@@ -128,7 +127,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="clear afk status")
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
-    async def afk_clear(self, ctx, member:discord.Member=commands.Option(default=None,description="spectify member")):
+    async def afk_clear(self, ctx, *,member:discord.Member=commands.Option(default=None,description="spectify member")):
         if member is None:
             member = ctx.author
 
@@ -210,13 +209,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Converter text to binary")
     @commands.guild_only()
-    async def binary(self, ctx, message = commands.Option(description="message converter to the binary")):
+    async def binary(self, ctx, *, message = commands.Option(description="message converter to the binary")):
         res = ''.join(format(i, '08b') for i in bytearray(message, encoding ='utf-8'))
         await ctx.send(str(res))
     
     @commands.command(help="Reverse message")
     @commands.guild_only()
-    async def reverse(self, ctx, message = commands.Option(description="message to reverse")):
+    async def reverse(self, ctx, *, message = commands.Option(description="message to reverse")):
         res = ''.join(reversed(message))
         await ctx.send(str(res))
     
@@ -230,7 +229,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @commands.command(name="random", help="random")
     @commands.guild_only()
-    async def random_(self, ctx, message = commands.Option(description="enter a split message")):
+    async def random_(self, ctx, *, message = commands.Option(description="enter a split message")):
         #convert_to_split
         input_value = message 
         list_input = list(input_value.split())
@@ -246,7 +245,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="create poll")
     @commands.guild_only()
-    async def poll(self, ctx, message= commands.Option(description="poll message")):
+    async def poll(self, ctx, *, message= commands.Option(description="poll message")):
         embed_error = RenlyEmbed.to_error()
         if len(message) > 2000:
             embed_error.description = 'poll message is a maximum of 2000 characters.'
@@ -264,7 +263,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Member sleep timer", aliases=['sl'])
     @commands.guild_only()
-    async def sleep(self, ctx, time:TimeConverter = commands.Option(description="specify duration") ,member: discord.Member = commands.Option(default=None, description="specify member")):    
+    async def sleep(self, ctx, time:TimeConverter = commands.Option(description="specify duration"), *, member: discord.Member = commands.Option(default=None, description="specify member")):    
         if member is None:
             member = ctx.author
 
@@ -324,7 +323,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])
     @commands.guild_only()
-    async def sleep_stop(self, ctx, member: discord.Member = commands.Option(default=None, description="specify member")):
+    async def sleep_stop(self, ctx, *, member: discord.Member = commands.Option(default=None, description="specify member")):
         if member is None:
             member = ctx.author
 
@@ -346,7 +345,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Reminder")
     @commands.guild_only()
-    async def remind(self, ctx, time:TimeConverter = commands.Option(description="specify duration") , message=commands.Option(default=None,description="message to remind") , channel: discord.TextChannel= commands.Option(default=None,description="spectify channel to remind")):
+    async def remind(self, ctx, time:TimeConverter = commands.Option(description="specify duration"), *, message=commands.Option(default=None,description="message to remind")):
         if time == 0:
             embed_time = RenlyEmbed.to_error(description="Time is invalid")
             return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
@@ -356,8 +355,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             embed_error = RenlyEmbed.to_error(description='Remind message is a maximum of 2000 characters.')
             return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
-        if channel is None:
-            channel = ctx.channel
+        channel = ctx.channel
         
         #time_converter
         try:
@@ -485,7 +483,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(aliases=["trans"], help="Translate your message")
     @commands.guild_only()
-    async def translate(self, ctx, to_lang=commands.Option(description="language you want to translate. like en, th, jp"), source=commands.Option(description="The source language you want to translate.")):
+    async def translate(self, ctx, to_lang=commands.Option(description="language you want to translate. like en, th, jp"), *, source=commands.Option(description="The source language you want to translate.")):
         embed_error = discord.Embed(color=0xFF7878)
 
         if len(source) > 2000:
