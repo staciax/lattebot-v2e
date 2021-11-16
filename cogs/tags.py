@@ -402,7 +402,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
 
         #check_data
         if bool(data) == False:
-            embed_error.description = f"{member.display_name} doesn't have any tags."#
+            embed_error.description = f"**{member.display_name}** doesn't have any tags."#
             return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         data = sorted(data, key=lambda x: x["tag"])
         
@@ -419,7 +419,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True)):
             await p.start()
         else:
             #reponse
-            embed = discord.Embed(description=f"{member.display_name} doesn't have any tags.", color=0xFF7878)
+            embed = discord.Embed(description=f"**{member.display_name}** doesn't have any tags.", color=0xFF7878)
             await ctx.send(embed=embed, ephemeral=True, delete_after=15)
     
     @commands.command(aliases=['tagall'], help="Lists all server-specific tags for this server.")

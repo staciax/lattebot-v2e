@@ -213,21 +213,19 @@ class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[88727496801
         embed_e.timestamp = datetime.now(timezone.utc)
 
         view = Confirm(ctx)
-        msg = await ctx.send(embed=embed, view=view, ephemeral=True)
+        msg = await ctx.send(embed=embed, view=view)
         await view.wait()
-        view.clear_items()
         if view.value is None:
             return
         elif view.value:
             embed_e.description = f"Shuting down..."
-            await msg.edit(embed=embed_e, view=view, ephemeral=True)
+            await msg.edit(embed=embed_e, view=None)
             print('Shuting down...')
             await self.bot.logout()
         else:
             print('Cancelled...')
             embed_e.description = f"Cancelled..."
-            await msg.edit(embed=embed_e, view=view, ephemeral=True)
-
+            await msg.edit(embed=embed_e, view=None)
 
     @commands.command(name="bot_status",help="change bot status")
     @commands.guild_only()

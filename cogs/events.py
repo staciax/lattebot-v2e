@@ -208,38 +208,13 @@ class Events(commands.Cog):
                 await message.channel.send('เอะ! เรียกเราหรอ? <:S_CuteGWave3:859660565160001537>')
             
             if message.content.startswith('invite'):
-                await message.channel.send('https://discord.gg/jhK46N6QWU\n**Auto role** : Latte・・ ♡' , delete_after=120)
+                await message.channel.send('https://discord.gg/jhK46N6QWU\n**Auto role** : Latte・・ ♡' , delete_after=180)
                 await asyncio.sleep(30)
                 await message.delete()
             
             if message.content.startswith('tempinvite'):
                 await message.delete()
                 await message.channel.send('https://discord.gg/f6adY5B8k2' , delete_after=60)
-
-            if message.content.startswith('uw'):
-                if message.author.voice:
-                    channel = message.guild.get_channel()
-                    await message.author.move_to()
-                    await message.delete()
-
-            if message.channel.id in self.latte_bot:
-                if message.author.voice:
-                    if message.content.startswith('temp'):
-                        channel = message.guild.get_channel(self.tempx[1])
-                        await message.author.move_to(channel)
-                        await message.delete()
-                    if message.content.startswith('moonlight'):
-                        channel = message.guild.get_channel(self.moonlightx[1])
-                        await message.author.move_to(channel) 
-                        await message.delete()
-                    if message.content.startswith('angel'):
-                        channel = message.guild.get_channel(self.angelx[1])
-                        await message.author.move_to(channel) 
-                        await message.delete()
-            
-            if message.channel.id == self.tempx[0]:
-                await asyncio.sleep(60)
-                await message.delete()
         
         #google_translator
         if message.channel.id == self.translatex:

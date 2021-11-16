@@ -12,6 +12,12 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
     """Commands only latte server"""
     def __init__(self, bot):
         self.bot = bot
+        self.latte_bot = [861874852050894868, 840381588704591912, 844462710526836756]
+        self.underworldx = [873677543453126676, 873679362082369546]
+        self.moonlightx = [875037193196945409, 875038018736644166]
+        self.deathx = [883025077610876958, 883059509810040884]
+        self.angelx = [873696566165250099, 883027485455941712]
+        self.tempx = [879260123665682482, 879260241286549525]
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -47,6 +53,33 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed, ephemeral=True)
             await asyncio.sleep(7200)
             await member.remove_roles(role)
+    
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.channel.id in self.latte_bot:
+            if message.author.voice:
+                if message.content.startswith('uw'):
+                    channel = message.guild.get_channel(self.underworldx[1])
+                    await message.author.move_to(channel)
+                    await message.delete()
+                if message.content.startswith('temp'):
+                    channel = message.guild.get_channel(self.tempx[1])
+                    await message.author.move_to(channel)
+                    await message.delete()
+                if message.content.startswith('moonlight'):
+                    channel = message.guild.get_channel(self.moonlightx[1])
+                    await message.author.move_to(channel) 
+                    await message.delete()
+                if message.content.startswith('angel'):
+                    channel = message.guild.get_channel(self.angelx[1])
+                    await message.author.move_to(channel) 
+                    await message.delete()
+        
+        if message.channel.id == self.tempx[0]:
+            await asyncio.sleep(60)
+            await message.delete()
+
+            
 
 def setup(bot):
     bot.add_cog(Latte(bot))
