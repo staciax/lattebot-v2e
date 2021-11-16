@@ -126,6 +126,9 @@ async def run_once_when_ready():
             bot.blacklist[value['user_id']] = (value['is_blacklisted'] or False)
         print("\nBlacklist database loaded")
 
+class Blacklisted_user(commands.CheckFailure):
+    pass
+
 @bot.check
 def blacklist(ctx):
     if not bot.tester or len(bot.tester) == 0:
@@ -140,7 +143,7 @@ def blacklist(ctx):
         if is_blacklisted is False:
             return True
         else:
-            raise commands.CheckFailure
+            raise Blacklisted_user
     return True
 
 # @bot.check

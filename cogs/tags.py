@@ -89,6 +89,9 @@ class TagName(commands.clean_content):
 
         return converted if not self.lower else lower
 
+class TagError(commands.CommandError):
+    pass
+
 class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Commands to fetch something by a tag name"""
     def __init__(self, bot):
@@ -158,12 +161,18 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         embed_error = discord.Embed(color=0xFF7878)
         embed = discord.Embed(color=0xfdfd96)
 
+        #data_user_count
+        data_user = await self.bot.latte_tags.find_by_custom({"user_id": ctx.author.id})
+        if len(data_user) >= 50 and ctx.author != self.bot.renly:
+            embed_error.description = "You can't have more than 50 tags at the moment."
+            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+
         #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name})
         if bool(data_check) == True:
             embed_error.description = "This tag already exists, please use another tag."
             return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
-
+        
         #data_count
         data_tags = await self.bot.latte_tags.find_many_by_custom({})
         data_count = reversed(data_tags)

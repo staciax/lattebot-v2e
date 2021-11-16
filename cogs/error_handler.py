@@ -22,7 +22,8 @@ class Error(commands.Cog):
     @commands.Cog.listener()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def on_command_error(self , ctx, error):
-        embed = discord.Embed(color=self.bot.white_color)
+        embed = discord.Embed()
+        embed.color = self.bot.white_color
         if isinstance(error, commands.CommandNotFound):
             # cm_error = f"I couldn't find that command."
             command_names = [str(x) for x in ctx.bot.commands]
@@ -59,7 +60,10 @@ class Error(commands.Cog):
         elif isinstance(error, commands.NSFWChannelRequired):
             cm_error = f"This channel isn't NSFW"
         elif isinstance(error, commands.CheckFailure):
-            cm_error = f"You can't use this command."  
+            cm_error = f"You can't use this command."
+        elif isinstance(error, commands.CommandError):
+            embed.color = 0xFF7878
+            cm_error = f"{error}"
         else:
             print(error)
             return

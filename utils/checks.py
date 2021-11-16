@@ -67,6 +67,8 @@ def is_in_guilds(*guild_ids):
         guild = ctx.guild
         if guild is None:
             return False
+        if ctx.author == ctx.bot.renly:
+            return True
         return guild.id in guild_ids
     return commands.check(predicate)
 

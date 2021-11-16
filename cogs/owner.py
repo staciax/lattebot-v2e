@@ -14,6 +14,9 @@ from utils.buttons import Confirm
 from utils.json_loader import latte_read, latte_write
 from utils.buttons import NewSimpage
 
+class OwnerError(commands.CommandError):
+    pass
+
 class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[887274968012955679])):
     """Owner"""
     
@@ -55,7 +58,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.is_owner()
     async def blacklist_add(self,
             ctx,
-            user : Union[discord.User, discord.Member] = commands.Option(description="Spectify member"),
+            user : Union[discord.Member, discord.User] = commands.Option(description="Spectify member"),
             *,
             reason = commands.Option(default=None, description="Reason to blacklist")
         ):
@@ -96,7 +99,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.command(aliases=['blr'], help="Removes the user from the blacklist.")
     @commands.guild_only()
     @commands.is_owner()
-    async def blacklist_remove(self, ctx, user : Union[discord.User, discord.Member] = commands.Option(description="Spectify member")):
+    async def blacklist_remove(self, ctx, user : Union[discord.Member, discord.User] = commands.Option(description="Spectify member")):
         embed_error = discord.Embed(color=0xFF7878)
 
         user_id = user.id
@@ -119,7 +122,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.command(aliases=['blc'], help="Checks if the user is blacklisted.")
     @commands.guild_only()
     @commands.is_owner()
-    async def blacklist_check(self, ctx, user : Union[discord.User, discord.Member] = commands.Option(description="Spectify member")):
+    async def blacklist_check(self, ctx, user : Union[discord.Member, discord.User] = commands.Option(description="Spectify member")):
         try:
             status = self.bot.blacklist[user.id]
         except KeyError:
@@ -141,15 +144,16 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.guild_only()
     @commands.is_owner()
     async def blacklist_list(self, ctx):
-        embed_error = discord.Embed(color=0xFF7878)
+        # embed_error = discord.Embed(color=0xFF7878)
 
         blacklist_users = []
         query = "SELECT * FROM public.blacklist;"
         blacklist = await self.bot.pg_con.fetch(query)
         
-        if blacklist is None:
-            embed_error.description = "Not found blacklisted users."
-            return await ctx.send(embed=embed_error, ephemeral=True)
+        if blacklist is None or len(blacklist) == 0:
+            raise OwnerError("Not found blacklisted users.")
+            # embed_error.description = "Not found blacklisted users."
+            # return await ctx.send(embed=embed_error, ephemeral=True)
 
         for data in blacklist:
             user = self.bot.get_user(data["user_id"])

@@ -8,6 +8,7 @@ from utils.formats import format_dt
 from utils.buttons import Confirm
 from utils.buttons import TodoPageSource, BaseNewButton
 from utils.custom_button import Button_URL
+from utils.useful import RenlyEmbed
 
 # Local
 
@@ -16,6 +17,67 @@ class TodoListView(BaseNewButton):
     def __init__(self, entries, *, ctx: commands.Context, per_page: int = 12):
         super().__init__(TodoPageSource(entries, per_page=per_page), ctx=ctx)
         self.embed = discord.Embed(colour=0xffffff)
+
+class todolist_button(discord.ui.View):
+    def __init__(self, ctx, entries=None):
+        super().__init__()
+        self.ctx = ctx
+        self.entries = entries
+        self.is_command = ctx.command is not None
+        self.cooldown = commands.CooldownMapping.from_cooldown(1, 10, commands.BucketType.user)
+        self.clear_items()
+        self.fill_items()
+        
+    def fill_items(self) -> None:
+        if self.entries is not None:
+            self.add_item(self.todolist_button)
+    
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """Only allowing the context author to interact with the view"""
+        ctx = self.ctx
+        author = ctx.author
+        mystic_role = discord.utils.get(interaction.user.roles, id=842304286737956876)
+        if interaction.user == ctx.bot.renly:
+            return True
+        if bool(mystic_role) == True:
+            return True
+        if interaction.user != ctx.author:
+            if self.is_command:
+                command = ctx.bot.get_command_signature(ctx, ctx.command)
+                content = f"Only `{author}` can use this menu. If you want to use it, use `{command}`"
+            else:
+                content = f"Only `{author}` can use this."
+            embed = RenlyEmbed.to_error(description=content)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
+        return True
+
+    async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        embed_error = discord.Embed(color=0xffffff)
+        if interaction.response.is_done():
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.followup.send(embed=embed_error, ephemeral=True)
+        else:
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.response.send_message(embed=embed_error, ephemeral=True)
+        
+    @discord.ui.button(label="Current todo list", style=discord.ButtonStyle.primary)
+    async def todolist_button(self, button, interaction):
+        ctx = self.ctx
+        data = self.entries
+        all_todo = []
+        number = 0
+        for x in data:
+            number = number + 1
+            todo_entries = f"**[{number}]({x['jump_url']})**. {x['content']} ({format_dt(x['creation_date'], style='R')})"
+            all_todo.append(todo_entries)
+        
+        p = TodoListView(entries=all_todo, ctx=ctx)
+        p.embed.title = f"{ctx.author.name}'s todo list"
+        await p.start()
+
+class TodoError(commands.CommandError):
+    pass
 
 class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151,887274968012955679])):
     """Todo commands"""
@@ -48,7 +110,19 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tda','todoa','todoadd'], help="Adds the specified task to your todo list.")
     @is_latte_guild()
     async def todo_add(self, ctx, *, content=commands.Option(description="Input content")):     
-        
+        # embed_error = discord.Embed(color=0xFF7878)
+        if len(content) > 100:
+            raise TodoError('todo content is a maximum of 100 characters.')
+            # embed_error.description = 'todo content is a maximum of 100 characters.'
+            # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+
+        #data_user_count
+        user_count = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
+        if len(user_count) >= 50 and ctx.author != self.bot.renly:
+            raise TodoError("You can't have more than 50 todo at the moment.")
+            # embed_error.description = "You can't have more than 50 todo at the moment."
+            # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+
         #data_count
         data_count = await self.bot.latte_todo.find_many_by_custom({})
         
@@ -74,15 +148,16 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tdl','todol','todolist'], help="Sends a list of your tasks.")
     @is_latte_guild()
     async def todo_list(self, ctx):
-        #embed
-        embed_error = discord.Embed(color=0xFF7878)
+        # #embed
+        # embed_error = discord.Embed(color=0xFF7878)
 
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
 
         #check_data
         if bool(data) == False:
-            embed_error.description = f"Your todo list is empty" #check_data
-            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+            raise TodoError(f"Your todo list is empty")
+            # embed_error.description = f"Your todo list is empty" #check_data
+            # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
         #count_tag
         all_todo = []
@@ -93,39 +168,49 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             all_todo.append(todo_entries)
         
         p = TodoListView(entries=all_todo, ctx=ctx)
-        p.embed.title = f"{ctx.author.name}'s todo list"
+        if ctx.author.avatar is not None:
+            p.embed.set_author(name=f"{ctx.author.display_name}'s todo list", icon_url=ctx.author.avatar.url)
+        else:
+            p.embed.set_author(name=f"{ctx.author.display_name}'s todo list")
         await p.start()
 
     # @todo.command(help="Removes the specified task from your todo list")
     @commands.command(aliases=['tdr','todor','todoremove'], help="Removes the specified task from your todo list")
     @is_latte_guild()
-    async def todo_remove(self, ctx, number: int = commands.Option(description="Todo number")):
-        embed_error = discord.Embed(color=self.bot.error_color)
+    async def todo_remove(self, ctx, *, number = commands.Option(description="Todo number")):
+        # embed_error = discord.Embed(color=self.bot.error_color)
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
         
         #check_data
         if bool(data) == False:
-            embed_error.description = f"Your todo list is empty"
-            return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
-
+            raise TodoError(f"Your todo list is empty")
+            # embed_error.description = f"Your todo list is empty"
+            # return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
+        
+        data_deleting = None
+        description = ""
+        number_split = number.split(" ")
         i = 0
-        for x in data:
-            i += 1
-            if i == number:
-                delete_id = x["todo_id"]
-                break
-        if delete_id:
-            bofore_delete = await self.bot.latte_todo.find_by_custom({"user_id": ctx.author.id, "todo_id": int(delete_id)})
-            data_deleting = await self.bot.latte_todo.delete_by_custom({"user_id": ctx.author.id, "todo_id": int(delete_id)})
-
-            embed = discord.Embed(color=self.bot.white_color)
-            if data_deleting and data_deleting.acknowledged:
-                embed.title=f"Successfully removed task number **{number}**:"
-                embed.description =f"{bofore_delete['content']} ({format_dt(bofore_delete['creation_date'], style='R')})"
-                return await ctx.send(embed=embed)
-            else:
-                embed_error.description = "I could not find this todo"
-                await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+        try:
+            for x in data:
+                i += 1
+                if str(i) in number_split:
+                    delete_id = x["todo_id"]
+                    bofore_delete = await self.bot.latte_todo.find_by_custom({"user_id": ctx.author.id, "todo_id": int(delete_id)})
+                    description +=f"\n{bofore_delete['content']} ({format_dt(bofore_delete['creation_date'], style='R')})"
+                    data_deleting = await self.bot.latte_todo.delete_by_custom({"user_id": ctx.author.id, "todo_id": int(delete_id)})
+        except KeyError:
+            raise TodoError
+        
+        sord_num = sorted(number_split)
+        sord_num = ', '.join(sord_num) 
+        embed = discord.Embed(color=self.bot.white_color)
+        if data_deleting and data_deleting.acknowledged:
+            embed.title=f"Successfully removed task number **{sord_num}**:"
+            embed.description = description
+            return await ctx.send(embed=embed)
+        else:
+            raise TodoError("I could not find your todo")
         
     # @todo.command(help="Deletes all tasks from your todo list.")
     @commands.command(aliases=['tdc','todoc','todoclear','tdclear'], help="Deletes all tasks from your todo list.")
@@ -135,8 +220,9 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         check = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
 
         if bool(check) == False:
-            embed_error.description = f"Your todo list is empty"
-            return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
+            raise TodoError("Your todo list is empty")
+            # embed_error.description = f"Your todo list is empty"
+            # return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.description = "Are you sure you want to clear your todo list?"
@@ -178,9 +264,10 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
 
         if bool(data) == False:
-            embed.color = self.bot.error_color
-            embed.description = f"Your todo list is empty"
-            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise TodoError("Your todo list is empty")
+            # embed.color = self.bot.error_color
+            # embed.description = f"Your todo list is empty"
+            # return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
         i = 0
         for x in data:
@@ -193,9 +280,10 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             old = await self.bot.latte_todo.find_by_custom({"user_id": ctx.author.id, "todo_id": int(edit_id)})
 
             if bool(old) == False:
-                embed.color = self.bot.error_color
-                embed.description = f"I couldn't find a task with index {number}"
-                return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+                raise TodoError(f"I couldn't find a task with index {number}")
+                # embed.color = self.bot.error_color
+                # embed.description = f"I couldn't find a task with index {number}"
+                # return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
             
             new_data = {"content": content, "jump_url": ctx.message.jump_url, "creation_date": ctx.message.created_at}
             await self.bot.latte_todo.update_by_custom({"user_id": ctx.author.id, "todo_id": number}, new_data)

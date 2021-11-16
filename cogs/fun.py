@@ -62,7 +62,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
         view = VALORANT_RANDOM(ctx)
         await view.start()
 
-    @commands.command(help="Message something you give latte to say.")
+    @commands.command(aliases=['lattesay','botsay'], help="Message something you give latte to say.")
     @commands.guild_only()
     async def latte_say(self, ctx, *, message=commands.Option(description="message to be latte say")):
         if ctx.clean_prefix == "/":

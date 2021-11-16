@@ -10,6 +10,7 @@ class Star(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.spoilers = re.compile(r'\|\|(.+?)\|\|')
+        self.latte_star_channel = [861883647070437386, 840398821544296480, 863438518981361686, 850507964938715196, 908360879769272350, 877489788188499998, 861874852050894868, 859960606761549835, 872139991436890132]
     
     @property
     def display_emoji(self) -> discord.PartialEmoji:
@@ -87,6 +88,8 @@ class Star(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if payload.guild_id == self.bot.latte_guild_id:
+            if payload.channel_id not in self.latte_star_channel:
+                return
             if str(payload.emoji) != '\N{WHITE MEDIUM STAR}':
                 return
             message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
@@ -117,6 +120,8 @@ class Star(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         if payload.guild_id == self.bot.latte_guild_id:
+            if payload.channel_id not in self.latte_star_channel:
+                return
             if str(payload.emoji) != '\N{WHITE MEDIUM STAR}':
                 return
             message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
@@ -152,6 +157,8 @@ class Star(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):
         if payload.guild_id == self.bot.latte_guild_id:
+            if payload.channel_id not in self.latte_star_channel:
+                return
             data = await self.get_starboard(message_id=payload.message_id)
             if data is not None:
                 try:
@@ -168,6 +175,8 @@ class Star(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload):    
         if payload.guild_id == self.bot.latte_guild_id:
+            if payload.channel_id not in self.latte_star_channel:
+                return
             for msg_id in payload.message_ids:
                 data = await self.get_starboard(message_id=msg_id)
                 if data is not None:
@@ -185,6 +194,8 @@ class Star(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_clear(self, payload):
         if payload.guild_id == self.bot.latte_guild_id:
+            if payload.channel_id not in self.latte_star_channel:
+                return
             data = await self.get_starboard(message_id=payload.message_id)
             if data is not None:
                 try:
@@ -197,8 +208,6 @@ class Star(commands.Cog):
                     pass
                 except KeyError: 
                     pass
-
-    """NEXT DAY"""
             
 def setup(bot):
     bot.add_cog(Star(bot))
