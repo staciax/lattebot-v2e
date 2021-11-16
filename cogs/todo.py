@@ -17,7 +17,7 @@ class TodoListView(BaseNewButton):
         super().__init__(TodoPageSource(entries, per_page=per_page), ctx=ctx)
         self.embed = discord.Embed(colour=0xffffff)
 
-class Todo(commands.Cog, command_attrs = dict(slash_command_guilds=[840379510704046151,887274968012955679])):
+class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151,887274968012955679])):
     """Todo commands"""
     def __init__(self, bot):
         self.bot = bot

@@ -14,7 +14,7 @@ from utils.buttons import Confirm
 from utils.json_loader import latte_read, latte_write
 from utils.buttons import NewSimpage
 
-class Owner(commands.Cog, command_attrs = dict(slash_command_guilds=[887274968012955679])):
+class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[887274968012955679])):
     """Owner"""
     
     def __init__(self, bot):

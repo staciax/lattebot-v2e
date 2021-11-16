@@ -18,7 +18,7 @@ level = ["level 3 ꮺ","level 5 ꮺ","level 10 ꮺ","level 20 ꮺ","level 25 ꮺ
 levelnum = [3,5,10,20,25,30,40,45,50,55]
 colorlvl = [0xeedad1,0xc39b7d,0xffbfd7,0xdbc6eb,0xcaf7e3,0xfdffbc,0xc1e7b8,0xc5ffff,0xec6fc1,0xb98fe4]
 
-class Leveling(commands.Cog, command_attrs = dict(slash_command_guilds=[840379510704046151])):
+class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Leveling system"""
 
     def __init__(self, bot):
