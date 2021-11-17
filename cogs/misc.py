@@ -9,6 +9,9 @@ import zlib
 from discord.ext import commands , tasks
 from datetime import datetime, timedelta, timezone
 
+# Third
+import aiohttp
+
 # Local
 from utils.emoji import emoji_converter
 from utils.formats import format_dt , count_python
@@ -50,6 +53,11 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     """Misc commands"""
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
+    
+    def cog_unload(self):
+        if self.session:
+            self.session.close()
     
     @commands.Cog.listener()
     async def on_ready(self):
