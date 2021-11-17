@@ -177,7 +177,7 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     # @todo.command(help="Removes the specified task from your todo list")
     @commands.command(aliases=['tdr','todor','todoremove'], help="Removes the specified task from your todo list")
     @is_latte_guild()
-    async def todo_remove(self, ctx, *, number = commands.Option(description="Todo number")):
+    async def todo_remove(self, ctx, *, number: int = commands.Option(description="Todo number")):
         # embed_error = discord.Embed(color=self.bot.error_color)
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
         
@@ -197,7 +197,7 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
                 if str(i) in number_split:
                     delete_id = x["todo_id"]
                     bofore_delete = await self.bot.latte_todo.find_by_custom({"user_id": ctx.author.id, "todo_id": int(delete_id)})
-                    description +=f"\n{bofore_delete['content']} ({format_dt(bofore_delete['creation_date'], style='R')})"
+                    description +=f"\n**[{i}]({bofore_delete['jump_url']})**. {bofore_delete['content']} ({format_dt(bofore_delete['creation_date'], style='R')})"
                     data_deleting = await self.bot.latte_todo.delete_by_custom({"user_id": ctx.author.id, "todo_id": int(delete_id)})
         except KeyError:
             raise TodoError

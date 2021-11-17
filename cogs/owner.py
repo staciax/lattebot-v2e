@@ -107,17 +107,21 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         
         row = await self.bot.pg_con.fetchrow(query, user_id)
         if row != None:
+            embed = discord.Embed(color=self.bot.white_color)
             try:
                 query = "DELETE FROM public.blacklist WHERE user_id = $1;"
                 await self.bot.pg_con.execute(query, user_id)
-                await ctx.send(f"**{user}** has been removed from the blacklist")
+                embed.description = f"**{user}** has been removed from the blacklist"
+                await ctx.send(embed=embed)
                 self.bot.blacklist[user.id] = False
             except:
-                embed_error.description = 'Could not remove this user. Please try again!'
-                return await ctx.send(embed=embed_error, ephemeral=True)
+                raise OwnerError('Could not remove this user. Please try again!')
+                # embed_error.description = 'Could not remove this user. Please try again!'
+                # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=30)
         else:
-            embed_error.description = 'User not found!'
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            raise OwnerError('User not found!')
+            # embed_error.description = 'User not found!'
+            # return await ctx.send(embed=embed_error, ephemeral=True)
 
     @commands.command(aliases=['blc'], help="Checks if the user is blacklisted.")
     @commands.guild_only()
@@ -157,7 +161,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
 
         for data in blacklist:
             user = self.bot.get_user(data["user_id"])
-            reason = data["reason"]
+            # reason = data["reason"]
             blacklist_users.append(f"{user.name} | `{user.id}`")
 
         p = NewSimpage(ctx=ctx, entries=blacklist_users, per_page=10)

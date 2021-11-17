@@ -9,6 +9,9 @@ from discord.ext import commands
 from utils.custom_button import Random_member
 from utils.game_random import APEX_RANDOM, VALORANT_RANDOM
 
+class FunError(commands.CommandError):
+    pass
+
 class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     """Fun commands"""
 
@@ -29,13 +32,12 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
 
         # check
         if channel is None:
+            if not ctx.author.voice:
+                raise FunError("You must join a voice channel first.")
             channel = ctx.author.voice.channel
             in_channel = ctx.author.voice.channel.members
         else:
             in_channel = channel.members
-
-        embed = discord.Embed(
-            title=f"Members - {channel.name}", color=self.bot.white_color)
 
         # get_member_in_voice
         member_list = []

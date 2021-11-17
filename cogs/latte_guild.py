@@ -26,6 +26,31 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
     @property
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='latte_icon_new', id=907030425011109888, animated=False)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.channel.id in self.latte_bot:
+            if message.author.voice:
+                if message.content.startswith('uw'):
+                    channel = message.guild.get_channel(self.underworldx[1])
+                    await message.author.move_to(channel)
+                    await message.delete()
+                if message.content.startswith('temp'):
+                    channel = message.guild.get_channel(self.tempx[1])
+                    await message.author.move_to(channel)
+                    await message.delete()
+                if message.content.startswith('moonlight'):
+                    channel = message.guild.get_channel(self.moonlightx[1])
+                    await message.author.move_to(channel) 
+                    await message.delete()
+                if message.content.startswith('angel'):
+                    channel = message.guild.get_channel(self.angelx[1])
+                    await message.author.move_to(channel) 
+                    await message.delete()
+        
+        if message.channel.id == self.tempx[0]:
+            await asyncio.sleep(60)
+            await message.delete()
     
     @commands.command(aliases=['lt'], help="latte server template")
     @commands.guild_only()
@@ -54,32 +79,5 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
             await asyncio.sleep(7200)
             await member.remove_roles(role)
     
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.channel.id in self.latte_bot:
-            if message.author.voice:
-                if message.content.startswith('uw'):
-                    channel = message.guild.get_channel(self.underworldx[1])
-                    await message.author.move_to(channel)
-                    await message.delete()
-                if message.content.startswith('temp'):
-                    channel = message.guild.get_channel(self.tempx[1])
-                    await message.author.move_to(channel)
-                    await message.delete()
-                if message.content.startswith('moonlight'):
-                    channel = message.guild.get_channel(self.moonlightx[1])
-                    await message.author.move_to(channel) 
-                    await message.delete()
-                if message.content.startswith('angel'):
-                    channel = message.guild.get_channel(self.angelx[1])
-                    await message.author.move_to(channel) 
-                    await message.delete()
-        
-        if message.channel.id == self.tempx[0]:
-            await asyncio.sleep(60)
-            await message.delete()
-
-            
-
 def setup(bot):
     bot.add_cog(Latte(bot))

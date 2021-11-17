@@ -22,7 +22,7 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='nekostare', id=903339723806875648, animated=False)
     
-    @commands.command(help="Display waifu im sfw.")
+    @commands.command(help="Display waifu im sfw.", aliases=["waifuim"])
     @commands.guild_only()
     async def waifu_im_sfw(self, ctx, tags: Literal["waifu", "maid", "all"] = commands.Option(description="choose tags")):
 
@@ -45,7 +45,7 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
             view = base_waifu_im_api(ctx=ctx, url=waifu_url)
             return await view.api_start()
     
-    @commands.command(help="Display waifu im nsfw.")
+    @commands.command(help="Display waifu im nsfw.", aliases=["waifuims"])
     @commands.guild_only()
     @commands.is_nsfw()
     async def waifu_im_nsfw(self, ctx, tags: Literal["ass","ecchi","ero","hentai","maid","milf","oppai","oral","paizuri","selfies","uniform"] = commands.Option(description="choose tags")):
@@ -93,7 +93,7 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
         #         return await view.api_start()  
             # raise commands.NSFWChannelRequired(ctx.channel)
 
-    @commands.command(help="Display waifu pisc.")
+    @commands.command(help="Display waifu pisc.", aliases=["waifupisc"])
     @commands.guild_only()
     async def waifu_pisc(self, ctx, type: Literal["sfw", "nsfw"] = commands.Option(description="choose type")):
         if type == "sfw":
