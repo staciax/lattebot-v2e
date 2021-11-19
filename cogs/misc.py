@@ -315,19 +315,23 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         await ctx.send(embed=e)
 
     @commands.group(help="Search the documentation", aliases=["rtd", "rtfs"], invoke_without_command=True)
+    @commands.guild_only()
     async def rtfm(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
 
     @rtfm.command(name='dpy', aliases=['discord'], help='Search the Discord.py docs')
+    @commands.guild_only()
     async def rtfm_dpy(self, ctx, *, search: str = commands.Option(description='Item to search for')):
         await self.do_rtfm(ctx, 'latest', search)
 
     @rtfm.command(name='edpy', help='Search the Enhanced-dpy docs')
+    @commands.guild_only()
     async def rtfm_edpy(self, ctx, *, search: str = commands.Option(description='Item to search for')):
         await self.do_rtfm(ctx, 'edpy', search)
     
     @rtfm.command(name='py', aliases=['python'], help='Search the Python docs')
+    @commands.guild_only()
     async def rtfm_python(self, ctx, *, search: str = commands.Option(description='Item to search for')):
         """Gives you a documentation link for a Python entity."""
         await self.do_rtfm(ctx, 'python', search)

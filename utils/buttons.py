@@ -34,7 +34,8 @@ class BaseNewButton(discord.ui.View):
 
     def fill_items(self) -> None:
         if not self.compact:
-            self.stop_pages.row = 1
+            pass
+            # self.stop_pages.row = 1
 
         if self.source.is_paginating():
             max_pages = self.source.get_max_pages()
@@ -42,6 +43,8 @@ class BaseNewButton(discord.ui.View):
             if use_last_and_first:
                 self.add_item(self.go_to_first_page)  # type: ignore
             self.add_item(self.go_to_previous_page)  # type: ignore
+            if not self.compact:
+                self.add_item(self.go_to_current_page)
             self.add_item(self.go_to_next_page)  # type: ignore
             if use_last_and_first:
                 self.add_item(self.go_to_last_page)  # type: ignore
@@ -87,6 +90,7 @@ class BaseNewButton(discord.ui.View):
 
         max_pages = self.source.get_max_pages()
         if max_pages is not None:
+            self.go_to_current_page.label = f"{page_number+1}/{max_pages}"
             self.go_to_last_page.disabled = (page_number + 1) >= max_pages
             self.go_to_next_page.disabled = (page_number + 1) >= max_pages
  
@@ -144,19 +148,23 @@ class BaseNewButton(discord.ui.View):
         self._update_labels(0)
         self.message = await self.ctx.send(**kwargs, view=self)
 
-    @discord.ui.button(label='≪', style=discord.ButtonStyle.grey, custom_id='1')
+    @discord.ui.button(label='≪', style=discord.ButtonStyle.blurple, custom_id='1')
     async def go_to_first_page(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.show_page(interaction, 0)
 
     @discord.ui.button(label='Back', style=discord.ButtonStyle.blurple, custom_id='2')
     async def go_to_previous_page(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.show_checked_page(interaction, self.current_page - 1)
+    
+    @discord.ui.button(label='Current', style=discord.ButtonStyle.grey, disabled=True)
+    async def go_to_current_page(self, button: discord.ui.Button, interaction: discord.Interaction):
+        pass
 
     @discord.ui.button(label='Next', style=discord.ButtonStyle.blurple, custom_id='3')
     async def go_to_next_page(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.show_checked_page(interaction, self.current_page + 1)
 
-    @discord.ui.button(label='≫', style=discord.ButtonStyle.grey, custom_id='4')
+    @discord.ui.button(label='≫', style=discord.ButtonStyle.blurple, custom_id='4')
     async def go_to_last_page(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.show_page(interaction, self.source.get_max_pages() - 1)
 

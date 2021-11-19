@@ -25,16 +25,15 @@ dotenv_path = join(dirname(__file__), 'data/settings.env')
 load_dotenv(dotenv_path)
 
 async def get_prefix(bot, message):
-    if message.guild.id == 840379510704046151:
+    prefix = 're'
+    if message.guild.id == bot.latte_guild_id:
         prefix = '.'
-    else:
-        prefix = 're'
     return commands.when_mentioned_or(prefix)(bot,message)
 
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.bot_version = "0.0.1s"
-        self.last_update = [2021, 11, 15]
+        self.last_update = [2021, 11, 20]
         self.launch_time = datetime.utcnow()
         self.tester = ''
         self.github = "https://github.com/staciax"
@@ -48,7 +47,6 @@ class LatteBot(commands.Bot):
         self.channel_sleep = {}
         self.current_streamers = list()
         self.no_prefix = False
-        self.latte_id = 887274968012955679
         self.latte_guild_id = 840379510704046151
         self.latte_sup_guild_id = 887274968012955679
         self.latte_log_id = 909301335743143946
@@ -68,6 +66,11 @@ class LatteBot(commands.Bot):
     def renly(self) -> Optional[discord.User]:
         """Returns discord.User of the owner"""
         return self.get_user(self.owner_id)
+    
+    @property
+    def latte(self) -> Optional[discord.Guild]:
+        """Returns discord.Guild of the guild"""
+        return self.get_guild(self.latte_guild_id)
 
     #thank_stella_bot
     def get_command_signature(self, ctx, command_name: Union[commands.Command, str]) -> str:

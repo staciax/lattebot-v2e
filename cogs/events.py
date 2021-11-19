@@ -468,6 +468,9 @@ class Events(commands.Cog):
             if self.server_log is None:
                 print("on_user_update error")
                 return
+            
+            if self.bot.latte not in before.mutual_guilds:
+                return
 
             #username_log
             if before.name != after.name:
