@@ -243,6 +243,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         ctx,
         status: Literal["online", "idle", "dnd", "offline"] = commands.Option(description="status type"),
         activity: Literal["playing", "streaming", "listening", "watching"] = commands.Option(description="activity type"),
+        text:str = commands.Option(description="status text"),
         streaming_url = commands.Option(default=None, description="streaming status url"),
     ):  
         if status == "online":
@@ -255,13 +256,13 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             bot_status = discord.Status.offline
 
         if activity == "playing":  # Setting `Playing ` status
-            await self.bot.change_presence(status=bot_status,activity=discord.Game(name=status))
+            await self.bot.change_presence(status=bot_status,activity=discord.Game(name=text))
         elif activity == "streaming": # Setting `Streaming ` status
-            await self.bot.change_presence(status=bot_status, activity=discord.Streaming(name=status, url=streaming_url))
+            await self.bot.change_presence(status=bot_status, activity=discord.Streaming(name=text, url=streaming_url))
         elif activity == "listening": # Setting `Listening ` statu
-            await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.listening, name=status))
+            await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.listening, name=text))
         elif activity == "watching": # Setting `Watching ` status
-            await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.watching, name=status))
+            await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.watching, name=text))
         
         embed = discord.Embed(title="Status Changed!",description=f"**type:** {type}\n**status:** `{status}`", color=self.bot.white_color)
         await ctx.send(embed=embed)

@@ -512,9 +512,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             value=f"**Type:** voice channel\n**Birate:** {int(channel.bitrate / 1000)}kbps\n**Region:** {channel.rtc_region}\n**Connected:** {len(channel.members)} connected",
             inline=False
         )
-        if str(channel.type) == "text": embed.add_field(
+        else: embed.add_field(
             name="infomation:", 
-            value=f"**Type:** text channel\n**Topic** : {channel.topic}\n**NSFW** : {channel.nsfw}",
+            value=f"**Type:** {channel.type} channel\n**Topic** : {channel.topic}\n**NSFW** : {channel.nsfw}",
             inline=False
         )
         
@@ -531,14 +531,14 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.add_field(name="Create date:" , value=f"{format_dt(channel.created_at)}" , inline=False)
         embed.set_thumbnail(url=channel.guild.icon.url)
         embed.set_footer(text=f"ID : {channel.id}")
-        
-        if str(channel.type) == 'text':
-            view = channel_info_view(ctx=ctx, embed=embed, channel=channel, role_list=role_list, member_list=member_list)
-            view.message = await view.start_text()
+
         if str(channel.type) == 'voice':
             view = channel_info_view(ctx=ctx, embed=embed, channel=channel, role_list=role_list, member_list=member_list)
             view.message = await view.start_voice()
-
+        else:
+            view = channel_info_view(ctx=ctx, embed=embed, channel=channel, role_list=role_list, member_list=member_list)
+            view.message = await view.start_text()
+        
     @commands.command(help="Shows the first message of the specified channel.")
     @commands.guild_only()
     async def first_message(self, ctx, channel : discord.TextChannel = commands.Option(description="mention channel")):
