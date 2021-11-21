@@ -35,6 +35,7 @@ class LatteBot(commands.Bot):
         self.bot_version = "0.0.1s"
         self.last_update = [2021, 11, 20]
         self.launch_time = datetime.utcnow()
+        self.latte_avtivity = "with my friends ♡ ₊˚"
         self.tester = ''
         self.github = "https://github.com/staciax"
         self.defaul_prefix = 're'
@@ -109,7 +110,7 @@ bot = LatteBot(intents=discord.Intents(
 async def on_ready():
     # await bot.http.bulk_upsert_guild_commands(bot.application_id, 840379510704046151, [])
     # await bot.http.bulk_upsert_global_commands(bot.application_id, [])
-    bot_avtivity = "with my friends ♡ ₊˚"
+    bot_avtivity = bot.latte_avtivity
     await bot.change_presence(activity=discord.Activity(
         type=discord.ActivityType.listening, name=bot_avtivity
     ))

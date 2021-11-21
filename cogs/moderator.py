@@ -18,6 +18,9 @@ from utils.paginator import SimplePages
 from utils.useful import RenlyEmbed
 from utils.checks import bypass_for_owner
 
+class ModError(commands.CommandError):
+    pass
+
 class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     """Moderation related commands"""
     
@@ -133,11 +136,20 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
     @commands.dynamic_cooldown(bypass_for_owner)
     async def purge(self, ctx, amount : int = commands.Option(description="Number to clear message")):
+        
+        if amount>500 or amount<0:
+            raise ModError('Invalid amount. Maximum is 500')
+        try:
+            deleted = await ctx.channel.purge(limit=amount)            
+        except discord.Forbidden:
+            raise ModError("You do not have permissions to purge message")
+        except discord.HTTPException:
+            raise ModError("Purging the messages failed.")
+        
         embed = discord.Embed(
-            description=f" `{ctx.channel.name}`: **{amount}** messages were cleared",
-            color=self.bot.white_color
-        )
-        await ctx.channel.purge(limit=(int(amount) + 1))
+                description=f" `{ctx.channel.name}`: **{len(deleted)}** messages were cleared",
+                color=self.bot.white_color
+            )
         await ctx.send(embed=embed, ephemeral=True, delete_after=15)
     
     # @commands.command(help="Cleanup the bot's messages")

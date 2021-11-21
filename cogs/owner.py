@@ -243,9 +243,13 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         ctx,
         status: Literal["online", "idle", "dnd", "offline"] = commands.Option(description="status type"),
         activity: Literal["playing", "streaming", "listening", "watching"] = commands.Option(description="activity type"),
-        text:str = commands.Option(description="status text"),
+        text:str = commands.Option(default=None, description="status text"),
         streaming_url = commands.Option(default=None, description="streaming status url"),
     ):  
+
+        if text is None:
+            text = self.bot.latte_avtivity
+
         if status == "online":
             bot_status = discord.Status.online
         elif status == "idle":
@@ -254,17 +258,31 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             bot_status = discord.Status.dnd
         elif status == "offline":
             bot_status = discord.Status.offline
+        else:
+            bot_status = discord.Status.online
 
-        if activity == "playing":  # Setting `Playing ` status
-            await self.bot.change_presence(status=bot_status,activity=discord.Game(name=text))
-        elif activity == "streaming": # Setting `Streaming ` status
-            await self.bot.change_presence(status=bot_status, activity=discord.Streaming(name=text, url=streaming_url))
-        elif activity == "listening": # Setting `Listening ` statu
-            await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.listening, name=text))
-        elif activity == "watching": # Setting `Watching ` status
-            await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.watching, name=text))
-        
-        embed = discord.Embed(title="Status Changed!",description=f"**type:** {type}\n**status:** `{status}`", color=self.bot.white_color)
+        try:
+            if activity == "playing":  # Setting `Playing ` status
+                await self.bot.change_presence(status=bot_status,activity=discord.Game(name=text))
+            elif activity == "streaming": # Setting `Streaming ` status
+                await self.bot.change_presence(status=bot_status, activity=discord.Streaming(name=text, url=streaming_url))
+            elif activity == "listening": # Setting `Listening ` statu
+                await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.listening, name=text))
+            elif activity == "watching": # Setting `Watching ` status
+                await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.watching, name=text))
+            else:
+                await self.bot.change_presence(status=bot_status,activity=discord.Game(name=text))
+        except:
+            raise OwnerError("Change status error")
+
+        embed = discord.Embed()
+        embed.add_field(name="Status:", value=f"`{status}`")
+        embed.add_field(name="Activity:", value=f"`{activity}`")
+        embed.add_field(name="Text:", value=f"`{text}`")
+        if activity == "watching" and streaming_url is not None:
+            embed.add_field(name="URL:", value=f"`{streaming_url}`")
+
+        embed = discord.Embed(title="Status Changed!",description=f"**Type:** {status}\n**Status:** `{status}`", color=self.bot.white_color)
         await ctx.send(embed=embed)
     
     # @commands.command(help="enable command")

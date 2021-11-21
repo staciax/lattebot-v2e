@@ -6,7 +6,7 @@ import io
 import asyncio
 from discord import Embed
 from discord.ext import commands , tasks
-from datetime import datetime, timezone
+from datetime import datetime, timezone , timedelta
 from re import search
 
 # Third
@@ -44,10 +44,12 @@ class Events(commands.Cog):
         self.boost_ = 0
         self.counted.start()
         self.afk_check.start()
+        self.clear_message_log.start()
         
     def cog_unload(self):
         self.counted.cancel()
         self.afk_check.cancel()
+        self.clear_message_log.cancel()
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -134,6 +136,26 @@ class Events(commands.Cog):
 
     @afk_check.before_loop
     async def before_afk_check(self):
+        await self.bot.wait_until_ready()
+    
+    #clear_message_log_latte_guild
+    @tasks.loop(hours=1)
+    async def clear_message_log(self):
+        def is_me(m):
+            return m.author != self.bot.renly
+        guild = self.bot.latte
+        message_log = guild.get_channel(self.json_read["message-log"])
+        time:int = (datetime.utcnow() + timedelta(seconds=25200)).strftime("%H")
+        if time == 0:
+            try:
+                await message_log.purge(limit=15, check=is_me)
+            except discord.Forbidden:
+                pass
+            except discord.HTTPException:
+                pass
+            
+    @clear_message_log.before_loop
+    async def before_clear_message_log(self):
         await self.bot.wait_until_ready()
     
     @commands.Cog.listener()

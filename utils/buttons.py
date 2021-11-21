@@ -168,7 +168,7 @@ class BaseNewButton(discord.ui.View):
     async def go_to_last_page(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.show_page(interaction, self.source.get_max_pages() - 1)
 
-    @discord.ui.button(label='Quit', style=discord.ButtonStyle.red, custom_id='5')
+    @discord.ui.button(label='Close', style=discord.ButtonStyle.red, custom_id='5')
     async def stop_pages(self, button: discord.ui.Button, interaction: discord.Interaction):
         await interaction.response.defer()
         await interaction.delete_original_message()
