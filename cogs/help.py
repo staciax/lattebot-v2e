@@ -234,7 +234,6 @@ class LatteBotHelp(commands.HelpCommand):
         with contextlib.suppress(commands.CommandError):
             if await command.can_run(self.context):
                 commandChecks.append("Usable by you: Yes")
-                
             else:
                 commandChecks.append("Usable by you: No")
 

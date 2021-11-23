@@ -300,10 +300,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         view = Confirm(ctx)
         m = await ctx.reply(embed=embed, view=view , mention_author=False)
         await view.wait()
+        view.clear_items()
         if view.value is None:
-            return
+            return await m.delete()
         elif view.value:
-            view.clear_items()
             embed_edit = discord.Embed(color=member.colour , timestamp=futuredate)
             embed_edit.description = f"**TIME TO SLEEP** {emoji_converter('sleeping')}\n{format_dt(futuredate, style='f')}({format_dt(futuredate, style='R')})"
             if member.avatar.url is not None:
@@ -316,19 +316,18 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                     embed_edit.description += f"\n||**Stoped timer** : {ctx.clean_prefix}sleep_stop||"
                 if ctx.author != member:
                     embed_edit.description += f"\n||**Stoped timer** : {ctx.clean_prefix}sleep_stop @{member.display_name}||"
-                await m.edit(embed=embed_edit, view=view)
+                await m.edit(embed=embed_edit, view=None)
                 self.bot.sleeping[str(member.id)] = {"time": futuredate_}
                 with open("latte_config/sleeping.json", "w") as fp:
                     json.dump(self.bot.sleeping, fp , indent=4)
             else:
-                embed_edit.description += f"\n__||Timer can't be stopped.||__"
-                await m.edit(embed=embed_edit , view=view)
+                embed_edit.description += f"\n||`Timer can't be stopped.`||"
+                await m.edit(embed=embed_edit, view=None)
                 await asyncio.sleep(timewait)
                 await member.move_to(channel=None)
         else:
-            embed_c = discord.Embed(description="Cancelling sleep time!" , color=0xffffff)
-            await ctx.send(embed=embed_c , ephemeral=True, delete_after=15)
             await m.delete()
+            raise UtilityError("Cancelling sleep time!")
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])
     @commands.guild_only()

@@ -275,14 +275,14 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         except:
             raise OwnerError("Change status error")
 
-        embed = discord.Embed()
+        embed = discord.Embed(color=self.bot.white_color)
+        embed.title = "Status Changed!"
         embed.add_field(name="Status:", value=f"`{status}`")
         embed.add_field(name="Activity:", value=f"`{activity}`")
         embed.add_field(name="Text:", value=f"`{text}`")
         if activity == "watching" and streaming_url is not None:
             embed.add_field(name="URL:", value=f"`{streaming_url}`")
 
-        embed = discord.Embed(title="Status Changed!",description=f"**Type:** {status}\n**Status:** `{status}`", color=self.bot.white_color)
         await ctx.send(embed=embed)
     
     # @commands.command(help="enable command")

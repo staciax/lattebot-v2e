@@ -147,7 +147,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             raise ModError("Purging the messages failed.")
         
         embed = discord.Embed(
-                description=f" `{ctx.channel.name}`: **{len(deleted)}** messages were cleared",
+                description=f" `#{ctx.channel.name}`: **{len(deleted)}** messages were cleared",
                 color=self.bot.white_color
             )
         await ctx.send(embed=embed, ephemeral=True, delete_after=15)
