@@ -330,7 +330,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     async def rtfm_edpy(self, ctx, *, search: str = commands.Option(description='Item to search for')):
         await self.do_rtfm(ctx, 'edpy', search)
     
-    @rtfm.command(name='py', aliases=['python'], help='Search the Python docs')
+    @rtfm.command(name='python', aliases=['py'], help='Search the Python docs')
     @commands.guild_only()
     async def rtfm_python(self, ctx, *, search: str = commands.Option(description='Item to search for')):
         """Gives you a documentation link for a Python entity."""

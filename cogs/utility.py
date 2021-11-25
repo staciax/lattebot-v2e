@@ -128,7 +128,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
         await ctx.send(embed=embed)
 
-    @commands.command(help="clear afk status")
+    @commands.command(help="clear afk status", aliases=["afkclear"])
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def afk_clear(self, ctx, member:discord.Member=commands.Option(default=None,description="spectify member")):
@@ -326,8 +326,8 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 await asyncio.sleep(timewait)
                 await member.move_to(channel=None)
         else:
-            await m.delete()
-            raise UtilityError("Cancelling sleep time!")
+            embed_c = discord.Embed(description="Cancelling sleep time!" , color=self.bot.white_color)
+            await m.edit(embed=embed_c, view=None, delete_after=15)
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])
     @commands.guild_only()
@@ -394,7 +394,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             embed_response.description = f"{ctx.author.mention}, {format_relative(remind_time)}\n{message}"
             await ctx.channel.send(embed=embed_response, view=view)
 
-    @commands.command(help="Disconnect timer for Voice channel")
+    @commands.command(help="Disconnect timer for Voice channel", aliases=['slch'])
     @commands.guild_only()
     async def sleep_channel(self, ctx, time:TimeConverter=commands.Option(description="specify duration"), channel:discord.VoiceChannel=commands.Option(default=None,description="specify channel")):
 
@@ -442,7 +442,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.set_footer(text=f"Total member: {len(in_channel)}")
 
         view = Confirm(ctx)
-        m = await ctx.reply(embed=embed, view=view , mention_author=False)
+        m = await ctx.reply(embed=embed, view=view, mention_author=False)
         await view.wait()
         if view.value is None:
             return
@@ -475,8 +475,9 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed_c, ephemeral=True, delete_after=15)
             await m.delete()
     
-    @commands.command(help="Stop disconnect timer")
-    async def sleep_channel_stop(self, ctx, *, channel:discord.VoiceChannel=None):
+    @commands.command(help="Stop disconnect timer", aliases=['slchstop'])
+    @commands.guild_only()
+    async def sleep_channel_stop(self, ctx, channel:discord.VoiceChannel=None):
         if channel is None:
             channel = ctx.author.voice.channel
 

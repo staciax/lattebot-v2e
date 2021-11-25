@@ -304,8 +304,7 @@ class LatteBotHelp(commands.HelpCommand):
             await ctx.send(embed = embed)
 
     async def send_error_message(self, error):
-        pass
-        #raise errors.CommandDoesntExist
+        raise commands.CommandError("Error")
 
     async def on_help_command_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):

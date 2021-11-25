@@ -145,8 +145,8 @@ class Events(commands.Cog):
             return m.author != self.bot.renly
         guild = self.bot.latte
         message_log = guild.get_channel(self.json_read["message-log"])
-        time:int = (datetime.utcnow() + timedelta(seconds=25200)).strftime("%H")
-        if time == 0:
+        time = (datetime.utcnow() + timedelta(seconds=25200)).strftime("%H")
+        if int(time) == 0:
             try:
                 await message_log.purge(limit=15, check=is_me)
             except discord.Forbidden:
@@ -633,7 +633,7 @@ class Events(commands.Cog):
                 
                 embed = discord.Embed(timestamp=datetime.now(timezone.utc))
                 if member.avatar.url is not None:
-                    embed.set_footer(text=member , icon_url=member.avatar.url)
+                    embed.set_footer(text=member , icon_url=member.display_avatar.url)
                 else:
                     embed.set_footer(text=member)
 

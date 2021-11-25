@@ -330,13 +330,19 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             self.bot.load_extension(f'cogs.{extension}')
             embed.description = f"{emoji_converter('greentick')} Load : `{extension}`"
             embed.color = 0x8be28b
-        except Exception as e:
-            embed.description(f"Could not load")
-            embed.color = 0xFF7878
             return await ctx.send(embed=embed)
-
-        await ctx.send(embed=embed)
-    
+        except commands.ExtensionNotFound:
+            raise OwnerError("Extension Not Found")
+        except commands.ExtensionAlreadyLoaded:
+            raise OwnerError("The extension is already loaded.")
+        except commands.NoEntryPointError:
+            raise OwnerError("The extension does not have a setup function.")
+        except commands.ExtensionFailed:
+            raise OwnerError("The extension load failed")
+        except Exception as ex:
+            print(ex)
+            raise OwnerError("The extension load failed")
+           
     @commands.command(help="unload cog")
     @commands.guild_only()
     @commands.is_owner()
@@ -350,29 +356,40 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             self.bot.unload_extension(f'cogs.{extension}')
             embed.description = f"{emoji_converter('greentick')} Unload : `{extension}`"
             embed.color = 0x8be28b
-        except Exception as e:
-            embed.description(f"Could not unload")
-            embed.color = 0xFF7878
             return await ctx.send(embed=embed)
+        except commands.ExtensionNotFound:
+            raise OwnerError("Extension Not Found")
+        except commands.ExtensionNotLoaded:
+            raise OwnerError("The extension was not loaded.")
+        except Exception as ex:
+            print(ex)
+            raise OwnerError("The extension unload failed")
+        # except Exception as e:
+        #     embed.description(f"Could not unload")
+        #     embed.color = 0xFF7878
+        #     return await ctx.send(embed=embed)
 
-        await ctx.send(embed=embed)
-    
     @commands.command(help="reload cog")
     @commands.guild_only()
     @commands.is_owner()
     async def reload(self, ctx, extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")):
         embed = discord.Embed()
         try:
-            self.bot.unload_extension(f'cogs.{extension}')
-            self.bot.load_extension(f'cogs.{extension}')
+            self.bot.reload_extension(f'cogs.{extension}')
             embed.description = f"{emoji_converter('greentick')} Reload : `{extension}`"
             embed.color = 0x8be28b
-        except Exception as e:
-            embed.description(f"Could not reload")
-            embed.color = 0xFF7878
             return await ctx.send(embed=embed)
-
-        await ctx.send(embed=embed)
+        except commands.ExtensionNotLoaded:
+            raise OwnerError("The extension was not loaded.")
+        except commands.ExtensionNotFound:
+            raise OwnerError("TExtension Not Found")
+        except commands.NoEntryPointError:
+            raise OwnerError("The extension does not have a setup function.")
+        except commands.ExtensionFailed:
+            raise OwnerError("The extension reload failed")
+        except Exception as ex:
+            print(ex)
+            raise OwnerError("The extension reload failed")
     
     @commands.command(help="reload all cogs")
     @commands.guild_only()

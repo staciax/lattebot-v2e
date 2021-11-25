@@ -71,7 +71,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
             await ctx.send('** **', ephemeral=True)
         await ctx.channel.send(f'{message}')
 
-    @commands.command(help="Genshin impact map guide")
+    @commands.command(help="Genshin impact map guide", aliases=["gsmap"])
     @commands.guild_only()
     async def genshinmap(self, ctx):
         embed = discord.Embed(color=0x2484d7)

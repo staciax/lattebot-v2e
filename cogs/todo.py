@@ -177,7 +177,7 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     # @todo.command(help="Removes the specified task from your todo list")
     @commands.command(aliases=['tdr','todor','todoremove'], help="Removes the specified task from your todo list")
     @is_latte_guild()
-    async def todo_remove(self, ctx, *, number: int = commands.Option(description="Todo number")):
+    async def todo_remove(self, ctx, *, number = commands.Option(description="Todo number")):
         # embed_error = discord.Embed(color=self.bot.error_color)
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
         

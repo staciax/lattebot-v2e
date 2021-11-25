@@ -61,6 +61,8 @@ class Error(commands.Cog):
             cm_error = f"This channel isn't NSFW"
         elif isinstance(error, commands.CheckFailure):
             cm_error = f"You can't use this command."
+        elif isinstance(error, commands.DisabledCommand):
+            cm_error = f"This command is restricted to slash commands." 
         elif isinstance(error, commands.CommandError):
             embed.color = 0xFF7878
             cm_error = f"{error}"

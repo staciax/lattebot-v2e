@@ -29,36 +29,50 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel.id in self.latte_bot:
-            if message.author.voice:
+        try:
+            if message.channel.id in self.latte_bot:
                 if message.content.startswith('uw'):
-                    channel = message.guild.get_channel(self.underworldx[1])
-                    await message.author.move_to(channel)
-                    await message.delete()
+                    if message.author.voice:
+                        channel = message.guild.get_channel(self.underworldx[1])
+                        await message.author.move_to(channel)
+                        await message.delete()
                 if message.content.startswith('temp'):
-                    channel = message.guild.get_channel(self.tempx[1])
-                    await message.author.move_to(channel)
-                    await message.delete()
+                    if message.author.voice:
+                        channel = message.guild.get_channel(self.tempx[1])
+                        await message.author.move_to(channel)
+                        await message.delete()
                 if message.content.startswith('moonlight'):
-                    channel = message.guild.get_channel(self.moonlightx[1])
-                    await message.author.move_to(channel) 
-                    await message.delete()
+                    if message.author.voice:
+                        channel = message.guild.get_channel(self.moonlightx[1])
+                        await message.author.move_to(channel) 
+                        await message.delete()
                 if message.content.startswith('angel'):
-                    channel = message.guild.get_channel(self.angelx[1])
-                    await message.author.move_to(channel) 
-                    await message.delete()
-        
-        if message.channel.id == self.tempx[0]:
-            await asyncio.sleep(60)
-            await message.delete()
-    
+                    if message.author.voice:
+                        channel = message.guild.get_channel(self.angelx[1])
+                        await message.author.move_to(channel) 
+                        await message.delete()
+
+            if message.channel.id == self.tempx[0]:
+                await asyncio.sleep(60)
+                await message.delete()
+        except discord.Forbidden:
+            pass
+        except discord.NotFound:
+            pass
+        except discord.HTTPException:
+            pass
+        except Exception as ex:
+            print(ex)
+
     @commands.command(aliases=['lt'], help="latte server template")
     @commands.guild_only()
     @is_latte_guild()
     async def latte_template(self, ctx):
-        await ctx.send("https://discord.new/sFYKgkknRN5f")
+        if ctx.clean_prefix == "/":
+            await ctx.send('** **', ephemeral=True)
+        await ctx.channel.send("https://discord.new/sFYKgkknRN5f")
 
-    @commands.command(aliases=['ls'], help="lattte temp role")
+    @commands.command(aliases=['ltemp'], help="lattte temp role")
     @commands.guild_only()
     @is_latte_guild()
     async def latte_temp_role(self, ctx, member: discord.Member = commands.Option(default=None, description="Give role to member")):
