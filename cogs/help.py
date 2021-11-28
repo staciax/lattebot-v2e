@@ -213,6 +213,9 @@ class MyHelp(commands.HelpCommand):
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='latte_', id='902674566655139881', animated=False)
 
+    def get_command_signature(self, command, ctx):
+        return '%s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
+
     def get_bot_mapping(self):
         ctx = self.context
         bot = self.context.bot
