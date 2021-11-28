@@ -64,7 +64,6 @@ class Error(commands.Cog):
         elif isinstance(error, commands.DisabledCommand):
             cm_error = f"This command is restricted to slash commands." 
         elif isinstance(error, commands.CommandError):
-            embed.color = 0xFF7878
             cm_error = f"{error}"
         else:
             print(error)

@@ -2,6 +2,12 @@
 import discord
 import random
 from discord.ext import commands
+from typing import List
+
+# Third
+import requests
+from io import BytesIO
+from colorthief import ColorThief
 
 # Local
 from utils.paginator import SimplePages
@@ -171,15 +177,6 @@ class base_Button_URL(discord.ui.View):
         self.clear_items()
         self.fill_items()
     
-    async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
-        embed_error = discord.Embed(color=0xffffff)
-        if interaction.response.is_done():
-            embed_error.description='An unknown error occurred, sorry'
-            await interaction.followup.send(embed=embed_error, ephemeral=True)
-        else:
-            embed_error.description='An unknown error occurred, sorry'
-            await interaction.response.send_message(embed=embed_error, ephemeral=True)
-
     def fill_items(self):
         if self.label and self.url:
             self.add_item(discord.ui.Button(label=self.label, url=self.url))
@@ -293,3 +290,92 @@ class content_button(discord.ui.View):
     @discord.ui.button(label="Content", style=discord.ButtonStyle.primary)
     async def content_button(self, button, interaction):
         await interaction.response.send_message(self.content, ephemeral=True)
+
+class AvatarView(discord.ui.View):
+    def __init__(self, ctx, member):
+        super().__init__()
+        self.ctx = ctx
+        self.member = member
+        self.avatar_url = member.avatar
+        self.avatar_display_url = member.display_avatar if member.avatar != member.display_avatar else None
+        self.embeds: List[discord.Embed] = []
+        self.clear_items()
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """Only allowing the context author to interact with the view"""
+        ctx = self.ctx
+        author = ctx.author
+        if interaction.user == ctx.bot.renly:
+            return True
+        if interaction.user != ctx.author:
+            if self.is_command:
+                command = ctx.bot.get_command_signature(ctx, ctx.command)
+                content = f"Only `{author}` can use this menu. If you want to use it, use `{command}`"
+            else:
+                content = f"Only `{author}` can use this."
+            embed = RenlyEmbed.to_error(description=content)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
+        return True
+    
+    def display_view(self) -> None:
+        self.clear_items()
+        if len(self.embeds) > 0:
+            self.add_item(self.category_select)
+            self.category_select: discord.ui.Select
+            self.category_select.options = []
+            self.category_select.add_option(label="User Avatar", value='avatar')
+            self.category_select.add_option(label="Server Avatar", value='display')
+
+    def avatar_url_button(self):
+        self.add_item(discord.ui.Button(label="Avatar URL", url=self.avatar_url))
+
+    @discord.ui.select(placeholder="Select avatar", row=0)
+    async def category_select(self, select: discord.ui.Select, interaction: discord.Interaction):
+        self.display_view()
+        if select.values[0] == 'avatar':
+            self.avatar_url_button()
+            await interaction.response.edit_message(embed=self.embeds[0], view=self)
+        elif select.values[0] == 'display':
+            self.add_item(discord.ui.Button(label="Server avatar URL", url=self.avatar_display_url))
+            await interaction.response.edit_message(embed=self.embeds[1], view=self)
+    
+    def get_color(self, member, avatar_url) -> None:
+        try:
+            url = avatar_url.replace(format='png')
+            resp = requests.get(url)      
+            out = BytesIO(resp.content)
+            out.seek(0)
+            icon_color = ColorThief(out).get_color(quality=1)
+            icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
+            dominant_color = int(icon_hex, 16)
+        except:
+            if member.color != discord.Colour.default():
+                dominant_color = member.colour
+            else:
+                dominant_color = self.ctx.bot.white_color
+        return dominant_color
+
+    def avatar_embed(self) -> discord.Embed:
+        member = self.member
+        embed = discord.Embed()
+        embed.title = f"{member.name}'s Avatar:"
+        embed.set_image(url=self.avatar_url)
+        embed.color = self.get_color(member, self.avatar_url)
+        self.embeds.append(embed)
+
+    def display_embed(self) -> discord.Embed:
+        member = self.member
+        embed = discord.Embed()
+        embed.title = f"{member.name}'s Server avatar:"
+        embed.set_image(url=self.avatar_display_url)
+        embed.color = self.get_color(member, self.avatar_display_url)
+        self.embeds.append(embed)
+
+    async def start(self) -> None:
+        self.avatar_embed()
+        if self.avatar_display_url:
+            self.display_embed()
+            self.display_view()
+        self.avatar_url_button()
+        await self.ctx.send(embed=self.embeds[0], view=self)

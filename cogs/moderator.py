@@ -3,7 +3,7 @@ import discord
 import datetime
 import asyncio
 import re
-from discord.ext import commands , tasks
+from discord.ext import commands
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 import aiohttp
@@ -136,8 +136,10 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
     @commands.dynamic_cooldown(bypass_for_owner)
     async def purge(self, ctx, amount : int = commands.Option(description="Number to clear message")):
-        
-        if amount>500 or amount<0:
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+
+        if amount> 500 or amount <0:
             raise ModError('Invalid amount. Maximum is 500')
         try:
             deleted = await ctx.channel.purge(limit=amount)            
@@ -171,11 +173,14 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
     @commands.dynamic_cooldown(bypass_for_owner)
     async def clear(
-        self,
-        ctx,
-        type: Literal["all","message without pinned","bot","attachments","embed","custom emoji"] = commands.Option(description="choose type to clean message"),
-        search:int = commands.Option(default=15, description="amount to search message / default = 15")
-    ):
+            self,
+            ctx,
+            type: Literal["all","message without pinned","bot","attachments","embed","custom emoji"] = commands.Option(description="choose type to clean message"),
+            search:int = commands.Option(default=15, description="amount to search message / default = 15")
+        ):
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+
         embed = discord.Embed(color=self.bot.white_color)
 
         if type == "message without pinned":
@@ -232,11 +237,14 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
     @commands.dynamic_cooldown(bypass_for_owner)
     async def clear_member(
-        self,
-        ctx,
-        member:discord.Member = commands.Option(description="Mention member"),
-        search:int = commands.Option(default=15, description="amount to search message / default = 15")
-    ):
+            self,
+            ctx,
+            member:discord.Member = commands.Option(description="Mention member"),
+            search:int = commands.Option(default=15, description="amount to search message / default = 15")
+        ):
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+        
         embed = discord.Embed(color=self.bot.white_color)
         try:
             await do_removal(self, ctx, search, lambda e: e.author == member)
@@ -258,6 +266,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             *,
             reason: str = commands.Option(default=None, description="reason")   
         ):
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
 
         embed = discord.Embed(color=self.bot.white_color)
 
@@ -338,6 +348,9 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.has_permissions(administrator = True)
     async def muterole(self, ctx): #role: discord.Role = commands.Option(description="Mention role")
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+
         guild = ctx.guild
         mutedRole = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
         embed = discord.Embed(color=self.bot.white_color)

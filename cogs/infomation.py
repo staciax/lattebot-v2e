@@ -13,13 +13,13 @@ from io import BytesIO
 from colorthief import ColorThief
 
 # Local
-from utils.custom_button import roleinfo_view , channel_info_view , base_Button_URL
+from utils.custom_button import roleinfo_view , channel_info_view , base_Button_URL , AvatarView
 from utils.emoji import profile_converter, emoji_converter , status_converter
 from utils.converter import *
 from utils.formats import format_dt , deltaconv
 from utils.custom_button import base_Button_URL
-from utils.useful import RenlyEmbed
 from utils.buttons import NewSimpage
+from utils.errors import CantRun
 
 class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     """All informative commands"""
@@ -39,7 +39,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     async def server(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
-        # await self.bot.help_command.send_group_help_custom(self.server, ctx)
 
     @server.command(name="info", help="Show server infomation", aliases=["si", "serverinformation", "serverinformations" , "guildinfo" , "gi"])
     @commands.guild_only()
@@ -105,9 +104,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     async def server_icon(self, ctx):
         guild = ctx.guild
         embed = discord.Embed(title = f"{guild.name}'s Icon:")
-        #start_view_button
-        # view = discord.ui.View()
-        # style = discord.ButtonStyle.gray
         try:
             #dominant_colour_icon_guild
             url = guild.icon.replace(format='png')
@@ -124,12 +120,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.set_image(url = guild.icon.url)
 
             view = base_Button_URL(label="Server icon URL", url=guild.icon.url)
-            # item = discord.ui.Button(style=style, label="Server icon URL", url=guild.icon.url)
         except:
-            embed_fail = discord.Embed(description="Guild icon not found" , color=self.bot.white_color)
-            return await ctx.send(embed=embed_fail)
+            raise CantRun('Server icon not found')
 
-        # view.add_item(item=item)
         await ctx.send(embed = embed , view=view)
 
     
@@ -139,16 +132,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         guild = ctx.guild
         try:
             embed = discord.Embed(title = f"{guild.name}'s Banner:", color=self.bot.white_color).set_image(url = guild.banner.url)
-            #start_view_button
-            # view = discord.ui.View()
-            # style = discord.ButtonStyle.gray
-            # item = discord.ui.Button(style=style, label="Server banner URL", url=guild.banner.url)
-            # view.add_item(item=item)
             view = base_Button_URL(label="Server banner URL", url=guild.banner.url)
             await ctx.send(embed = embed, view=view)
         except:
-            embed = discord.Embed(description="Guild banner not found" , color=self.bot.white_color)
-            await ctx.send(embed=embed)
+            raise CantRun('Server banner not found')
     
     @server.command(name="splash", help="Shows the server invite banner.", aliases=["serversplash","ssp","invitebanner"], message_command=False)
     @commands.guild_only()
@@ -156,21 +143,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         guild = ctx.guild
         try:
             embed = discord.Embed(title = f"{guild.name}'s Splash banner:", color=self.bot.white_color).set_image(url = guild.splash.url)
-            #start_view_button
-            # view = discord.ui.View()
-            # style = discord.ButtonStyle.gray
-            # item = discord.ui.Button(style=style, label="Splash URL", url=guild.splash.url)
-            # view.add_item(item=item)
             view = base_Button_URL(label="Splash URL", url=guild.splash.url)
             await ctx.send(embed=embed , view=view)
         except:
-            embed = discord.Embed(description="Guild splash not found" , color=self.bot.white_color)
-            await ctx.send(embed=embed)
-
-    # @commands.group(aliases=['u'])
-    # @commands.guild_only()
-    # async def user(self, ctx):
-    #     pass
+            raise CantRun('Server splash not found')
 
     @commands.command(name="userinfo", help="Shows information about the specified member.", aliases=["ui", "userinformation","memberinfo"])
     @commands.guild_only()
@@ -213,8 +189,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
             dominant_color = int(icon_hex, 16)
         except:
-            if member.color == discord.Colour.default():
+            if member.color != discord.Colour.default():
                 dominant_color = member.colour
+            else:
+                dominant_color = self.bot.white_color
 
         #start_view
         view = discord.ui.View()
@@ -249,81 +227,69 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
         await ctx.send(embed=embed , view=view)
 
-    @commands.group(help="Avatar commands")
+    @commands.command()
     @commands.guild_only()
-    async def avatar(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
-        # await self.bot.help_command.send_group_help_custom(self.avatar, ctx)
-
-    @avatar.command(name="user", help="Shows the user avatar of the specified member.", aliases=["av"])
-    @commands.guild_only()
-    async def avatar_user(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    async def avatar(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.author
-
-        #dominant_colour_avatar
-        try:
-            url = member.avatar.replace(format='png')
-            resp = requests.get(url)      
-            out = BytesIO(resp.content)
-            out.seek(0)
-            icon_color = ColorThief(out).get_color(quality=1)
-            icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-            dominant_color = int(icon_hex, 16)
-        except:
-            dominant_color = self.bot.white_color
-
-        embed = discord.Embed(title = f"{member.name}'s Avatar:", color=dominant_color)
-        if member.avatar.url is not None:
-            embed.set_image(url = member.avatar.url)
-            #start_view_button
-            # view = discord.ui.View()
-            # style = discord.ButtonStyle.gray
-            # item = discord.ui.Button(style=style, label="Avatar URL", url=member.avatar.url)
-            # view.add_item(item=item)
-            view = base_Button_URL(label="Avatar URL", url=member.avatar.url)
-            await ctx.send(embed = embed , view=view)
+        if member.avatar is not None:
+            view = AvatarView(ctx, member)
+            await view.start()
         else:
-            embed.description = f"this user must have a avatar."
-            await ctx.send(embed = embed)
+            raise CantRun(f'**{member.display_name}** must have a avatar.')
+
+    # @avatar.command(name="user", help="Shows the user avatar of the specified member.", aliases=["av"])
+    # @commands.guild_only()
+    # async def avatar_user(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    #     member = member or ctx.author
+
+    #     #dominant_colour_avatar
+    #     try:
+    #         url = member.avatar.replace(format='png')
+    #         resp = requests.get(url)      
+    #         out = BytesIO(resp.content)
+    #         out.seek(0)
+    #         icon_color = ColorThief(out).get_color(quality=1)
+    #         icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
+    #         dominant_color = int(icon_hex, 16)
+    #     except:
+    #         dominant_color = self.bot.white_color
+
+    #     embed = discord.Embed(title = f"{member.name}'s Avatar:", color=dominant_color)
+    #     if member.avatar.url is not None:
+    #         embed.set_image(url = member.avatar.url)
+    #         view = base_Button_URL(label="Avatar URL", url=member.avatar.url)
+    #         await ctx.send(embed = embed , view=view)
+    #     else:
+    #         raise CantRun('this user must have a avatar.')
     
-    @avatar.command(name="server",help="Shows the server avatar of the specified member.", aliases=["sav"], message_command=False)
-    @commands.guild_only()
-    async def avatar_server(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
-        member = member or ctx.author
+    # @avatar.command(name="server", help="Shows the server avatar of the specified member.", aliases=["sav"], message_command=False)
+    # @commands.guild_only()
+    # async def avatar_server(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
+    #     member = member or ctx.author
 
-        embed = discord.Embed()
-        if member.avatar != member.display_avatar:
-            #dominant_colour_avatar_server
-            try:
-                url = member.display_avatar.replace(format='png')
-                resp = requests.get(url)      
-                out = BytesIO(resp.content)
-                out.seek(0)
-                icon_color = ColorThief(out).get_color(quality=1)
-                icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-                dominant_color = int(icon_hex, 16)
-            except:
-                dominant_color = self.bot.white_color
+    #     embed = discord.Embed()
+    #     if member.avatar != member.display_avatar:
+    #         #dominant_colour_avatar_server
+    #         try:
+    #             url = member.display_avatar.replace(format='png')
+    #             resp = requests.get(url)      
+    #             out = BytesIO(resp.content)
+    #             out.seek(0)
+    #             icon_color = ColorThief(out).get_color(quality=1)
+    #             icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
+    #             dominant_color = int(icon_hex, 16)
+    #         except:
+    #             dominant_color = self.bot.white_color
             
-            #display_avatar
-            embed.title = f"{member.name}'s Server avatar:"
-            embed.set_image(url = member.display_avatar.url)
-            embed.color = dominant_color
+    #         #display_avatar
+    #         embed.title = f"{member.name}'s Server avatar:"
+    #         embed.set_image(url = member.display_avatar.url)
+    #         embed.color = dominant_color
+    #         view = base_Button_URL(label="Server avatar URL", url=member.display_avatar.url)
 
-            #start_view_button
-            # view = discord.ui.View()
-            # style = discord.ButtonStyle.gray
-            # item = discord.ui.Button(style=style, label="Server avatar URL", url=member.display_avatar.url)
-            # view.add_item(item=item)
-
-            view = base_Button_URL(label="Server avatar URL", url=member.display_avatar.url)
-
-            await ctx.send(embed = embed , view=view)
-        else:
-            embed.description = f"this user don't have a server avatar."
-            embed.color = self.bot.white_color
-            await ctx.send(embed = embed)
+    #         await ctx.send(embed = embed , view=view)
+    #     else:
+    #         raise CantRun("this user don't have a server avatar.")
 
     @commands.command(help="Shows the banner of the specified member.", aliases=["bn"])
     @commands.guild_only()
@@ -350,12 +316,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             #dominant_color
             embed.color = dominant_color
 
-            #start_view_button
-            # view = discord.ui.View()
-            # style = discord.ButtonStyle.gray
-            # item = discord.ui.Button(style=style, label="Banner URL", url=fetch_member.banner.url)
-            # view.add_item(item=item)
-
             view = base_Button_URL(label="Banner URL", url=fetch_member.banner.url)
             await ctx.send(embed=embed , view=view)
         elif fetch_member.accent_color:
@@ -370,15 +330,13 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.add_field(name=f"this user don't have banner\n\nAccent color:" , value=f"{fetch_member.accent_color} (HEX)", inline=False)
             await ctx.send(file=f, embed=embed)
         else:
-            embed.description = f"this user don't have a banner."
-            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise CantRun("this user don't have a banner.")
 
     @commands.group(help="Role commands")
     @commands.guild_only()
     async def role(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
-        # await self.bot.help_command.send_group_help_custom(self.role, ctx)
 
     @role.command(name="info",aliases=["ri"], help="Shows information about the specified role.")
     @commands.guild_only()
@@ -411,7 +369,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     async def emoji(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.bot.help_command.send_group_help_custom(ctx.command, ctx)
-        # await self.bot.help_command.send_group_help_custom(self.emoji, ctx)
     
     @emoji.command(name="info", help="Shows information about a emoji.")
     @commands.guild_only()
@@ -420,7 +377,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             try:
                 emoji = await emoji.guild.fetch_emoji(emoji.id)
             except discord.NotFound:
-                return await ctx.send("I could not find this emoji in the given guild.")
+                raise CantRun("I could not find this emoji in the given server.")
+            except discord.HTTPException:
+                raise CantRun("An error occurred fetching the emoji.")
             is_managed = "Yes" if emoji.managed else "No"
             is_animated = "Yes" if emoji.animated else "No"
             is_available = "Yes" if emoji.available else "No"
@@ -450,12 +409,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
                 colour=self.bot.white_color,
             )
             embed.set_thumbnail(url=emoji.url)
-            # start_view_button
-            # view = discord.ui.View()
-            # style = discord.ButtonStyle.gray
-            # item = discord.ui.Button(style=style, label="Emoji URL", url=emoji.url)
-            # view.add_item(item=item)
-
             view = base_Button_URL(label="Emoji URL", url=emoji.url)
             await ctx.send(embed=embed , view=view)
         elif isinstance(emoji, discord.PartialEmoji):
@@ -480,8 +433,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed , view=view)
 
         else:
-            embed = RenlyEmbed.to_error(description=f"{emoji} <- This is unicode emoji")
-            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise CantRun(f"{emoji} <- This is unicode emoji")
 
     @emoji.command(name="list",help="Shows you a list of emotes from the server.")
     @commands.guild_only()
@@ -489,6 +441,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     async def emotelist(self, ctx):
         guild = ctx.guild
         guildEmotes = guild.emojis
+        if not guildEmotes or len(guildEmotes) == 0:
+            raise CantRun("This server don't have emoji")
+
         emotes = []
 
         for emoji in guildEmotes:
@@ -546,11 +501,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             content = message.content
             if len(content) > 25:
                 content = f"`please click button 'Go to message'`"
-            
-            # view = discord.ui.View()
-            # style = discord.ButtonStyle.gray
-            # item = discord.ui.Button(style=style, label="Go to original message", url=message.jump_url)
-            # view.add_item(item=item)
 
             view = base_Button_URL(label="Go to original message", url=message.jump_url)
 
@@ -616,8 +566,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed, view=view)
 
         else:
-            embed = RenlyEmbed.to_success(description="That member doesn't have a spotify status!")
-            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise CantRun("That member doesn't have a spotify status!")
             
     @commands.command(
     help="Shows you a list of members from the server.")

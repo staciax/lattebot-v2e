@@ -18,7 +18,7 @@ class OwnerError(commands.CommandError):
     pass
 
 class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[887274968012955679])):
-    """Owner"""
+    """Owner related commands."""
     
     def __init__(self, bot):
         self.bot = bot

@@ -8,8 +8,8 @@ from datetime import datetime, timedelta, timezone
 
 # Local
 from utils.json_loader import latte_read
-
 from bot import LatteBot
+from utils.useful import RenlyEmbed
 
 class HelpCustomError(commands.CommandError):
     pass
@@ -180,10 +180,21 @@ class HelpView(discord.ui.View):
         self.go_to_first_page.style = styles[page == 0]
         
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user and interaction.user == self.ctx.author:
+        """Only allowing the context author to interact with the view"""
+        ctx = self.ctx
+        author = ctx.author
+        if interaction.user == ctx.bot.renly:
             return True
-        await interaction.response.defer()
-        return False
+        if interaction.user != ctx.author:
+            if self.is_command:
+                command = ctx.bot.get_command_signature(ctx, ctx.command)
+                content = f"Only `{author}` can use this menu. If you want to use it, use `{command}`"
+            else:
+                content = f"Only `{author}` can use this."
+            embed = RenlyEmbed.to_error(description=content)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
+        return True
 
     async def on_timeout(self) -> None:
         self.clear_items()
@@ -224,16 +235,17 @@ class MyHelp(commands.HelpCommand):
                    cog.qualified_name not in ignored_cogs}
         return mapping
 
-    def get_minimal_command_signature(self, command, show_sub = False):
-        if show_sub is False:
-            if isinstance(command, commands.Group):
-                return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
-            return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
-        else:
-            if isinstance(command, commands.Group):
-                return '[G] %s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
-            return '(c) %s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
+    def get_minimal_command_signature(self, command, ctx:commands.context=None):
+        ctx = ctx or self.context
+        if isinstance(command, commands.Group):
+            return '[G] %s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
+        return '(c) %s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
     
+    def get_minimal_command_signature_custom(self, command, ctx):
+        if isinstance(command, commands.Group):
+            return '%s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
+        return '%s%s %s' % (ctx.clean_prefix, command.qualified_name, command.signature)
+
     def get_minimal_command_usage(self, command):
         return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
 
@@ -246,6 +258,10 @@ class MyHelp(commands.HelpCommand):
         ctx = self.context
         aliases = command.aliases
         description = command.help
+
+        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo']
+        if command.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
+            raise HelpCustomError(f'No command called "{command.name}" found.')
 
         command_cd = []
         try:
@@ -277,22 +293,35 @@ class MyHelp(commands.HelpCommand):
         
     async def send_cog_help(self, cog):
         entries = cog.get_commands()
+        ctx = self.context
+        
+        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo']
+        if cog.qualified_name in ignored_cogs and ctx.author != ctx.bot.renly:
+            raise HelpCustomError(f'No commands found in "{cog.qualified_name}"')
+
         if entries:
-            command_signatures = [self.get_minimal_command_signature(entry, show_sub=True) for entry in entries]
+            command_signatures = [self.get_minimal_command_signature(entry) for entry in entries]
             val = "\n".join(command_signatures)
             embed = discord.Embed(color=self.context.bot.white_color)
             embed.title = f"{cog.qualified_name} - Help category"
-            embed.add_field(name="Description:", value=f'{cog.description}', inline=False)
-            embed.add_field(name="Commands:", value=f'```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command', inline=False)
+            embed.description = f"**Description:**\n{cog.description}\n"
+            embed.description += f"**Commands:**\n```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command"
+            # embed.add_field(name="Description:", value=f'{cog.description}', inline=False)
+            # embed.add_field(name="Commands:", value=f'```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command', inline=False)
             embed.set_footer(text="<> = required argument | [] = optional argument")
             await self.context.send(embed=embed)
         else:
-            await self.context.send(f'No commands found in {cog.qualified_name}')
+            raise HelpCustomError(f'No commands found in {cog.qualified_name}')
 
     async def send_group_help(self, group):
         ctx = self.context
-        prefix = self.context.clean_prefix
+        # prefix = self.context.clean_prefix
         entries = group.commands
+
+        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo']
+        if group.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
+            raise HelpCustomError(f'No command called "{group.name}" found.')
+
         command_signatures = [self.get_minimal_command_signature(c) for c in entries]
         if command_signatures:
             val = "\n".join(command_signatures)
@@ -317,6 +346,17 @@ class MyHelp(commands.HelpCommand):
             if group.aliases:
                 embed.add_field(name="Aliases:", value=f'`{"`, `".join(group.aliases)}`', inline=False)
             embed.add_field(name="Sub-commands:", value=f"{group.short_doc}\n```yalm\n{val}\n```{can_run_checks}", inline=False)
+            embed.set_footer(text="<> = required argument | [] = optional argument")
+            await ctx.send(embed = embed)
+            
+    async def send_group_help_custom(self, group, ctx):
+        entries = group.commands
+        command_signatures = [self.get_minimal_command_signature(c, ctx) for c in entries]
+        if command_signatures:
+            val = "\n".join(command_signatures)
+            embed=discord.Embed(title=f"{group.qualified_name} - Help group", color=ctx.bot.white_color)  
+            embed.add_field(name="Description:", value=f"{group.help or 'No Description.'}", inline=False)
+            embed.add_field(name="Sub-commands:", value=f"{group.short_doc}\n```yalm\n{val}\n```", inline=False)
             embed.set_footer(text="<> = required argument | [] = optional argument")
             await ctx.send(embed = embed)
 
