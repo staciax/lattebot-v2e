@@ -415,7 +415,7 @@ def valorant_random_agent(category):
     #list_of_agent
     Duelist = ["Phoenix", "Jett", "Reyna", "Raze", "Yoru"]
     Controller = ["Brimston","Viper","Omen","Astra"]
-    Initiator = ["Sova", "Breach", "KAY/O" "Skye"]
+    Initiator = ["Sova", "Breach", "KAY/O", "Skye"]
     Sentinel = ["Killjoy", "Cypher", "Sage"]
     all_agent = ["Phoenix", "Jett", "Reyna", "Raze", "Yoru", "Brimston","Viper","Omen","Astra", "Sova", "Breach", "KAY/O", "Killjoy", "Cypher", "Sage"]
     

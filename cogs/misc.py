@@ -65,7 +65,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @property
     def display_emoji(self) -> discord.PartialEmoji:
-        return discord.PartialEmoji(name='⚙️')
+        return discord.PartialEmoji(name='misc', id='914142887854358588', animated=False)
 
     @commands.command(help="Invite me")
     # @commands.guild_only()
@@ -273,7 +273,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     async def do_rtfm(self, ctx, key, obj):
         page_types = {
             'latest': 'https://discordpy.readthedocs.io/en/latest',
-            'edpy': 'https://discordpy.readthedocs.io/en/latest',
+            'edpy': 'https://enhanced-dpy.readthedocs.io/en/latest',
             'latest-jp': 'https://discordpy.readthedocs.io/ja/latest',
             'python': 'https://docs.python.org/3',
             'python-jp': 'https://docs.python.org/ja/3',
@@ -301,15 +301,11 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
                     break
 
         cache = list(self._rtfm_cache[key].items())
-        def transform(tup):
-            return tup[0]
-
         matches = fuzzy.finder(obj, cache, key=lambda t: t[0], lazy=False)[:8]
 
         e = discord.Embed(colour=discord.Colour.blurple())
         if len(matches) == 0:
             raise commands.CommandError('Could not find anything. Sorry.')
-            # return await ctx.send('Could not find anything. Sorry.')
 
         e.description = '\n'.join(f'[`{key}`]({url})' for key, url in matches)
         await ctx.send(embed=e)

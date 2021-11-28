@@ -75,6 +75,8 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
     @commands.guild_only()
     @is_latte_guild()
     async def ranking(self, ctx):
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
         try:
             filter_member = await self.bot.latte_level.find_many_by_custom({"guild_id": ctx.guild.id})
             filter_member = sorted(filter_member, key=lambda x: x["xp"] , reverse=True)
@@ -114,6 +116,8 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
     @commands.guild_only()
     @is_latte_guild()
     async def xp(self, ctx, member: discord.Member = None):
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
         try:
             async with ctx.typing():
                 if not member:

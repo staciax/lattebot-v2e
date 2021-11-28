@@ -110,18 +110,16 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tda','todoa','todoadd'], help="Adds the specified task to your todo list.")
     @is_latte_guild()
     async def todo_add(self, ctx, *, content=commands.Option(description="Input content")):     
-        # embed_error = discord.Embed(color=0xFF7878)
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+        
         if len(content) > 100:
             raise TodoError('todo content is a maximum of 100 characters.')
-            # embed_error.description = 'todo content is a maximum of 100 characters.'
-            # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         #data_user_count
         user_count = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
         if len(user_count) >= 50 and ctx.author != self.bot.renly:
             raise TodoError("You can't have more than 50 todo at the moment.")
-            # embed_error.description = "You can't have more than 50 todo at the moment."
-            # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
 
         #data_count
         data_count = await self.bot.latte_todo.find_many_by_custom({})
@@ -148,16 +146,14 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tdl','todol','todolist'], help="Sends a list of your tasks.")
     @is_latte_guild()
     async def todo_list(self, ctx):
-        # #embed
-        # embed_error = discord.Embed(color=0xFF7878)
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
 
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
 
         #check_data
         if bool(data) == False:
             raise TodoError(f"Your todo list is empty")
-            # embed_error.description = f"Your todo list is empty" #check_data
-            # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
         
         #count_tag
         all_todo = []
@@ -178,14 +174,14 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tdr','todor','todoremove'], help="Removes the specified task from your todo list")
     @is_latte_guild()
     async def todo_remove(self, ctx, *, number = commands.Option(description="Todo number")):
-        # embed_error = discord.Embed(color=self.bot.error_color)
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+        
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
         
         #check_data
         if bool(data) == False:
             raise TodoError(f"Your todo list is empty")
-            # embed_error.description = f"Your todo list is empty"
-            # return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
         
         data_deleting = None
         description = ""
@@ -208,7 +204,7 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         if data_deleting and data_deleting.acknowledged:
             embed.title=f"Successfully removed task number **{sord_num}**:"
             embed.description = description
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
         else:
             raise TodoError("I could not find your todo")
         
@@ -216,13 +212,13 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tdc','todoc','todoclear','tdclear'], help="Deletes all tasks from your todo list.")
     @is_latte_guild()
     async def todo_clear(self, ctx):
-        embed_error = discord.Embed(color=self.bot.error_color)
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+        
         check = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
 
         if bool(check) == False:
             raise TodoError("Your todo list is empty")
-            # embed_error.description = f"Your todo list is empty"
-            # return await ctx.send(embeb=embed_error, ephemeral=True, delete_after=15)
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.description = "Are you sure you want to clear your todo list?"
@@ -258,16 +254,14 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             *,
             content
         ):
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
+        
         embed = discord.Embed()
-
-
         data = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
 
         if bool(data) == False:
             raise TodoError("Your todo list is empty")
-            # embed.color = self.bot.error_color
-            # embed.description = f"Your todo list is empty"
-            # return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
         i = 0
         for x in data:
@@ -281,9 +275,6 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
 
             if bool(old) == False:
                 raise TodoError(f"I couldn't find a task with index {number}")
-                # embed.color = self.bot.error_color
-                # embed.description = f"I couldn't find a task with index {number}"
-                # return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
             
             new_data = {"content": content, "jump_url": ctx.message.jump_url, "creation_date": ctx.message.created_at}
             await self.bot.latte_todo.update_by_custom({"user_id": ctx.author.id, "todo_id": number}, new_data)
@@ -298,9 +289,7 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
                 "New Source":f"{new['jump_url']}"
             }
             view = Button_URL(label=view_url.keys(), url=view_url.values())
-            
             await ctx.send(embed=embed, view=view)
         
-
 def setup(bot):
     bot.add_cog(Todo(bot))
