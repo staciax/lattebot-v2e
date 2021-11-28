@@ -74,20 +74,7 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
         if waifu_url:
             view = base_waifu_im_api(ctx=ctx, url=waifu_url)
             return await view.api_start()
-        
-        # if type == "sfw":
-        #     waifu_url = "https://api.waifu.im/sfw/waifu/"
-        #     view = base_waifu_im_api(ctx=ctx, url=waifu_url)
-        #     return await view.api_start()
-        # elif type == "nsfw":
-        #     if ctx.channel.is_nsfw():
-        #         nsfw = ["ass","ecchi","ero","hentai","maid","milf","oppai","oral","paizuri","selfies","uniform"]
-        #         random_nsfw = random.choice(nsfw)
-        #         waifu_url = f"https://api.waifu.im/nsfw/{random_nsfw}/"
-        #         view = base_waifu_im_api_nsfw(ctx=ctx, url=waifu_url)
-        #         return await view.api_start()  
-            # raise commands.NSFWChannelRequired(ctx.channel)
-
+            
     @commands.command(name="waifupisc", help="Display waifu pisc.", aliases=["wfp"])
     @commands.guild_only()
     async def waifu_pisc(self, ctx, type: Literal["sfw", "nsfw"] = commands.Option(description="choose type")):

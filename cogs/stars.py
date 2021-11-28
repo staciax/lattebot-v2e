@@ -137,22 +137,6 @@ class Star(commands.Cog):
                     content, embed = self.get_emoji_message(message, stars=count)
                     await message_bot.edit(content=content,embed=embed)
                     return await self.bot.latte_stars.update_by_custom({"message_id": message.id}, {"stars": count})
-
-    # @commands.Cog.listener()
-    # async def on_message_delete(self, message):
-    #     if message.guild.id == self.bot.latte_guild_id:
-    #         data = await self.bot.latte_stars.find_by_custom({"message_id": message.id})
-    #         if data is not None:
-    #             try:
-    #                 star_message = data["message_id"]
-    #                 if message.id == star_message:
-    #                     message_bot = await self.bot.get_channel(data["channel_bot_id"]).fetch_message(data["message_bot"])
-    #                     await self.bot.latte_stars.delete_by_custom({"message_id": message.id})
-    #                     await message_bot.delete()
-    #             except TypeError: 
-    #                 pass
-    #             except KeyError: 
-    #                 pass
     
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):

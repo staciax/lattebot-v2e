@@ -105,10 +105,6 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='createthread', id=903346472509141023, animated=False)
 
-    # @commands.group()
-    # async def tag(self, ctx):
-    #     pass
-
     @commands.command(help="Tag command")
     @commands.guild_only()
     @is_latte_guild()

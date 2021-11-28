@@ -227,7 +227,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
         await ctx.send(embed=embed , view=view)
 
-    @commands.command()
+    @commands.command(help="Shows the user avatar of the specified member.", aliases=["av"])
     @commands.guild_only()
     async def avatar(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.author
@@ -237,66 +237,12 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             raise CantRun(f'**{member.display_name}** must have a avatar.')
 
-    # @avatar.command(name="user", help="Shows the user avatar of the specified member.", aliases=["av"])
-    # @commands.guild_only()
-    # async def avatar_user(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
-    #     member = member or ctx.author
-
-    #     #dominant_colour_avatar
-    #     try:
-    #         url = member.avatar.replace(format='png')
-    #         resp = requests.get(url)      
-    #         out = BytesIO(resp.content)
-    #         out.seek(0)
-    #         icon_color = ColorThief(out).get_color(quality=1)
-    #         icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-    #         dominant_color = int(icon_hex, 16)
-    #     except:
-    #         dominant_color = self.bot.white_color
-
-    #     embed = discord.Embed(title = f"{member.name}'s Avatar:", color=dominant_color)
-    #     if member.avatar.url is not None:
-    #         embed.set_image(url = member.avatar.url)
-    #         view = base_Button_URL(label="Avatar URL", url=member.avatar.url)
-    #         await ctx.send(embed = embed , view=view)
-    #     else:
-    #         raise CantRun('this user must have a avatar.')
-    
-    # @avatar.command(name="server", help="Shows the server avatar of the specified member.", aliases=["sav"], message_command=False)
-    # @commands.guild_only()
-    # async def avatar_server(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
-    #     member = member or ctx.author
-
-    #     embed = discord.Embed()
-    #     if member.avatar != member.display_avatar:
-    #         #dominant_colour_avatar_server
-    #         try:
-    #             url = member.display_avatar.replace(format='png')
-    #             resp = requests.get(url)      
-    #             out = BytesIO(resp.content)
-    #             out.seek(0)
-    #             icon_color = ColorThief(out).get_color(quality=1)
-    #             icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-    #             dominant_color = int(icon_hex, 16)
-    #         except:
-    #             dominant_color = self.bot.white_color
-            
-    #         #display_avatar
-    #         embed.title = f"{member.name}'s Server avatar:"
-    #         embed.set_image(url = member.display_avatar.url)
-    #         embed.color = dominant_color
-    #         view = base_Button_URL(label="Server avatar URL", url=member.display_avatar.url)
-
-    #         await ctx.send(embed = embed , view=view)
-    #     else:
-    #         raise CantRun("this user don't have a server avatar.")
-
     @commands.command(help="Shows the banner of the specified member.", aliases=["bn"])
     @commands.guild_only()
     async def banner(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
         member = member or ctx.author
         fetch_member = await self.bot.fetch_user(member.id)
-
+        
         embed = discord.Embed(title=f"{member.name}'s Banner:")
         if fetch_member.banner:
             embed.set_image(url=fetch_member.banner.url)

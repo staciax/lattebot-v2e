@@ -378,4 +378,4 @@ class AvatarView(discord.ui.View):
             self.display_embed()
             self.display_view()
         self.avatar_url_button()
-        await self.ctx.send(embed=self.embeds[0], view=self)
+        await self.ctx.reply(embed=self.embeds[0], view=self, mention_author=False)

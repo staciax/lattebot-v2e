@@ -27,6 +27,7 @@ class HelpView(discord.ui.View):
         self.message: discord.Message = None
         self.embeds: List[discord.Embed] = [self.main_embed]
         self.check_view = True
+        self.is_command = ctx.command is not None
         self.clear_items()
         self.fill_items()
     
@@ -91,16 +92,6 @@ class HelpView(discord.ui.View):
                 description = cog.description or None
                 self.category_select.add_option(label=cog.qualified_name, value=cog.qualified_name, emoji=emoji, description=description)
             
-        # for cog, commands in self.data.items():
-        #     if not commands:
-        #         continue
-        #     # emoji = getattr(cog, 'display_emoji', None)
-        #     # brief = getattr(cog, 'description', None)
-        #     emoji = cog.display_emoji or None
-        #     label = cog.qualified_name # + f" ({len(commands)})"
-        #     description = cog.description or None
-        #     self.category_select.add_option(label=label, value=cog.qualified_name, emoji=emoji, description=description)
-
     def build_main_page(self) -> discord.Embed:
         ctx = self.ctx
         embed = discord.Embed(color=0xffffff)
