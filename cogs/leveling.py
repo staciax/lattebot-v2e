@@ -9,6 +9,7 @@ from utils.xp_pillow import level_images
 from utils.buttons import NewSimpage
 from utils.useful import RenlyEmbed
 from utils.checks import is_latte_guild
+from utils.errors import CantRun
 
 # xp_channel
 chat_channel = 861883647070437386 , 840398821544296480 , 863438518981361686 , 859960606761549835 #chat,game,anime,kdbot
@@ -152,10 +153,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
                         return await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15)
                     await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
         except:
-            embed_error = RenlyEmbed.to_error()
-            embed_error.description='An unknown error occurred, please try again !'
-            await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
-            # raise commands.BadArgument('error')
+            raise CantRun('An unknown error occurred, please try again !')
   
     # @commands.command(description="Crete xp role")
     # @commands.guild_only()

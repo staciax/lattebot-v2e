@@ -109,9 +109,7 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     # @todo.command(help="Adds the specified task to your todo list.")
     @commands.command(aliases=['tda','todoa','todoadd'], help="Adds the specified task to your todo list.")
     @is_latte_guild()
-    async def todo_add(self, ctx, *, content=commands.Option(description="Input content")):     
-        if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
+    async def todo_add(self, ctx, *, content=commands.Option(description="Input content")):             
         
         if len(content) > 100:
             raise TodoError('todo content is a maximum of 100 characters.')
@@ -212,9 +210,6 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tdc','todoc','todoclear','tdclear'], help="Deletes all tasks from your todo list.")
     @is_latte_guild()
     async def todo_clear(self, ctx):
-        if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
-        
         check = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
 
         if bool(check) == False:
@@ -230,6 +225,8 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         if view.value is None:
             return
         elif view.value:
+            if ctx.interaction is not None:
+                await ctx.interaction.response.defer()
             embed_suc = discord.Embed(color=self.bot.white_color)
             len_data = len(await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id}))
             data_deleted = await self.bot.latte_todo.delete_by_custom({"user_id": ctx.author.id})

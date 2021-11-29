@@ -137,7 +137,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.dynamic_cooldown(bypass_for_owner)
     async def purge(self, ctx, amount : int = commands.Option(description="Number to clear message")):
         if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
+            await ctx.interaction.response.defer(ephemeral=True)
 
         if amount> 500 or amount <0:
             raise ModError('Invalid amount. Maximum is 500')
@@ -179,7 +179,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             search:int = commands.Option(default=15, description="amount to search message / default = 15")
         ):
         if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
+            await ctx.interaction.response.defer(ephemeral=True)
 
         embed = discord.Embed(color=self.bot.white_color)
 
@@ -243,7 +243,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             search:int = commands.Option(default=15, description="amount to search message / default = 15")
         ):
         if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
+            await ctx.interaction.response.defer(ephemeral=True)
         
         embed = discord.Embed(color=self.bot.white_color)
         try:
