@@ -116,12 +116,8 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 self.bot.blacklist[user.id] = False
             except:
                 raise OwnerError('Could not remove this user. Please try again!')
-                # embed_error.description = 'Could not remove this user. Please try again!'
-                # return await ctx.send(embed=embed_error, ephemeral=True, delete_after=30)
         else:
             raise OwnerError('User not found!')
-            # embed_error.description = 'User not found!'
-            # return await ctx.send(embed=embed_error, ephemeral=True)
 
     @commands.command(aliases=['blc'], help="Checks if the user is blacklisted.")
     @commands.guild_only()
@@ -156,8 +152,6 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         
         if blacklist is None or len(blacklist) == 0:
             raise OwnerError("Not found blacklisted users.")
-            # embed_error.description = "Not found blacklisted users."
-            # return await ctx.send(embed=embed_error, ephemeral=True)
 
         for data in blacklist:
             user = self.bot.get_user(data["user_id"])

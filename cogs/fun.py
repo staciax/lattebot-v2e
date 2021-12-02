@@ -90,12 +90,12 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     @commands.command(name="pastel", help="pastel color")
     @commands.guild_only()
     async def pastel(self, ctx):
-        await ctx.send("https://colorhunt.co/palettes/pastel")
+        await ctx.reply("https://colorhunt.co/palettes/pastel", mention_author=False)
 
     @commands.command(name="color", help="color hex")
     @commands.guild_only()
     async def color(self, ctx):
-        await ctx.send("https://www.color-hex.com/")
+        await ctx.reply("https://www.color-hex.com/", mention_author=False)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

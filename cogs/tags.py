@@ -139,15 +139,12 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
             names = (r['tag'] for r in not_found)
             matches = get_close_matches(tag , names)
-            embed_r = discord.Embed(colour=self.bot.white_color)
             if matches:
                 matches = "\n".join(matches)
-                embed_r.description = f"Tag not found. Did you mean...\n`{matches}`"
-                cooldown = 30
+                description = f"Tag not found. Did you mean...\n`{matches}`"
             else:
-                embed_r.description = f"Tag not found."
-                cooldown = 15
-            await ctx.send(embed=embed_r , ephemeral=True, delete_after=cooldown)
+                description = f"Tag not found."
+            raise TagError(description)
 
     @commands.command(aliases=['tagcreate','tagc'], help="Creates a new tag owned by you.")
     @commands.guild_only()
@@ -188,7 +185,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         #response
         view = Cancel_button(ctx)
         embed.description = "Please enter the content within your tag (within 5 minutes)"
-        view.message = await ctx.send(embed=embed, view=view)
+        view.message = await ctx.reply(embed=embed, view=view, mention_author=False)
         
         try:
             message_response = await self.bot.wait_for('message', timeout=300, check=lambda m:(ctx.author == m.author and ctx.channel == m.channel))
@@ -265,7 +262,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         if data_deleted and data_deleted.acknowledged:
             embed.description=f"You have successfully deleted **{data_check['tag']}**."
             embed.timestamp = discord.utils.utcnow()
-            return await ctx.send(embed=embed)
+            return await ctx.reply(embed=embed, mention_author=False)
         else:
             raise TagError('I could not find tag')
 
@@ -300,7 +297,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             embed.set_footer(text=f"Rename by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
         else:
             embed.set_footer(text=f"Rename by {ctx.author.display_name}")
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command(aliases=['tagedit','tage'], help="edit your tag")
     @commands.guild_only()
@@ -409,9 +406,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             p.embed.color = 0xBFA2DB
             await p.start()
         else:
-            #reponse
-            embed = discord.Embed(description=f"**{member.display_name}** doesn't have any tags.", color=0xFF7878)
-            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise TagError(f"**{member.display_name}** doesn't have any tags.")
     
     @commands.command(aliases=['tagall'], help="Lists all server-specific tags for this server.")
     @commands.guild_only()
@@ -469,9 +464,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             p.embed.color = 0xBFA2DB
             await p.start()
         else:
-            #reponse
-            embed = discord.Embed(description=f"**{name}** This tag not found", color=0x77dd77)
-            await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise TagError(f"**{name}** This tag not found")
 
     @commands.command(aliases=['taginfo','tagi'], help="Shows information about the specified tag.")
     @commands.guild_only()
@@ -502,36 +495,29 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             embed.description += f"**Author:** {owner_tag.mention}\n"
             embed.set_footer(text=f"ID : {data['tag_id']}")
 
-            await ctx.send(embed=embed, view=view)
+            await ctx.reply(embed=embed, view=view, mention_author=False)
 
         else:
             not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
             names = (r['tag'] for r in not_found)
             matches = get_close_matches(tag , names)
-            embed_r = discord.Embed(colour=self.bot.white_color)
             if matches:
                 matches = "\n".join(matches)
-                embed_r.description = f"Tag not found. Did you mean...\n`{matches}`"
-                cooldown = 30
+                description = f"Tag not found. Did you mean...\n`{matches}`"
             else:
-                embed_r.description = f"Tag not found."
-                cooldown = 15
-            await ctx.send(embed=embed_r , ephemeral=True, delete_after=cooldown)
+                description = f"Tag not found."
+            raise TagError(description)
 
     @commands.command(aliases=['tag_count'], help="Total tag in your server")
     @commands.guild_only()
     @is_latte_guild()
-    async def tagcount(self, ctx):
-        if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
-            
+    async def tagcount(self, ctx):            
         data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
         if bool(data) == False:
             raise TagError("This server doesn't have any tags.")
 
-        
         embed = discord.Embed(description=f"Total tags : `{len(data)}`",color=0x77dd77)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
   
 def setup(bot):
     bot.add_cog(Tags(bot))

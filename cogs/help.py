@@ -197,7 +197,7 @@ class HelpView(discord.ui.View):
     async def start(self):
         self.build_select()
         self._update_buttons()
-        self.message = await self.ctx.send(embed=self.main_embed, view=self)
+        self.message = await self.ctx.reply(embed=self.main_embed, view=self, mention_author=False)
 
 class MyHelp(commands.HelpCommand):
     def __init__(self, **options):
@@ -283,7 +283,7 @@ class MyHelp(commands.HelpCommand):
             embed.add_field(name="Aliases:", value=f"```{aliases}```", inline=False)
         embed.add_field(name="Usage:", value=f"```{self.get_minimal_command_usage(command)}```" + f"{cmd_can_run}", inline=False)
         embed.set_footer(text="<> = required argument | [] = optional argument")
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
         
     async def send_cog_help(self, cog):
         entries = cog.get_commands()
@@ -303,7 +303,7 @@ class MyHelp(commands.HelpCommand):
             # embed.add_field(name="Description:", value=f'{cog.description}', inline=False)
             # embed.add_field(name="Commands:", value=f'```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command', inline=False)
             embed.set_footer(text="<> = required argument | [] = optional argument")
-            await self.context.send(embed=embed)
+            await self.context.reply(embed=embed, mention_author=False)
         else:
             raise HelpCustomError(f'No commands found in {cog.qualified_name}')
 
@@ -337,11 +337,12 @@ class MyHelp(commands.HelpCommand):
             command_checks = ''.join(command_cd)
             can_run_checks = ''.join(can_run)
             embed.add_field(name="Description:", value=f"{group.help or 'No Description.' + f'{command_checks}'}", inline=False)
+            embed.add_field(name="Category:", value=f"```{group.cog_name}```", inline=False)
             if group.aliases:
                 embed.add_field(name="Aliases:", value=f'`{"`, `".join(group.aliases)}`', inline=False)
             embed.add_field(name="Sub-commands:", value=f"{group.short_doc}\n```yalm\n{val}\n```{can_run_checks}", inline=False)
             embed.set_footer(text="<> = required argument | [] = optional argument")
-            await ctx.send(embed = embed)
+            await ctx.reply(embed = embed, mention_author=False)
             
     async def send_group_help_custom(self, group, ctx):
         entries = group.commands
@@ -350,9 +351,23 @@ class MyHelp(commands.HelpCommand):
             val = "\n".join(command_signatures)
             embed=discord.Embed(title=f"{group.qualified_name} - Help group", color=ctx.bot.white_color)  
             embed.add_field(name="Description:", value=f"{group.help or 'No Description.'}", inline=False)
+            embed.add_field(name="Category:", value=f"```{group.cog_name}```", inline=False)
             embed.add_field(name="Sub-commands:", value=f"{group.short_doc}\n```yalm\n{val}\n```", inline=False)
             embed.set_footer(text="<> = required argument | [] = optional argument")
-            await ctx.send(embed = embed)
+            await ctx.reply(embed = embed, mention_author=False)
+    
+    async def send_group_help_user(self, cog_name, ctx):
+        cog = ctx.bot.get_cog(cog_name)
+        entries = cog.get_commands()
+        command_signatures = [self.get_minimal_command_signature_custom(c, ctx) for c in entries]
+        if command_signatures:
+            val = "\n".join(command_signatures[1:])
+            embed=discord.Embed(title=f"{str(ctx.command.name).capitalize()} - Help group", color=ctx.bot.white_color)
+            embed.add_field(name="Description:", value=f"{ctx.command.help or 'No Description.'}", inline=False)
+            embed.add_field(name=f"Category:", value=f"{ctx.command.cog_name}", inline=False)
+            embed.add_field(name="Sub-commands:", value=f"{ctx.command.short_doc}\n```yalm\n{val}\n```", inline=False)
+            embed.set_footer(text="<> = required argument | [] = optional argument")
+            await ctx.reply(embed=embed, mention_author=False)
 
     def command_not_found(self, string):
         return string
@@ -371,7 +386,7 @@ class MyHelp(commands.HelpCommand):
             embed = discord.Embed(description=f"{str(error.original)}")
             embed.set_footer(text=f"Command requested by {ctx.author}", icon_url=ctx.author.avatar.url)
 
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed, mention_author=False)
 
 class Help(commands.Cog, command_attrs = dict(slash_command=True)):
     def __init__(self, bot):

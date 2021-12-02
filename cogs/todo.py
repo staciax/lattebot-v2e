@@ -94,17 +94,8 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     
     @commands.command(help="Todo commands")
     @is_latte_guild()
-    async def todo(self, ctx):
-        cog = self.bot.get_cog("Todo")
-                
-        entries = cog.get_commands()
-        command_signatures = [ctx.bot.help_command.get_minimal_command_signature_custom(c, ctx) for c in entries]
-        commands_list = []
-        for command in command_signatures:
-            if not command == f"{ctx.clean_prefix}todo ":
-                commands_list.append(command)
-                
-        await ctx.bot.help_command.send_group_help_user(signatures=commands_list, ctx=ctx, command_name=ctx.command, description="Todo commands")
+    async def todo(self, ctx):                
+        await ctx.bot.help_command.send_group_help_user("Todo", ctx)
 
     # @todo.command(help="Adds the specified task to your todo list.")
     @commands.command(aliases=['tda','todoa','todoadd'], help="Adds the specified task to your todo list.")

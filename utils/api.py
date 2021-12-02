@@ -29,8 +29,8 @@ class Waifu_im_selection(discord.ui.Select):
         if types == 'sfw':
             options = [
                 discord.SelectOption(label='Waifu', description='Waifu'),
-                discord.SelectOption(label='Maid', description='Maid'),
-                discord.SelectOption(label='All', description='All'),
+                discord.SelectOption(label='Maid', description='Maid')
+                # discord.SelectOption(label='All', description='All'),
             ]
         elif types == 'nsfw':
             options = [
@@ -106,15 +106,16 @@ class base_waifu_im_api(discord.ui.View):
             request = await session.get(f'{self.url}/?gif={self.gif}')
             api = await request.json()
             if request.status == 200:
-                api_title = api.get('tags')[0].get('name')
-            
+                api_title = api.get('images')[0].get('tags')[0].get('name')
+
                 #color_converter
-                dominant_color1 = str(api.get('tags')[0].get('images')[0].get('dominant_color')).replace('#', '')
+                dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
                 dominant_color = int(dominant_color1, 16)
 
+
                 api_color = dominant_color
-                image_url = api.get('tags')[0].get('images')[0].get('url')
-                source_url = api.get('tags')[0].get('images')[0].get('source')
+                image_url = api.get('images')[0].get('url')
+                source_url = api.get('images')[0].get('source')
                 self.image_url = image_url
                 self.source_url = source_url
  
@@ -201,15 +202,16 @@ class base_waifu_im_api_nsfw(discord.ui.View):
             request = await session.get(f'{self.url}/?gif={self.gif}')
             api = await request.json()
             if request.status == 200:
-                api_title = api.get('tags')[0].get('name')
-            
+                api_title = api.get('images')[0].get('tags')[0].get('name')
+
                 #color_converter
-                dominant_color1 = str(api.get('tags')[0].get('images')[0].get('dominant_color')).replace('#', '')
+                dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
                 dominant_color = int(dominant_color1, 16)
 
+
                 api_color = dominant_color
-                image_url = api.get('tags')[0].get('images')[0].get('url')
-                source_url = api.get('tags')[0].get('images')[0].get('source')
+                image_url = api.get('images')[0].get('url')
+                source_url = api.get('images')[0].get('source')
                 self.image_url = image_url
                 self.source_url = source_url
  

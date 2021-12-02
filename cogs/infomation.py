@@ -456,7 +456,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.description = f"**Content:** {content}\n**Author:** {message.author.mention}\n**Sent at:** {discord.utils.format_dt(message.created_at, style='F')} ({discord.utils.format_dt(message.created_at, style='R')})"
             embed.set_footer(text=f"Message ID : {message.author.id}")
 
-            return await ctx.send(embed=embed ,view=view)
+            return await ctx.send(embed=embed, view=view)
 
     @commands.command(name="status", help="Shows status about the specified member.")
     @commands.guild_only()

@@ -272,7 +272,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         try:
             await ctx.send(random.choice(list_input))
         except ValueError:
-            await ctx.send("Invalid Range")
+            raise UtilityError("Invalid Range")
 
     @commands.command(help="create poll")
     @commands.guild_only()
@@ -365,7 +365,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 del data[str(member.id)]
                 latte_write(data, "sleeping")
                 embed = discord.Embed(description=f"{member.mention} has stopped the timer." , color=self.bot.white_color)
-                return await ctx.send(embed=embed)
+                return await ctx.reply(embed=embed, mention_author=False)
             except:
                 raise UtilityError("Error stop timer")
 
@@ -499,7 +499,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 del data[str(channel.id)]
                 latte_write(data, "channel_sleep")
                 embed = discord.Embed(description=f"{channel.mention} has stopped the timer." , color=self.bot.white_color)
-                return await ctx.send(embed=embed)
+                return await ctx.reply(embed=embed, mention_author=False)
             except:
                 UtilityError("Error stop timer")
 
@@ -530,7 +530,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.set_author(name="Translate" , icon_url="https://upload.wikimedia.org/wikipedia/commons/d/db/Google_Translate_Icon.png")
         embed.add_field(name=f"Original ({str(a.lang)})", value=f"```{source}```", inline=False)
         embed.add_field(name=f"Translated ({str(b.lang)})", value=f"```{result.text}```", inline=False)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
 def setup(bot):
     bot.add_cog(Utility(bot))

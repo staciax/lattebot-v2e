@@ -69,7 +69,7 @@ class Error(commands.Cog):
             print(error)
             return
         embed.description = cm_error
-        await ctx.send(embed=embed, delete_after=15, ephemeral=True)
+        await ctx.send(embed=embed, delete_after=20, ephemeral=True)
     
 def setup(bot):
     bot.add_cog(Error(bot))

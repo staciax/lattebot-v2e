@@ -24,17 +24,15 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @commands.command(name="waifuim", help="Display waifu im sfw.", aliases=["wfim"])
     @commands.guild_only()
-    async def waifu_im_sfw(self, ctx, tags: Literal["waifu", "maid", "all"] = commands.Option(description="choose tags")):        
+    async def waifu_im_sfw(self, ctx, tags: Literal["waifu", "maid"] = commands.Option(description="choose tags")):        
         if tags == "waifu":
             waifu_url = "https://api.waifu.im/sfw/waifu"
         elif tags == "maid":
             waifu_url = "https://api.waifu.im/sfw/maid"
-        elif tags == "all":
-            waifu_url = "https://api.waifu.im/sfw/all"
         else:
-            tags_list = ["waifu", "maid", "all"]
+            tags_list = ["waifu", "maid"]
             tags_random = random.choice(tags_list)
-            waifu_url = f"https://api.waifu.im/nsfw/{tags_random}"
+            waifu_url = f"https://api.waifu.im/sfw/{tags_random}"
           
         if waifu_url:
             view = base_waifu_im_api(ctx=ctx, url=waifu_url)

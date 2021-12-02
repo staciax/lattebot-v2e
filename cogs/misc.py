@@ -78,7 +78,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name=f"{self.bot.user.name} Invite", icon_url=self.bot.user.avatar.url, url=invite_url)
-        await ctx.send(embed=embed, view=view)
+        await ctx.reply(embed=embed, view=view, mention_author=False)
     
     # @commands.command(help="Vote for me")
     # @commands.guild_only()
@@ -99,7 +99,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name=f"{self.bot.user.name} Support server", icon_url=self.bot.user.avatar.url, url=self.bot.latte_supprt_url)
-        await ctx.send(embed=embed, view=view)
+        await ctx.reply(embed=embed, view=view, mention_author=False)
 
     @commands.command(help="Shows the bot's prefixes")
     @commands.guild_only()
@@ -109,7 +109,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name=f"{self.bot.user.name} prefixes:" , icon_url=self.bot.user.avatar.url)
         embed.description = f"{self.bot.user.mention}\n/\n{prefix[2]}"
-        await ctx.send(embed=embed, ephemeral=True)
+        await ctx.reply(embed=embed, ephemeral=True, mention_author=False)
     
     @commands.command(aliases=["botinfo"], help="Shows basic information about the bot.")
     @commands.guild_only()
@@ -159,19 +159,6 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed = discord.Embed(description=f"🕘 I started {format_dt(futuredate, style='R')}", color=self.bot.white_color)
         await ctx.send(embed=embed)
-        # delta_uptime = relativedelta(datetime.utcnow(), self.bot.launch_time)
-        # days, hours, minutes, seconds = delta_uptime.days, delta_uptime.hours, delta_uptime.minutes, delta_uptime.seconds
-
-        # uptimes = {x[0]: x[1] for x in [('days', days), ('hours', hours),
-        #                                 ('minutes', minutes), ('seconds', seconds)] if x[1]}
-
-        # last = "".join(value for index, value in enumerate(uptimes.keys()) if index == len(uptimes)-1)
-        # uptime_string = "".join(
-        #     f"{v} {k} " if k != last else f" and {v} {k}" if len(uptimes) != 1 else f"{v} {k}"
-        #     for k, v in uptimes.items()
-        # )
-        # embed = discord.Embed(description=f"I started {uptime_string} ago.", color=self.bot.white_color)
-        # await ctx.send(embed=embed)
 
     @commands.command(help="Shows the latency of the bot")
     @commands.guild_only()
