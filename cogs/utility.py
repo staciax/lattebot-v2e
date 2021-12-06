@@ -505,8 +505,6 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=["trans"], help="Translate your message")
     @commands.guild_only()
     async def translate(self, ctx, to_lang=commands.Option(description="language you want to translate. like en, th, jp"), *, source=commands.Option(description="The source language you want to translate.")):
-        embed_error = discord.Embed(color=0xFF7878)
-
         if len(source) > 2000:
             raise UtilityError(f"The message character a maximum of 2000 characters.")
     

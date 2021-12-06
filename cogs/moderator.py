@@ -53,6 +53,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                         await ctx.send(embed=embed)
                         await ses.close()
                     else:
+                        await ses.close()
                         raise ModError(f'Error when making request | {r.status} response.')
                 except discord.HTTPException:
                     raise ModError(f'File size is too big!')
@@ -135,7 +136,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def bans(self, ctx) -> discord.Message:
         bans = await ctx.guild.bans()
         if not bans:
-            return await ctx.send(embed=discord.Embed(description="There are no banned users in this server",color=self.bot.white_color))
+            raise ModError("There are no banned users in this server")
         ban_list = []
         for ban_entry in bans:
             ban_list.append(f"{ban_entry.user}")
@@ -429,11 +430,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             *,
             reason = commands.Option(default=None, description="reason")
         ):
-        embed_error = discord.Embed(color=self.bot.error_color)
-
         if member.id == ctx.author.id:
-            embed_error.description = "You can't Voice mute yourself!"
-            return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+            raise ModError("You can't Voice mute yourself!")
 
         if isinstance(member, discord.Member):
             if ctx.me.top_role < member.top_role:
@@ -471,7 +469,6 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             reason = commands.Option(default=None, description="reason")
         ):
         if ctx.author.guild_permissions.deafen_members:
-            embed_error = discord.Embed(color=self.bot.error_color)
 
             if member.id == ctx.author.id:
                 raise ModError("You can't VC deafen yourself!")
