@@ -62,15 +62,12 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             *,
             reason = commands.Option(default=None, description="Reason to blacklist")
         ):
-        embed_error = discord.Embed(color=0xFF7878)
 
         if user == self.bot.user:
-            embed_error.description = "You cannot blacklist the bot"
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            raise OwnerError("You cannot blacklist the bot")
         
         if user == ctx.author:
-            embed_error.description = "You cannot blacklist yourself."
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            raise OwnerError("You cannot blacklist yourself.")
         
         if reason is None:
             reason = "no reason"
@@ -81,8 +78,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         row = await con.fetchrow(query, user.id)
         if row:
             if row['user_id'] == user.id:
-                embed_error.description = 'This user already exists.'
-                return await ctx.send(embed=embed_error, ephemeral=True)
+                raise OwnerError('This user already exists.')
 
         #create_blacklist
         try:
@@ -93,15 +89,12 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             self.bot.blacklist[user.id] = True
             await ctx.send(embed=embed)
         except:
-            embed_error.description = 'Could not blacklist this user.'
-            return await ctx.send(embed=embed_error, ephemeral=True)
+            raise OwnerError('Could not blacklist this user.')
 
     @commands.command(aliases=['blr'], help="Removes the user from the blacklist.")
     @commands.guild_only()
     @commands.is_owner()
     async def blacklist_remove(self, ctx, user : Union[discord.Member, discord.User] = commands.Option(description="Spectify member")):
-        embed_error = discord.Embed(color=0xFF7878)
-
         user_id = user.id
         query = "SELECT user_id FROM public.blacklist WHERE user_id = $1;"
         
@@ -144,8 +137,6 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.guild_only()
     @commands.is_owner()
     async def blacklist_list(self, ctx):
-        # embed_error = discord.Embed(color=0xFF7878)
-
         blacklist_users = []
         query = "SELECT * FROM public.blacklist;"
         blacklist = await self.bot.pg_con.fetch(query)
@@ -172,8 +163,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             embed.description=f"{file_target}.json\n```json\n{json.dumps(data, indent = 1)}```"
             return await ctx.send(embed=embed, ephemeral=True)
         except:
-            embed.description=f"file not found!"
-            await ctx.send(embed=embed, ephemeral=True)
+            raise OwnerError("file not found!")
 
     @commands.command(name="config_set", help="edit config files")
     @commands.guild_only()
@@ -199,8 +189,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             embed.add_field(name="config", value=f'```css\n"{keys}":"{value}"```', inline=False)
             return await ctx.send(embed=embed)
         except:
-            embed.description = "write json error"
-            await ctx.send(embed=embed, ephemeral=True)
+            raise OwnerError('Write json error')
 
     @commands.command(help="logout bot")
     @commands.guild_only()
@@ -222,12 +211,10 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         elif view.value:
             embed_e.description = f"Shuting down..."
             await msg.edit(embed=embed_e, view=None)
-            print('Shuting down...')
             await self.bot.logout()
         else:
-            print('Cancelled...')
-            embed_e.description = f"Cancelled..."
-            await msg.edit(embed=embed_e, view=None)
+            await msg.delete()
+            raise OwnerError("Cancelled...")
 
     @commands.command(name="bot_status",help="change bot status")
     @commands.guild_only()
@@ -240,21 +227,8 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         text:str = commands.Option(default=None, description="status text"),
         streaming_url = commands.Option(default=None, description="streaming status url"),
     ):  
-
-        if text is None:
-            text = self.bot.latte_avtivity
-
-        if status == "online":
-            bot_status = discord.Status.online
-        elif status == "idle":
-            bot_status = discord.Status.idle
-        elif status == "dnd":
-            bot_status = discord.Status.dnd
-        elif status == "offline":
-            bot_status = discord.Status.offline
-        else:
-            bot_status = discord.Status.online
-
+        text or self.bot.latte_avtivity
+        bot_status = getattr(discord.Status, status)
         try:
             if activity == "playing":  # Setting `Playing ` status
                 await self.bot.change_presence(status=bot_status,activity=discord.Game(name=text))
@@ -264,8 +238,6 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.listening, name=text))
             elif activity == "watching": # Setting `Watching ` status
                 await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.watching, name=text))
-            else:
-                await self.bot.change_presence(status=bot_status,activity=discord.Game(name=text))
         except:
             raise OwnerError("Change status error")
 
@@ -279,26 +251,6 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
 
         await ctx.send(embed=embed)
     
-    # @commands.command(help="enable command")
-    # @commands.guild_only()
-    # @commands.is_owner()
-    # async def enable(self, ctx, command = commands.Option(description="command name")):
-    #     command = self.bot.get_command(command)
-    #     if command.enabled:
-    #         return await ctx.send(f"`{command}` is already enabled.")
-    #     command.enabled = True
-    #     await ctx.send(f"Successfully enabled the `{command.name}` command.")
-    
-    # @commands.command(help="disable command")
-    # @commands.guild_only()
-    # @commands.is_owner()
-    # async def disable(self, ctx, command = commands.Option(description="command name")):
-    #     command = self.bot.get_command(command)
-    #     if not command.enabled:
-    #         return await ctx.send(f"`{command}` is already disabled.")
-    #     command.enabled = False
-    #     await ctx.send(f"Successfully disabled the `{command.name}` command.")
-
     @commands.command(help="Toggle command")
     @commands.guild_only()
     @commands.is_owner()
@@ -358,10 +310,6 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         except Exception as ex:
             print(ex)
             raise OwnerError("The extension unload failed")
-        # except Exception as e:
-        #     embed.description(f"Could not unload")
-        #     embed.color = 0xFF7878
-        #     return await ctx.send(embed=embed)
 
     @commands.command(help="reload cog")
     @commands.guild_only()

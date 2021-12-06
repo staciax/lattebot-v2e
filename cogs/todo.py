@@ -226,12 +226,10 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
                 embed_suc.timestamp = discord.utils.utcnow()
                 return await msg.edit(embed=embed_suc, view=None) 
             else:
-                embed.description = "I could not remove todo"
-                await msg.edit(embed=embed, view=None, ephemeral=True, delete_after=15)
-
+                raise TodoError("I could not remove todo")
+                
         else:
-            embed.description = f"Cancelled..."
-            await msg.edit(embed=embed, view=None, ephemeral=True, delete_after=15)
+            raise TodoError('Cancelled...')
 
     @commands.command(aliases=['tde','todoe','todoedit'], help="Edits the specified task")
     @is_latte_guild()

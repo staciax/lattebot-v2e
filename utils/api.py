@@ -69,8 +69,8 @@ class base_waifu_im_api(discord.ui.View):
         super().__init__(timeout=600)
         self.ctx = ctx
         self.url = url
-        self.image_url = ""
-        self.message = ""
+        self.image_url = ''
+        self.message = None
         self.gif = False
         self.source_url = ''
 
@@ -134,15 +134,15 @@ class base_waifu_im_api(discord.ui.View):
         if embed:
             await interaction.response.edit_message(embed=embed, view=self)
     
-    @discord.ui.button(label="GIF", style=discord.ButtonStyle.blurple, custom_id='b3')
-    async def gif_true_or_false(self, button, interaction):
-        if self.url in ['https://api.waifu.im/sfw/maid', 'https://api.waifu.im/nsfw/maid', 'https://api.waifu.im/nsfw/selfies/']:
-            self.gif = False
-        else:
-            self.gif = True
-        embed = await self.base_embed(self)
-        if embed:
-            await interaction.response.edit_message(embed=embed, view=self)
+    # @discord.ui.button(label="GIF", style=discord.ButtonStyle.blurple, custom_id='b3')
+    # async def gif_true_or_false(self, button, interaction):
+    #     if self.url in ['https://api.waifu.im/sfw/maid', 'https://api.waifu.im/nsfw/maid', 'https://api.waifu.im/nsfw/selfies/']:
+    #         self.gif = False
+    #     else:
+    #         self.gif = True
+    #     embed = await self.base_embed(self)
+    #     if embed:
+    #         await interaction.response.edit_message(embed=embed, view=self)
     
     @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
     async def disable_all_button(self, button:discord.ui.Button, interaction: discord.Interaction):
@@ -174,8 +174,8 @@ class base_waifu_im_api_nsfw(discord.ui.View):
         super().__init__(timeout=600)
         self.ctx = ctx
         self.url = url
-        self.image_url = ""
-        self.message = ""
+        self.image_url = ''
+        self.message = None
         self.gif = False
         self.source_url = ''
 
@@ -230,15 +230,15 @@ class base_waifu_im_api_nsfw(discord.ui.View):
         if embed:           
             await interaction.response.edit_message(embed=embed, view=self)
     
-    @discord.ui.button(label="GIF", style=discord.ButtonStyle.blurple, custom_id='b3')
-    async def gif_true_or_false(self, button, interaction):
-        if self.url in ['https://api.waifu.im/nsfw/maid', 'https://api.waifu.im/nsfw/selfies/']:
-            self.gif = False
-        else:
-            self.gif = True
-        embed = await self.base_embed(self)
-        if embed:
-            await interaction.response.edit_message(embed=embed, view=self)
+    # @discord.ui.button(label="GIF", style=discord.ButtonStyle.blurple, custom_id='b3')
+    # async def gif_true_or_false(self, button, interaction):
+    #     if self.url in ['https://api.waifu.im/nsfw/maid', 'https://api.waifu.im/nsfw/selfies/']:
+    #         self.gif = False
+    #     else:
+    #         self.gif = True
+    #     embed = await self.base_embed(self)
+    #     if embed:
+    #         await interaction.response.edit_message(embed=embed, view=self)
     
     @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
     async def disable_all_button(self, button, interaction):
@@ -249,18 +249,17 @@ class base_waifu_im_api_nsfw(discord.ui.View):
         self.stop()
 
     @discord.ui.select(custom_id="Select_waifu_im", placeholder="Select category..", min_values=1, max_values=1, options=[
-        discord.SelectOption(label='Ass', value="ass", description='Waifu'),
-        discord.SelectOption(label='Ecchi', value="ecchi", description='Maid'),
-        discord.SelectOption(label='Ero', value="Ero", description='Random'),
-        discord.SelectOption(label='Hentai', value="hentai", description='Random'),
-        discord.SelectOption(label='Maid', value="maid", description='Random'),
-        discord.SelectOption(label='Milf', value="milf", description='Random'),
-        discord.SelectOption(label='Oppai', value="oppi", description='Random'),
-        discord.SelectOption(label='Oral', value="oral", description='Random'),
-        discord.SelectOption(label='Paizuri', value="paizuri", description='Random'),
-        discord.SelectOption(label='Selfies', value="selfies", description='Random'),
-        discord.SelectOption(label='Uniform', value="uniform", description='Random'),
-    ])
+        discord.SelectOption(label='Ass', value='ass'),
+        discord.SelectOption(label='Ecchi', value='ecchi'),
+        discord.SelectOption(label='Ero', value='ero'),
+        discord.SelectOption(label='Hentai', value='hentai'),
+        discord.SelectOption(label='Maid', value='maid'),
+        discord.SelectOption(label='Milf', value='milf'),
+        discord.SelectOption(label='Oppai', value='oppi'),
+        discord.SelectOption(label='Oral', value='oral'),
+        discord.SelectOption(label='Paizuri', value='paizuri'),
+        discord.SelectOption(label='Selfies', value='selfies'),
+        discord.SelectOption(label='Uniform', value='uniform')])
     async def callback(self, select: discord.ui.select, interaction: discord.Interaction):
         if select.values[0]:
             self.url = f'https://api.waifu.im/nsfw/{select.values[0]}'
@@ -289,16 +288,16 @@ class base_waifu_pisc_api(discord.ui.View):
     def __init__(self, ctx):
         super().__init__(timeout=600)
         self.ctx = ctx
-        self.url = "https://api.waifu.pics/sfw/waifu"
-        self.json_url = ""
-        self.title = "waifu"
-        self.message = ""
+        self.url = 'https://api.waifu.pics/sfw/waifu'
+        self.json_url = ''
+        self.title = 'waifu'
+        self.message = ''
 
     def add_button(self):
         self.add_item(discord.ui.Button(label='Image URL', url=self.json_url))
 
     def api_site(self):
-        self.add_item(discord.ui.Button(label='API site', url="https://waifu.pics/"))
+        self.add_item(discord.ui.Button(label='API site', url='https://waifu.pics/'))
 
     async def on_timeout(self):
         self.clear_items()
@@ -343,23 +342,23 @@ class base_waifu_pisc_api(discord.ui.View):
         self.stop()
 
     @discord.ui.select(custom_id="Select_waifu_pics_1", placeholder="Select category (A - K)", min_values=1, max_values=1, options=[        
-        discord.SelectOption(label='Awoo', value="awoo", description='Waifu'),
-        discord.SelectOption(label='Bite', value="bite", description='Waifu'),
-        discord.SelectOption(label='Blush', value="blush", description='Waifu'),
-        discord.SelectOption(label='Bonk', value="bonk", description='Waifu'),
-        discord.SelectOption(label='bully', value="bully", description='Waifu'),
-        discord.SelectOption(label='Cringe', value="cringe", description='Waifu'),
-        discord.SelectOption(label='Cry', value="cry", description='Waifu'),
-        discord.SelectOption(label='Cuddle', value="cuddle", description='Waifu'),
-        discord.SelectOption(label='Dance', value="dance", description='Waifu'),
-        discord.SelectOption(label='Glomp', value="glomp", description='Waifu'),
-        discord.SelectOption(label='Handhold', value="handhold", description='Waifu'),
-        discord.SelectOption(label='Happy', value="happy", description='Waifu'),
-        discord.SelectOption(label='Highfive', value="highfive", description='Waifu'),
-        discord.SelectOption(label='Hug', value="hug", description='Waifu'),
-        discord.SelectOption(label='Kick', value="kick", description='Waifu'),
-        discord.SelectOption(label='Kill', value="kill", description='Waifu'),
-        discord.SelectOption(label='Kiss', value="kiss", description='Waifu'),
+        discord.SelectOption(label='Awoo', value="awoo"),
+        discord.SelectOption(label='Bite', value="bite"),
+        discord.SelectOption(label='Blush', value="blush"),
+        discord.SelectOption(label='Bonk', value="bonk"),
+        discord.SelectOption(label='bully', value="bully"),
+        discord.SelectOption(label='Cringe', value="cringe"),
+        discord.SelectOption(label='Cry', value="cry"),
+        discord.SelectOption(label='Cuddle', value="cuddle"),
+        discord.SelectOption(label='Dance', value="dance"),
+        discord.SelectOption(label='Glomp', value="glomp"),
+        discord.SelectOption(label='Handhold', value="handhold"),
+        discord.SelectOption(label='Happy', value="happy"),
+        discord.SelectOption(label='Highfive', value="highfive"),
+        discord.SelectOption(label='Hug', value="hug"),
+        discord.SelectOption(label='Kick', value="kick"),
+        discord.SelectOption(label='Kill', value="kill"),
+        discord.SelectOption(label='Kiss', value="kiss"),
     ])
     async def callback_a_k(self, select: discord.ui.select, interaction: discord.Interaction):
         if select.values[0]:
@@ -367,20 +366,20 @@ class base_waifu_pisc_api(discord.ui.View):
             self.title = f'{str(select.values[0])}'
     
     @discord.ui.select(custom_id="Select_waifu_pics_2", placeholder="Select category (L - Z)", min_values=1, max_values=1, options=[
-        discord.SelectOption(label='Lick', value="lick", description='Waifu'),
-        discord.SelectOption(label='Megumin', value="megumin", description='Waifu'),
-        discord.SelectOption(label='Neko', value="neko", description='Waifu'),
-        discord.SelectOption(label='Nom', value="nom", description='Waifu'),
-        discord.SelectOption(label='Pat', value="pat", description='Waifu'),
-        discord.SelectOption(label='Poke', value="poke", description='Waifu'),
-        discord.SelectOption(label='Shinobu', value="shinobu", description='Waifu'),
-        discord.SelectOption(label='Slap', value="slap", description='Waifu'),
-        discord.SelectOption(label='Smile', value="smile", description='Waifu'),
-        discord.SelectOption(label='Smug', value="smug", description='Waifu'),
-        discord.SelectOption(label='Waifu', value="waifu", description='Waifu'),
-        discord.SelectOption(label='Wave', value="wave", description='Waifu'),
-        discord.SelectOption(label='Wink', value="wink", description='Waifu'),
-        discord.SelectOption(label='Yeet', value="yeet", description='Waifu'),
+        discord.SelectOption(label='Lick', value="lick"),
+        discord.SelectOption(label='Megumin', value="megumin"),
+        discord.SelectOption(label='Neko', value="neko"),
+        discord.SelectOption(label='Nom', value="nom"),
+        discord.SelectOption(label='Pat', value="pat"),
+        discord.SelectOption(label='Poke', value="poke"),
+        discord.SelectOption(label='Shinobu', value="shinobu"),
+        discord.SelectOption(label='Slap', value="slap"),
+        discord.SelectOption(label='Smile', value="smile"),
+        discord.SelectOption(label='Smug', value="smug"),
+        discord.SelectOption(label='Waifu', value="waifu"),
+        discord.SelectOption(label='Wave', value="wave"),
+        discord.SelectOption(label='Wink', value="wink"),
+        discord.SelectOption(label='Yeet', value="yeet"),
     ])
     async def callback_L_z(self, select: discord.ui.select, interaction: discord.Interaction):
         if select.values[0]:
@@ -405,10 +404,10 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
     def __init__(self, ctx):
         super().__init__(timeout=600)
         self.ctx = ctx
-        self.url = "https://api.waifu.pics/nsfw/waifu"
-        self.json_url = ""
-        self.title = "waifu"
-        self.message = ""
+        self.url = 'https://api.waifu.pics/nsfw/waifu'
+        self.json_url = ''
+        self.title = 'waifu'
+        self.message = ''
 
     def add_button(self):
         self.add_item(discord.ui.Button(label='Image URL', url=self.json_url))
@@ -453,7 +452,7 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
         await interaction.response.edit_message(view=self)
         self.stop()
 
-    @discord.ui.select(custom_id="Select_waifu_pics_1", placeholder="Select category (A - K)", min_values=1, max_values=1, options=[        
+    @discord.ui.select(custom_id="Select_waifu_pics_1", placeholder="Select category..", min_values=1, max_values=1, options=[        
         discord.SelectOption(label='Waifu', value="waifu", description='Waifu'),
         discord.SelectOption(label='Neko', value="neko", description='Waifu'),
         discord.SelectOption(label='Trap', value="trap", description='Waifu'),

@@ -200,12 +200,12 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="snipe message")
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True, embed_links=True)
-    async def snipe(self, ctx , type: Literal["Message", "Embed"] = commands.Option(description="choose type")):
+    async def snipe(self, ctx, type: Literal["message", "embed"] = commands.Option(description="choose type")):
 
         embed = Embed()
         embed.color = self.bot.white_color
 
-        if type == 'Message':
+        if type == 'message':
             
             try:
                 message , content, author, channel , time = self.bot.sniped[ctx.guild.id]
@@ -229,14 +229,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
             await ctx.send(embed=embed, ephemeral=True)
         
-        if type == 'Embed':
+        if type == 'embed':
             try:
                 embed_snipe = self.bot.sniped_embed[ctx.guild.id]
             except:
-                embed.description = "Couldn't find a embed to snipe!"
-                return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+                raise UtilityError("Couldn't find a embed to snipe!")
 
-            await ctx.send(embed=embed_snipe , ephemeral=True)
+            await ctx.send(embed=embed_snipe, ephemeral=True)
 
     @commands.command(help="Converter text to binary")
     @commands.guild_only()
@@ -349,8 +348,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 await asyncio.sleep(timewait)
                 await member.move_to(channel=None)
         else:
-            embed_c = discord.Embed(description="Cancelling sleep time!" , color=self.bot.white_color)
-            await m.edit(embed=embed_c, view=None, delete_after=15)
+            raise UtilityError("Cancelling sleep time!")
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])
     @commands.guild_only()
@@ -370,8 +368,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 raise UtilityError("Error stop timer")
 
         else:
-            em_error = discord.Embed(description=f"**{member}** : sleep timer not found", color=0xde3163)
-            await ctx.send(embed=em_error)
+            raise UtilityError(f"**{member}** : sleep timer not found")
 
     @commands.command(help="Reminder")
     @commands.guild_only()
@@ -481,9 +478,8 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 for member in in_channel:
                     await member.move_to(channel=None)
         else:
-            embed_c = discord.Embed(description="*Cancelling!*" , color=self.bot.white_color)
-            await ctx.send(embed=embed_c, ephemeral=True, delete_after=15)
             await m.delete()
+            raise UtilityError("*Cancelling!*")
     
     @commands.command(help="Stop disconnect timer", aliases=['slchstop'])
     @commands.guild_only()

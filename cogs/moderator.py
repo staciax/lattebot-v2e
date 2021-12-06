@@ -53,14 +53,9 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                         await ctx.send(embed=embed)
                         await ses.close()
                     else:
-                        embed.color = 0xFF7878
-                        embed.description = f'Error when making request | {r.status} response.'
-                        await ctx.send(embed=embed, ephemeral=True)
-                        await ses.close()
+                        raise ModError(f'Error when making request | {r.status} response.')
                 except discord.HTTPException:
-                    embed.color = 0xFF7878
-                    embed.description = f'File size is too big!'
-                    await ctx.send(embed=embed, ephemeral=True)
+                    raise ModError(f'File size is too big!')
     
     @commands.command(help="Remove custom emoji from server")
     @commands.guild_only()
@@ -73,9 +68,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed)
             await emoji.delete()
         except:
-            embed.color = 0xFF7878
-            embed.description = 'error delete emoji!'
-            await ctx.send(embed=embed, ephemeral=True)
+            raise ModError('Error delete emoji!')
 
     @commands.command(name="kick", help="kick member from your server")
     @commands.guild_only()
@@ -84,12 +77,25 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.dynamic_cooldown(bypass_for_owner)
     async def kick(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
-            return await ctx.send(embed=discord.Embed(description="you can't kick bot",color=self.bot.white_color))
+            raise ModError("You can't kick bot")
+        
+        if member == ctx.author:
+            raise ModError("You can't kick yourself.")
+        
+        if member == ctx.guild.owner:
+            raise ModError("You can't kick owner.")
 
         embed = discord.Embed(description=f'Member {member.mention} has been Kicked\nReason : {reason}', color=self.bot.white_color)
-
-        await member.kick(reason=reason)
-        await ctx.send(embed=embed)
+        
+        try:
+            await member.kick(reason=reason)
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            raise ModError('Unable to kick user.')
+        except discord.HTTPException:
+            raise ModError(f'Kick **{member}** is Failed')
+        except Exception:
+            raise ModError(f'Kick **{member}** is Failed')
 
     @commands.command(help="ban member from your server")
     @commands.guild_only()
@@ -98,21 +104,29 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.dynamic_cooldown(bypass_for_owner)
     async def ban(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
-            return await ctx.send(embed=discord.Embed(description="you can't kick bot",color=self.bot.white_color))
+            raise ModError("You can't ban the bot")
         
+        if member == ctx.author:
+            raise ModError("You can't ban yourself.")
+        
+        if member == ctx.guild.owner:
+            raise ModError("You can't ban owner.")
+
         embed = discord.Embed(description=f'{member} has been banned from server\nReason: {reason}', timestamp=datetime.now(timezone.utc),color=0xffffff)
         if ctx.author.display_avatar.url is not None: 
             embed.set_footer(text=f"Banned by {ctx.author}" , icon_url = ctx.author.display_avatar.url)
         else:
             embed.set_footer(text=f"Banned by {ctx.author}")
-
-        embedprm = discord.Embed(description="`Bot doesn't have enough permission to ban someone.`",color=self.bot.white_color)
        
         try:
             await member.ban(reason=reason)
             await ctx.send(embed=embed)
+        except discord.Forbidden:
+            raise ModError('Unable to ban user.')
+        except discord.HTTPException:
+            raise ModError(f'Ban **{member}** is Failed')
         except Exception:
-            await ctx.send(embed=embedprm)
+            raise ModError(f'Ban **{member}** is Failed')
     
     @commands.command(help="Gets the current guild's list of bans")
     @commands.guild_only()
@@ -188,47 +202,46 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 await do_removal(self, ctx, search, lambda e: not e.pinned)
                 embed.description=f"`{ctx.channel.name}` : message NOT pinned were cleared"
             except:
-                embed.description=f"i can't cleanup messages"
+                raise ModError("i can't cleanup messages")
         
         if type == "bot":
             try:
                 await do_removal(self, ctx, search, lambda e: e.author.bot)
                 embed.description=f"`{ctx.channel.name}` : bot message were cleared"
             except:
-                embed.description=f"i can't cleanup bot messages"
+                raise ModError("i can't cleanup bot messages")
         
         if type == "attachments":
             try:
                 await do_removal(self, ctx, search, lambda e: len(e.attachments))
                 embed.description=f"`{ctx.channel.name}` : message attachments were cleared"
             except:
-                embed.description=f"i can't cleanup messages attachments"
+                raise ModError(f"i can't cleanup messages attachments")
         
         if type == "embed":
             try:
                 await do_removal(self , ctx , search, lambda e: len(e.embeds))
                 embed.description=f"`{ctx.channel.name}` : embed were cleared"
             except:
-                embed.description=f"i can't cleanup embed"
+                raise ModError(f"i can't cleanup embed")
                 
         if type == "custom emoji":
             custom_emoji = re.compile(r'<a?:[a-zA-Z0-9_]+:([0-9]+)>')
-           
             def predicate(m):
                 return custom_emoji.search(m.content)
             try:
                 await do_removal(self, ctx, search, predicate)
                 embed.description=f"`{ctx.channel.name}` : emoji were cleared"
             except:
-                embed.description=f"i can't custom emoji message"    
+                raise ModError(f"i can't custom emoji message")
     
         if type == "all":
             try:
                 await do_removal(self, ctx, search, lambda e: True)
                 embed.description=f"`{ctx.channel.name}` : all messsage were cleared"
             except:
-                embed.description=f"i can't message"   
-        
+                raise ModError(f"i can't message")
+          
         await ctx.send(embed=embed , ephemeral=True, delete_after=15)
 
     @commands.command(help="Cleanup member messages")
@@ -248,9 +261,9 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         embed = discord.Embed(color=self.bot.white_color)
         try:
             await do_removal(self, ctx, search, lambda e: e.author == member)
-            embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
         except:
-            embed.description=f"i can't cleanup messages"
+            raise ModError("i can't cleanup messages")
+        embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
         await ctx.send(embed=embed , ephemeral=True, delete_after=15)
         
     @commands.command(help="Mute member")
@@ -280,27 +293,22 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         role = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
 
         if not role:
-            embed.description = "Your server don't have : **`Muted Role`**"
-            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise ModError("Your server don't have : **`Muted Role`**")
 
         if member == self.bot.user:
-            embed.description = "You cannot mute the bot"
-            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise ModError("You cannot mute the bot")
         
         if member == ctx.author:
-            embed.description = "You cannot mute yourself."
-            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+            raise ModError("You cannot mute yourself.")
                 
         member_role = discord.utils.get(member.roles, name="⠀ mute ♡ ₊˚")
         if member_role:
-            embed.description = "member's already have a mute role."
-            return await ctx.send(embed=embed)
+            raise ModError("member's already have a mute role.")
 
         try:
             await member.add_roles(role)
         except:
-            embed.description = "i can't mute this member"
-            return await ctx.send(embed=embed)
+            raise ModError("i can't mute this member")
         
         if time is not None:
             minutes, seconds = divmod(time, 60)
@@ -364,16 +372,22 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             for channel in guild.channels:
                 await channel.set_permissions(mutedRole, speak=False, send_messages=False) #read_message_history=True, read_messages=False
         else:
-            embed.description = "Your server has a muted role."
-            await ctx.send(embed=embed)
+            raise ModError("Your server has a muted role.")
 
     @commands.command(aliases=["nick"], help="change nickname")
     @commands.guild_only()
     @commands.has_permissions(manage_nicknames=True)
     async def change_nick(self, ctx , member: discord.Member = commands.Option(description="mention member"), *, nick:str = commands.Option(description="New nickname")):
-        await member.edit(nick=nick)
-        embed = discord.Embed(description=f"{member.mention} : Nickname was changed for `{member.display_name}`", color=self.bot.white_color)
-        await ctx.send(embed=embed)
+        try:
+            await member.edit(nick=nick)
+            embed = discord.Embed(description=f"{member.mention} : Nickname was changed for `{member.display_name}`", color=self.bot.white_color)
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            raise ModError('You do not have a permissions to change nickname')
+        except discord.HTTPException:
+            raise ModError('Change nickname failed')
+        except Exception as Ex:
+            print(Ex)
     
     @commands.command(aliases=["slow"], help="set slowmode channel")
     @commands.guild_only()
@@ -382,14 +396,10 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def slowmode(self, ctx , time: TimeConverter = commands.Option(description="slowmode duration / time = 0s for disable")):
         
         if time == 0:
-            embed_time = RenlyEmbed.to_error(description="Time is invalid")
-            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
-        
-        embed = discord.Embed(color=self.bot.white_color)
+            raise ModError("Time is invalid")
         
         if int(time) > 21600:
-            embed.description = "slowmode is a maximum of 6 hours."
-            return await ctx.send(embed=embed)
+            raise ModError("slowmode is a maximum of 6 hours.")
 
         seconds = int(time)
         minutes, seconds = divmod(time, 60)
@@ -400,13 +410,12 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         if seconds : time_format += f"{int(seconds)} seconds"
         
         try:
-            
+            embed = discord.Embed(color=self.bot.white_color)
             embed.description = f"Set the slowmode delay in this channel to {time_format}"
             await ctx.channel.edit(slowmode_delay=seconds)
-        except:
-            embed.description = f"i can't set the slowmode this channel"
             return await ctx.send(embed=embed)
-        await ctx.send(embed=embed)
+        except:
+            raise ModError(f"i can't set the slowmode this channel")
 
     @commands.command(help="Mutes the specified member with a specified reason.")
     @commands.has_guild_permissions(mute_members=True)
@@ -428,19 +437,16 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
         if isinstance(member, discord.Member):
             if ctx.me.top_role < member.top_role:
-                embed_error.description = f"Can't mute this member"
-                return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+                raise ModError(f"Can't mute this member")
             elif ctx.me.top_role >= member.top_role:
                 pass
             if member == ctx.guild.owner:
-                embed_error.description = f"Can't mute The Owner"
-                return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+                raise ModError(f"Can't mute The Owner")
         
         if reason == None:
             reason = "None"
         elif len(reason) > 500:
             reason = "Reason was exceeded the 500-character limit."
-
         try:    
             await member.edit(mute=True, reason=reason)
             embed = RenlyEmbed.to_success(title="Voice Mute", description=f"Successfully Voice muted `{member}`\n reason:**{reason}**")
@@ -450,9 +456,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed.set_footer(text=f"Muted by {ctx.author}")
             await ctx.send(embed=embed)
         except:
-            embed_error = RenlyEmbed.to_error(description=f"Target user is not connected to voice.")
-            await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
-
+            raise ModError("Target user is not connected to voice.")
 
     @commands.command(help="Deafens the specified member with a specified reason.")
     @commands.guild_only()
@@ -470,18 +474,15 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             embed_error = discord.Embed(color=self.bot.error_color)
 
             if member.id == ctx.author.id:
-                embed_error.description = "You can't VC deafen yourself!"
-                return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+                raise ModError("You can't VC deafen yourself!")
 
             if isinstance(member, discord.Member):
                 if ctx.me.top_role < member.top_role:
-                    embed_error.description = f"Can't deafen this member"
-                    return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+                    raise ModError(f"Can't deafen this member")
                 elif ctx.me.top_role >= member.top_role:
                     pass
                 if member == ctx.guild.owner:
-                    embed_error.description = f"Can't deafen The Owner"
-                    return await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+                    raise ModError(f"Can't deafen The Owner")
             
             if reason == None:
                 reason = "None"
@@ -496,8 +497,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                     embed.set_footer(text=f"Deafened by {ctx.author}")
                 await ctx.send(embed=embed)
             except:
-                embed_error = RenlyEmbed.to_error(description=f"Target user is not connected to voice.")
-                await ctx.send(embed=embed_error, ephemeral=True, delete_after=15)
+                raise ModError(f"Target user is not connected to voice.")
         else:
             raise commands.MissingPermissions(['Deafen Members'])
     
