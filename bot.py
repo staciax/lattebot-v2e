@@ -32,12 +32,12 @@ async def get_prefix(bot, message):
 
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
-        self.bot_version = "0.0.1s"
-        self.last_update = [2021, 11, 29]
+        self.bot_version = '0.0.1s'
+        self.last_update = [2021, 12, 10]
         self.launch_time = datetime.utcnow()
-        self.latte_avtivity = "with my friends ♡ ₊˚"
+        self.latte_avtivity = 'mirror ♡ ₊˚'
         self.tester = ''
-        self.github = "https://github.com/staciax"
+        self.github = 'https://github.com/staciax'
         self.defaul_prefix = 're'
         self.blacklist = {}
         self.afk_user = {}
@@ -70,7 +70,7 @@ class LatteBot(commands.Bot):
     
     @property
     def latte(self) -> Optional[discord.Guild]:
-        """Returns discord.Guild of the guild"""
+        """Returns discord.Guild of the owner guild"""
         return self.get_guild(self.latte_guild_id)
 
     #thank_stella_bot

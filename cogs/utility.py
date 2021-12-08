@@ -348,6 +348,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 await asyncio.sleep(timewait)
                 await member.move_to(channel=None)
         else:
+            await m.delete()
             raise UtilityError("Cancelling sleep time!")
 
     @commands.command(help="stop sleep timer", aliases=['slstop'])
@@ -458,9 +459,9 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             embed_edit = discord.Embed(color=ctx.author.colour)
             embed_edit.description = f"**BOMB CHANNEL** {emoji_converter('sleeping')}\n\n**CHANNEL**: {channel.mention}\n{format_dt(futuredate, style='f')}({format_dt(futuredate, style='R')})"
             if ctx.author.avatar is not None:
-                embed_edit.set_footer(text='Sleep timer by %s' % (ctx.author) , icon_url=ctx.author.avatar.url)
+                embed_edit.set_footer(text='Requested by %s' % (ctx.author) , icon_url=ctx.author.avatar.url)
             else:
-                embed_edit.set_footer(text='Sleep timer by %s' % (ctx.author))
+                embed_edit.set_footer(text='Requested by %s' % (ctx.author))
 
             #chat_send
             chat_channel = ctx.guild.get_channel(861883647070437386)            

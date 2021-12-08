@@ -227,7 +227,8 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         text:str = commands.Option(default=None, description="status text"),
         streaming_url = commands.Option(default=None, description="streaming status url"),
     ):  
-        text or self.bot.latte_avtivity
+        if text == 'default':
+            text = self.bot.latte_avtivity
         bot_status = getattr(discord.Status, status)
         try:
             if activity == "playing":  # Setting `Playing ` status
