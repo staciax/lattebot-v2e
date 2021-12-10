@@ -442,6 +442,8 @@ class MapView(discord.ui.View):
             await self.send_embed.delete()
         if self.send_shuffle:
             await self.send_shuffle.delete()
+        if self.atkordef:
+            await self.atkordef.delete()
         await interaction.response.edit_message(embed=self.embed, view=self.other_view)
         self.stop()
         
@@ -581,10 +583,10 @@ class ValorantView(discord.ui.View):
     def build_main_page(self) -> discord.Embed:
         embed = discord.Embed(color=0xfa4454)
         embed.title = "Valorant Random"
-        embed.description = "Click **Button** for choose type random."
-        embed.add_field(name=f'\u200B', value=f'• **Agent**', inline=True)
-        embed.add_field(name=f'\u200B', value=f'• **Weapon**', inline=True)
-        embed.add_field(name=f'\u200B', value=f'• **Map**' , inline=True)
+        embed.description = "Use **Selection** for choose type random."
+        embed.add_field(name=f'\u200B', value=f'• <:jetthappy:914210940084424744> **Agent**', inline=True)
+        embed.add_field(name=f'\u200B', value=f'• <:weapon:914212537531248720> **Weapon**', inline=True)
+        embed.add_field(name=f'\u200B', value=f'• <:map2:914213385984421968> **Map**' , inline=True)
         embed.set_thumbnail(url=ICON)
         return embed
             

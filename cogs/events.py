@@ -173,9 +173,9 @@ class Events(commands.Cog):
         message = ctx.message
                 
         embed = discord.Embed(title=f"{ctx.command} - has been used", color=self.bot.white_color, timestamp=discord.utils.utcnow())
-        embed.add_field(name="Server:",value=f"Name: `{server}`\nID: `{server.id}`\nOwner: {owner.mention}",inline=False)
-        embed.add_field(name="User:",value=f"Name: {author.mention}\nID: `{author.id}`",inline=False)
-        embed.add_field(name="Content:",value=f"```{message.content}```",inline=False)
+        embed.add_field(name="Server:",value=f"Name: `{server}`\nID: `{server.id}`\nOwner: {owner}({owner.id})", inline=False)
+        embed.add_field(name="User:",value=f"Name: {author}({author.id})\nMention: {author.mention}", inline=False)
+        embed.add_field(name="Content:",value=f"```{message.content}```", inline=False)
         
         await channel_log.send(embed=embed)
                 

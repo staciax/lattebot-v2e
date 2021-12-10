@@ -1,6 +1,7 @@
 # Standard
 import discord
 import asyncio
+import random
 from discord.ext import commands
 
 # Third
@@ -31,31 +32,47 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.Cog.listener()
     async def on_message(self, message):
         try:
-            if message.channel.id in self.latte_bot:
-                if message.content.startswith('uw'):
-                    if message.author.voice:
-                        channel = message.guild.get_channel(self.underworldx[1])
-                        await message.author.move_to(channel)
-                        await message.delete()
-                if message.content.startswith('temp'):
-                    if message.author.voice:
-                        channel = message.guild.get_channel(self.tempx[1])
-                        await message.author.move_to(channel)
-                        await message.delete()
-                if message.content.startswith('moonlight'):
-                    if message.author.voice:
-                        channel = message.guild.get_channel(self.moonlightx[1])
-                        await message.author.move_to(channel) 
-                        await message.delete()
-                if message.content.startswith('angel'):
-                    if message.author.voice:
-                        channel = message.guild.get_channel(self.angelx[1])
-                        await message.author.move_to(channel) 
-                        await message.delete()
+            if message.guild == self.bot.latte:
+                if message.channel.id in self.latte_bot:
+                    if message.content.startswith('uw'):
+                        if message.author.voice:
+                            channel = message.guild.get_channel(self.underworldx[1])
+                            await message.author.move_to(channel)
+                            await message.delete()
+                    if message.content.startswith('temp'):
+                        if message.author.voice:
+                            channel = message.guild.get_channel(self.tempx[1])
+                            await message.author.move_to(channel)
+                            await message.delete()
+                    if message.content.startswith('moonlight'):
+                        if message.author.voice:
+                            channel = message.guild.get_channel(self.moonlightx[1])
+                            await message.author.move_to(channel) 
+                            await message.delete()
+                    if message.content.startswith('angel'):
+                        if message.author.voice:
+                            channel = message.guild.get_channel(self.angelx[1])
+                            await message.author.move_to(channel) 
+                            await message.delete()
 
-            if message.channel.id == self.tempx[0]:
-                await asyncio.sleep(60)
-                await message.delete()
+                if message.content.startswith('ร้องไห้'):
+                    sticker_list = [872926712776777768, 872922021036707901]
+                    sticker_choice = random.choice(sticker_list)
+                    stick = self.bot.get_sticker(sticker_choice)
+                    await message.channel.send(stickers = [stick])
+                
+                if message.content.startswith('shadowplay'):
+                    stick = self.bot.get_sticker(878702176413810699)
+                    await message.channel.send(stickers = [stick])
+                
+                if message.content.startswith(('เอาซันไลต์มา','เอาซันไลมา','ล้างตา','ซันไล')):
+                    stick = self.bot.get_sticker(872926576847777842)
+                    await message.channel.send(stickers = [stick])
+
+                if message.channel.id == self.tempx[0]:
+                    await asyncio.sleep(60)
+                    await message.delete()
+
         except discord.Forbidden:
             pass
         except discord.NotFound:
