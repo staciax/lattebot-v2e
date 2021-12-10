@@ -7,7 +7,7 @@ from discord.ext import commands
 
 # Local
 from utils.custom_button import Random_member
-from utils.game_random import APEX_RANDOM, VALORANT_RANDOM
+from utils.game_random import APEX_RANDOM, ValorantView
 
 class FunError(commands.CommandError):
     pass
@@ -61,7 +61,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     @commands.command(name="valorant", aliases=["vlr", "valo"], help="valorant random agent, weapon")
     @commands.guild_only()
     async def valorant(self, ctx):
-        view = VALORANT_RANDOM(ctx)
+        view = ValorantView(ctx)
         await view.start()
 
     @commands.command(aliases=['lattesay','botsay'], help="Message something you give latte to say.")
