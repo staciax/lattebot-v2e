@@ -604,3 +604,258 @@ class ValorantView(discord.ui.View):
     async def start(self):
         self.build_select()
         self.message = await self.ctx.send(embed=self.main_embed, view=self)
+
+class APEX_RANDOM(discord.ui.View):
+    def __init__(self, ctx):
+        super().__init__(timeout=1800)
+        self.ctx = ctx
+        self.weapon_type = None
+        self.message = ''
+        self.embeds_legend = None
+        self.embeds_weapon = None
+        self.logging = ''
+        self.counts = 0
+
+    async def on_timeout(self):
+        self.clear_items()
+        if self.message:
+            await self.message.edit(view=self)
+
+    async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
+        embed_error = discord.Embed(color=0xffffff)
+        if interaction.response.is_done():
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.followup.send(embed=embed_error, ephemeral=True)
+        else:
+            embed_error.description='An unknown error occurred, sorry'
+            await interaction.response.send_message(embed=embed_error, ephemeral=True)
+
+    @discord.ui.select(custom_id="Select Weapon type", placeholder="Weapon type (default=random)", min_values=1, max_values=1, options=[        
+        discord.SelectOption(label='Random', value="random"),
+        discord.SelectOption(label='Assault rifles', value="ar"),
+        discord.SelectOption(label='Sub machine guns', value="sub"),
+        discord.SelectOption(label='Light machine guns', value="light"),
+        discord.SelectOption(label='Marksman weapons', value="marksman"),
+        discord.SelectOption(label='Sniper rifles', value="sniper"),
+        discord.SelectOption(label='Shotguns', value="shotgun"),
+        discord.SelectOption(label='Pistols', value="pistol"),
+    ])
+    async def callback_a_k(self, select: discord.ui.select, interaction: discord.Interaction):
+        if select.values[0] == 'random':
+            self.weapon_type = None
+        elif select.values[0]:
+            self.weapon_type = f'{str(select.values[0])}'
+    
+    @discord.ui.button(label="Legend", style=discord.ButtonStyle.blurple)
+    async def apex_legend(self, button, interaction):
+        self.w_log.disabled = False
+        await self.message.edit(view=self)
+        
+        embed = apex_random_legends()
+        if interaction.user.avatar is not None:
+            embed.set_footer(text=f'Req by {interaction.user.display_name}', icon_url=interaction.user.avatar.url)
+        else:
+            embed.set_footer(text=f'Req by {interaction.user.display_name}')
+        a_logging = str(embed.description.split('**' )[1])
+        if self.embeds_legend is None:
+            self.embeds_legend = await self.ctx.channel.send(embed=embed)
+            if self.counts > 100:
+                return
+            self.counts += 1
+            self.logging += f'\n{self.counts}. {interaction.user.display_name}: {a_logging}'
+        else:
+            await self.embeds_legend.edit(embed=embed)
+            if self.counts > 100:
+                return
+            self.counts += 1
+            self.logging += f'\n{self.counts}. {interaction.user.display_name}: {a_logging}'
+    
+    @discord.ui.button(label="Weapon", style=discord.ButtonStyle.blurple)
+    async def apex_weapon(self, button, interaction):
+        self.w_log.disabled = False
+        await self.message.edit(view=self)
+        embed = apex_random_weapon(category=self.weapon_type)
+
+        if interaction.user.avatar is not None:
+            embed.set_footer(text=f'Req by {interaction.user.display_name}', icon_url=interaction.user.avatar.url)
+        else:
+            embed.set_footer(text=f'Req by {interaction.user.display_name}')
+        a_logging = str(embed.description.split('**' )[1])
+        if self.embeds_weapon is None:
+            self.embeds_weapon = await self.ctx.channel.send(embed=embed)
+            if self.counts > 100:
+                return
+            self.counts += 1
+            self.logging += f'\n{self.counts}. {interaction.user.name}: {a_logging}'
+        else:
+            await self.embeds_weapon.edit(embed=embed)
+            if self.counts > 100:
+                return
+            self.counts += 1
+            self.logging += f'\n{self.counts}. {interaction.user.name}: {a_logging}'
+    
+    @discord.ui.button(label="Log", style=discord.ButtonStyle.gray)
+    async def w_log(self, button, interaction):
+        embed = discord.Embed(color=0xffffff)
+        embed.description = ''
+        weapon_log_list = []
+
+        data = self.logging
+        if data:
+            await interaction.response.send_message(self.logging, ephemeral=True)
+    
+    async def start(self):
+        self.w_log.disabled = True
+        embed = discord.Embed(title="Apex Legend")
+        embed.description = '`apex legend random`\n`-legend`\n`-weapon`'
+        embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/417245049315655690/902169368744566784/apex-legends.png')
+        embed.color = 0xFFA500
+        if embed:
+            self.message = await self.ctx.send(embed=embed, view=self, mention_author=False)
+
+def apex_random_weapon(category):
+    #embed
+    embed = discord.Embed(color=0xFFA500)
+
+    #list_of_weapon
+    Assault_rifles = ["HAVOC Rifle", "VK-47 Flatline", "Hemlok Burst AR" , "R-301 Carbine"]
+    Submachine_guns = ["Alternator SMG","Prowler Burst PDW","R-99 SMG","Volt SMG","C.A.R. SMG"]
+    Light_machine_guns = ["Devotion LMG" , "L-STAR EMG", "M600 Spitfire" , "Rampage"]
+    Marksman_weapons = ["G7 Scout", "Triple Take", "30-30 Repeater", "Bocek Compound Bow"]
+    Sniper_rifles = ["Charge Rifle", "Longbow DMR", "Kraber .50-Cal Sniper", "Sentinel"]
+    Shotguns = ["EVA-8 Auto", "Mastiff Shotgun", "Mozambique Shotgun", "Peacekeeper"]
+    Pistols = ["RE-45 Auto","P2020","Wingman"]
+    all_weapon = ["HAVOC Rifle", "VK-47 Flatline", "Hemlok Burst AR" , "R-301 Carbine","Alternator SMG","Prowler Burst PDW","R-99 SMG","Volt SMG","C.A.R. SMG","Devotion LMG" , "L-STAR EMG", "M600 Spitfire" , "Rampage","G7 Scout", "Triple Take", "30-30 Repeater", "Bocek Compound Bow","Charge Rifle", "Longbow DMR", "Kraber .50-Cal Sniper", "Sentinel","EVA-8 Auto", "Mastiff Shotgun", "Mozambique Shotgun", "Peacekeeper","RE-45 Auto","P2020","Wingman"]
+
+    #category
+    if category == None:
+        random_gun = random.choice(all_weapon)
+    elif category == "ar":
+        random_gun = random.choice(Assault_rifles)
+    elif category == "sub":
+        random_gun = random.choice(Submachine_guns)
+    elif category == "light":
+        random_gun = random.choice(Light_machine_guns)
+    elif category == "marksman":
+        random_gun = random.choice(Marksman_weapons)
+    elif category == "sniper":
+        random_gun = random.choice(Sniper_rifles)
+    elif category == "shotgun":
+        random_gun = random.choice(Shotguns)
+    elif category == "pistol":
+        random_gun = random.choice(Pistols)
+    
+    #picture_of_gun
+    if random_gun == "HAVOC Rifle":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/e/ec/HAVOC_Rifle.png/revision/latest/scale-to-width-down/1000?cb=20190304144136")
+    elif random_gun == "VK-47 Flatline":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/f/f1/VK-47_Flatline.png/revision/latest/scale-to-width-down/1000?cb=20190304143943")
+    elif random_gun == "Hemlok Burst AR":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/7/74/Hemlok_Burst_AR.png/revision/latest/scale-to-width-down/1000?cb=20190304144048")
+    elif random_gun == "R-301 Carbine":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/f/f1/R-301_Carbine.png/revision/latest/scale-to-width-down/1000?cb=20190304143302")
+    elif random_gun == "Alternator SMG":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/e/e9/Alternator_SMG.png/revision/latest/scale-to-width-down/688?cb=20190304180240")
+    elif random_gun == "Prowler Burst PDW":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/b/bf/Prowler_Burst_PDW.png/revision/latest/scale-to-width-down/996?cb=20190304180338")
+    elif random_gun == "R-99 SMG":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/d/d5/R-99_SMG.png/revision/latest/scale-to-width-down/1000?cb=20190304180412")
+    elif random_gun == "Volt SMG":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/f/f5/Volt.png/revision/latest/scale-to-width-down/1000?cb=20210717062422")
+    elif random_gun == "C.A.R. SMG":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/1/13/C.A.R._SMG.png/revision/latest/scale-to-width-down/1000?cb=20211018182120")
+    elif random_gun == "Devotion LMG":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/8/8c/Devotion_LMG.png/revision/latest/scale-to-width-down/1000?cb=20190304180450")
+    elif random_gun == "L-STAR EMG":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/0/01/L-STAR_EMG.png/revision/latest/scale-to-width-down/1000?cb=20190709153859")
+    elif random_gun == "M600 Spitfire":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/f/f2/M600_Spitfire.png/revision/latest/scale-to-width-down/1000?cb=20190304180514")
+    elif random_gun == "Rampage":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/e/e4/Rampage.png/revision/latest/scale-to-width-down/1000?cb=20210807042402")
+    elif random_gun == "G7 Scout":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/e/eb/G7_Scout.png/revision/latest/scale-to-width-down/1000?cb=20190304181016")
+    elif random_gun == "Triple Take":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/d/d9/Triple_Take.png/revision/latest/scale-to-width-down/1000?cb=20210823030642")
+    elif random_gun == "30-30 Repeater":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/8/86/30-30_Repeater.png/revision/latest/scale-to-width-down/1000?cb=20210710054145")
+    elif random_gun == "Bocek Compound Bow":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/0/02/Bocek_Compound_Bow.png/revision/latest/scale-to-width-down/777?cb=20210710045232")
+    elif random_gun == "Charge Rifle":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/2/2b/Charge_Rifle.png/revision/latest/scale-to-width-down/1000?cb=20210130154504")
+    elif random_gun == "Longbow DMR":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/4/46/Longbow_DMR.png/revision/latest/scale-to-width-down/1000?cb=20190304181103")
+    elif random_gun == "Kraber .50-Cal Sniper":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/f/f5/Kraber_.50-Cal_Sniper.png/revision/latest/scale-to-width-down/1000?cb=20190304181037")
+    elif random_gun == "Sentinel":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/9/91/Sentinel.png/revision/latest/scale-to-width-down/1000?cb=20210710095136")
+    elif random_gun == "EVA-8 Auto":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/9/97/EVA-8_Auto.png/revision/latest/scale-to-width-down/1000?cb=20210817041450")
+    elif random_gun == "Mastiff Shotgun":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/c/c9/Mastiff_Shotgun.png/revision/latest/scale-to-width-down/1000?cb=20210818084651")
+    elif random_gun == "Mozambique Shotgun":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/a/ae/Mozambique_Shotgun.png/revision/latest/scale-to-width-down/1000?cb=20210813094328")
+    elif random_gun == "Peacekeeper":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/6/64/Peacekeeper.png/revision/latest/scale-to-width-down/1000?cb=20210814095843")
+    elif random_gun == "RE-45 Auto":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/2/25/RE-45_Auto.png/revision/latest/scale-to-width-down/1000?cb=20210816090119")
+    elif random_gun == "P2020":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/c/c1/P2020.png/revision/latest/scale-to-width-down/1000?cb=20210815055000")
+    elif random_gun == "Wingman":
+        embed.set_image(url="https://static.wikia.nocookie.net/apexlegends_gamepedia_en/images/0/09/Wingman.png/revision/latest/scale-to-width-down/1000?cb=20210813090820")
+    
+    embed.description = f"**{random_gun}**"
+
+    return embed
+
+def apex_random_legends():
+    #embed
+    embed = discord.Embed(color=0xFFA500)
+
+    #list_of_legends
+    legends_list = ['Ash','Bangalore','Bloodhound','Caustic','Crypto','Fuse','Gibraltar','Horizon','Lifeline','Loba','Mirage','Octane','Pathfinder','Rampart','Revenant','Seer','Valkyrie','Wattson','Wraith']
+    
+    random_legends = random.choice(legends_list)
+
+    #picture_of_agent
+    if random_legends == "Ash":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/common/legends/ash/apex-grid-tile-legends-ash.png.adapt.crop16x9.png")
+    elif random_legends == "Bangalore":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-bangalore.png.adapt.crop16x9.png")
+    elif random_legends == "Bloodhound":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-bloodhound.png.adapt.crop16x9.png")
+    elif random_legends == "Caustic":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-caustic.png.adapt.crop16x9.png")
+    elif random_legends == "Crypto":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-crypto.png.adapt.crop16x9.png")
+    elif random_legends == "Fuse":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2021/01/apex-grid-tile-legends-fuse.png.adapt.crop16x9.png")
+    elif random_legends == "Gibraltar":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-gibraltar.png.adapt.crop16x9.png")
+    elif random_legends == "Horizon":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2020/10/horizon/apex-grid-tile-legends-horizon.png.adapt.crop16x9.png")
+    elif random_legends == "Lifeline":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-lifeline.png.adapt.crop16x9.png")
+    elif random_legends == "Loba":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2020/05/apex-grid-tile-legends-loba.png.adapt.crop16x9.png")
+    elif random_legends == "Mirage":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-mirage.png.adapt.crop16x9.png")
+    elif random_legends == "Octane":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-octane.png.adapt.crop16x9.png")
+    elif random_legends == "Pathfinder":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-pathfinder.png.adapt.crop16x9.png")
+    elif random_legends == "Rampart":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2020/08/rampart/apex-grid-tile-legends-rampart.png.adapt.crop16x9.png")
+    elif random_legends == "Revenant":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2020/02/apex-legend-revenant-grid-tile.png.adapt.crop16x9.png")
+    elif random_legends == "Seer":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2021/07/seer-assets/apex-grid-tile-legends-seer.png.adapt.crop16x9.png")
+    elif random_legends == "Valkyrie":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2021/04/apex-grid-tile-legends-valkyrie.png.adapt.crop16x9.png")
+    elif random_legends == "Wattson":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-wattson.png.adapt.crop16x9.png")
+    elif random_legends == "Wraith":
+        embed.set_thumbnail(url="https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/legends-character-tiles/apex-grid-tile-legends-wraith.png.adapt.crop16x9.png")
+    
+    embed.description = f"**{random_legends}**"
+
+    return embed
