@@ -61,11 +61,11 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
                     stick = self.bot.get_sticker(sticker_choice)
                     await message.channel.send(stickers = [stick])
                 
-                if message.content.startswith('shadowplay'):
-                    stick = self.bot.get_sticker(878702176413810699)
-                    await message.channel.send(stickers = [stick])
+                # if message.content.startswith('shadowplay'):
+                #     stick = self.bot.get_sticker(878702176413810699)
+                #     await message.channel.send(stickers = [stick])
                 
-                if message.content.startswith(('เอาซันไลต์มา','เอาซันไลมา','ล้างตา','ซันไล')):
+                if message.content.startswith(('เอาซันไลต์มาล้างตาดิ','เอาซันไลมา','ล้างตา','ซันไล')):
                     stick = self.bot.get_sticker(872926576847777842)
                     await message.channel.send(stickers = [stick])
 
@@ -82,7 +82,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
         except Exception as ex:
             print(ex)
 
-    @commands.command(aliases=['lt'], help="latte server template")
+    @commands.command(name='template', aliases=['lt'], help="latte server template")
     @commands.guild_only()
     @is_latte_guild()
     async def latte_template(self, ctx):
@@ -90,7 +90,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send('** **', ephemeral=True)
         await ctx.channel.send("https://discord.new/sFYKgkknRN5f")
 
-    @commands.command(aliases=['ltemp'], help="lattte temp role")
+    @commands.command(name='temprole', aliases=['ltemp'], help="lattte temp role")
     @commands.guild_only()
     @is_latte_guild()
     async def latte_temp_role(self, ctx, member: discord.Member = commands.Option(default=None, description="Give role to member")):

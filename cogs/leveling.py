@@ -7,7 +7,6 @@ from discord.ext import commands
 # Local
 from utils.xp_pillow import level_images
 from utils.buttons import NewSimpage
-from utils.useful import RenlyEmbed
 from utils.checks import is_latte_guild
 from utils.errors import CantRun
 
@@ -33,44 +32,53 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='lutoarakablush', id=903360992103268403, animated=False)
 
+    async def xp_update(self, member, guilds, channel=None, get_xp=None):
+        if channel is None:
+            member_guild = member.guild
+            channel = member_guild.get_channel(861883647070437386)
+
+        data = await self.bot.latte_level.find_by_custom({"id": member.id, "guild_id": guilds.id})            
+        if data is None:
+            data = {
+                "id" : member.id,
+                "xp" : 100,
+                "guild_id": guilds.id
+            }
+            #add_role_xp_bar
+            guild = guilds
+            lvl_bar = discord.utils.get(guild.roles, id = 854503041775566879)#・ ──────꒰ ・ levels ・ ꒱────── ・
+            await member.add_roles(lvl_bar)
+
+        xp = data["xp"]
+        data["xp"] += get_xp or 10
+        await self.bot.latte_level.update_by_custom(
+            {"id": member.id, "guild_id": guilds.id}, data
+        )
+        lvl = 0 
+        while True:
+            if xp < ((50*(lvl**2))+(50*lvl)):
+                break
+            lvl += 1
+        xp -= ((50*((lvl-1)**2))+(50*(lvl-1)))
+        if xp == 0:
+            emlvup = discord.Embed(description=f"{member.mention} you leveled up to **level {lvl}.**!", color=0xffffff)
+            msg = await channel.send(embed=emlvup)
+            for i in range(len(level)):
+                if lvl == levelnum[i]:
+                    await member.add_roles(discord.utils.get(member.guild.roles, name=level[i]))
+                    embed = discord.Embed(description=f"{member.mention} you leveled up to **level {lvl}.**!\nyou have gotten role **{level[i]}**!!!",color=0xffffff)
+                    await msg.edit(embed=embed)
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if not self.bot.tester or len(self.bot.tester) == 0:
             if message.author.bot:
                 return
-            if message.channel.id in chat_channel: #แก้ไขเป็น json
-                data = await self.bot.latte_level.find_by_custom({"id": message.author.id, "guild_id": message.guild.id})            
-                if data is None:
-                    data = {
-                        "id" : message.author.id,
-                        "xp" : 100,
-                        "guild_id": message.guild.id
-                    }
-                    #add_role_xp_bar
-                    guild = message.guild
-                    lvl_bar = discord.utils.get(guild.roles, id = 854503041775566879)#・ ──────꒰ ・ levels ・ ꒱────── ・
-                    await message.author.add_roles(lvl_bar)
-
-                xp = data["xp"]
-                data["xp"] += 10
-                await self.bot.latte_level.update_by_custom(
-                    {"id": message.author.id, "guild_id": message.guild.id}, data
-                )
-
-                lvl = 0 
-                while True:
-                    if xp < ((50*(lvl**2))+(50*lvl)):
-                        break
-                    lvl += 1
-                xp -= ((50*((lvl-1)**2))+(50*(lvl-1)))
-                if xp == 0:
-                    emlvup = discord.Embed(description=f"{message.author.mention} you leveled up to **level {lvl}.**!",color=0xffffff)
-                    msg = await message.channel.send(embed=emlvup)
-                    for i in range(len(level)):
-                        if lvl == levelnum[i]:
-                            await message.author.add_roles(discord.utils.get(message.author.guild.roles, name=level[i]))
-                            embed = discord.Embed(description=f"{message.author.mention} you leveled up to **level {lvl}.**!\nyou have gotten role **{level[i]}**!!!",color=0xffffff)
-                            await msg.edit(embed=embed)
+            if message.channel.id in chat_channel:
+                try:
+                    await self.xp_update(message.author, message.guild, message.channel)
+                except:
+                    pass
             
     @commands.command(help="Level ranking", aliases=['rank','leaderboard'])
     @commands.guild_only()
@@ -154,7 +162,19 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
                     await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
         except:
             raise CantRun('An unknown error occurred, please try again !')
-  
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        try:
+            if member.guild.id == self.bot.latte_guild_id:
+                if not before.channel and after.channel: #join
+                    try:
+                        await self.xp_update(member, member.guild, get_xp=2)
+                    except:
+                        pass
+        except:
+            pass
+
     # @commands.command(description="Crete xp role")
     # @commands.guild_only()
     # @commands.has_permissions(administrator = True)

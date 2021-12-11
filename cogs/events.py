@@ -173,8 +173,8 @@ class Events(commands.Cog):
         message = ctx.message
                 
         embed = discord.Embed(title=f"{ctx.command} - has been used", color=self.bot.white_color, timestamp=discord.utils.utcnow())
-        embed.add_field(name="Server:",value=f"Name: `{server}`\nID: `{server.id}`\nOwner: {owner}({owner.id})", inline=False)
-        embed.add_field(name="User:",value=f"Name: {author}({author.id})\nMention: {author.mention}", inline=False)
+        embed.add_field(name="Server:",value=f"Name: `{server}`\nID: `{server.id}`\nOwner: {owner}\nID : {owner.id}", inline=False)
+        embed.add_field(name="User:",value=f"Name: {author}\nID : {author.id}\nMention: {author.mention}", inline=False)
         embed.add_field(name="Content:",value=f"```{message.content}```", inline=False)
         
         await channel_log.send(embed=embed)
@@ -238,16 +238,16 @@ class Events(commands.Cog):
                 await message.delete()
                 await message.channel.send('https://discord.gg/f6adY5B8k2' , delete_after=60)
         
-        #google_translator
-        if message.channel.id == self.translatex:
-            translator = Translator()
-            try:
-                result =  translator.translate(f'{message.clean_content}' , dest='th')
-            except:
-                return await message.channel.send("An unknown error occurred, sorry" , delete_after=10)
+        # #google_translator
+        # if message.channel.id == self.translatex:
+        #     translator = Translator()
+        #     try:
+        #         result =  translator.translate(f'{message.clean_content}' , dest='th')
+        #     except:
+        #         return await message.channel.send("An unknown error occurred, sorry" , delete_after=10)
 
-            await message.channel.send(result.text)
-            # await message.reply(result.text)
+        #     await message.channel.send(result.text)
+        #     # await message.reply(result.text)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before , after):   
