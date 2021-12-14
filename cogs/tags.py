@@ -122,14 +122,15 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         else:
             raise RuntimeError('I could not find tag')
 
-    async def get_tag(self, guild_id, tag):  
+    async def get_tag(self, guild_id, *, tag):  
         def disambiguate(rows):
             if rows is None or len(rows) == 0:
                 raise RuntimeError('Tag not found.')
-            names = (r['tag'] for r in rows)
-            matches = get_close_matches(tag, names)
-            matches = "\n".join(matches)
-            raise RuntimeError(f"Tag not found. Did you mean...\n`{matches}`")
+            else:
+                names = (r['tag'] for r in rows)
+                matches = get_close_matches(tag, names)
+                matches = "\n".join(matches)
+                raise RuntimeError(f"Tag not found. Did you mean...\n`{matches}`")
 
         query = {"guild_id": guild_id, "tag": str(tag)}
         row = await self.bot.latte_tags.find_by_custom(query)
@@ -143,9 +144,9 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(help="Tag command")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag(self, ctx, *, tag:TagName =commands.Option(description="Input name")):
+    async def tag(self, ctx, *, name:TagName = commands.Option(description="Input name")):
         try:
-            tag = await self.get_tag(ctx.guild.id, tag)
+            tag = await self.get_tag(ctx.guild.id, name)
         except RuntimeError as e:
             raise TagError(f'{e}')
 
