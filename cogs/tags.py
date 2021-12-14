@@ -122,7 +122,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         else:
             raise RuntimeError('I could not find tag')
 
-    async def get_tag(self, guild_id, *, tag):  
+    async def get_tag(self, guild_id, tag):  
         def disambiguate(rows):
             if rows is None or len(rows) == 0:
                 raise RuntimeError('Tag not found.')
