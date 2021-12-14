@@ -124,13 +124,14 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
 
     async def get_tag(self, guild_id, tag):  
         def disambiguate(rows):
-            if rows is None or len(rows) == 0:
-                raise RuntimeError('Tag not found.')
-            else:
-                names = (r['tag'] for r in rows)
-                matches = get_close_matches(tag, names)
+            # if rows is None or len(rows) == 0:
+            #     raise RuntimeError('Tag not found.')
+            names = (r['tag'] for r in rows)
+            matches = get_close_matches(tag, names)
+            if matches:
                 matches = "\n".join(matches)
                 raise RuntimeError(f"Tag not found. Did you mean...\n`{matches}`")
+            raise RuntimeError('Tag not found.')
 
         query = {"guild_id": guild_id, "tag": str(tag)}
         row = await self.bot.latte_tags.find_by_custom(query)
@@ -145,14 +146,16 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.guild_only()
     @is_latte_guild()
     async def tag(self, ctx, *, name:TagName = commands.Option(description="Input name")):
+        print(name)
         try:
             tag = await self.get_tag(ctx.guild.id, name)
         except RuntimeError as e:
             raise TagError(f'{e}')
-
-        if ctx.clean_prefix != "/" or tag.lower().endswith(('png','jpeg','jpg','gif','webp','mp4')):
+        
+        content = tag['content']
+        if ctx.clean_prefix != "/" or content.lower().endswith(('png','jpeg','jpg','gif','webp','mp4')):
             return await ctx.send(tag['content'])
-        await ctx.send(f"**`{tag['tag']}`**\n{tag['content']}")
+        await ctx.send(f"**`{tag['tag']}`**\n{content}")
             
     @commands.command(aliases=['tagcreate','tagc'], help="Creates a new tag owned by you.")
     @commands.guild_only()
