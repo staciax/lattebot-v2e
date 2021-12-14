@@ -48,7 +48,6 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @tasks.loop(minutes=1)
     async def sleeped(self):
-        guild = self.bot.latte
         data = latte_read("sleeping")
         if not data:
             return
@@ -57,6 +56,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             if data[key]["time"] is None:
                 return
             elif int(data[key]["time"]) <= int(dt):
+                guild = self.bot.get_guild((data[key]['guild_id']))
                 member_sleep = guild.get_member(int(key))
                 if member_sleep:
                     try:
@@ -96,7 +96,6 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @tasks.loop(minutes=1)
     async def channel_sleeped(self):
-        guild = self.bot.latte
         data = latte_read("channel_sleep")
         if not data:
             return
@@ -105,6 +104,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             if data[key]["time"] is None:
                 return
             elif int(data[key]["time"]) <= int(dt):
+                guild = self.bot.get_guild((data[key]['guild_id']))
                 channel = guild.get_channel(int(key))
                 member_list = channel.members
                 if member_list is not None:
@@ -136,8 +136,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         member = ctx.author
 
         if member.id in self.bot.afk_user.keys():
-            embed_time = RenlyEmbed.to_error(title="You already have afk status", description=f"**reason:** {self.bot.afk_user[member.id]['reason']}")
-            return await ctx.send(embed=embed_time, ephemeral=True, delete_after=15)
+            raise UtilityError(f"**You already have afk status**\n*reason:* {self.bot.afk_user[member.id]['reason']}")
 
         embed = Embed(color=self.bot.white_color)
         if reason is None:
@@ -293,7 +292,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         await msg.add_reaction(emoji_converter('greentick'))
         await msg.add_reaction(emoji_converter('redtick'))
 
-    @commands.command(help="Member sleep timer", aliases=['sl'])
+    @commands.command(help="Set member VC timer disconnect", aliases=['sl'])
     @commands.guild_only()
     async def sleep(self, ctx, time:TimeConverter = commands.Option(description="specify duration"), member: discord.Member = commands.Option(default=None, description="specify member")):    
         if member is None:
@@ -339,7 +338,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 if ctx.author != member:
                     embed_edit.description += f"\n||**Cancel timer** : `{ctx.clean_prefix}sleep_stop @{member.display_name}`||"
                 await m.edit(embed=embed_edit, view=None)
-                self.bot.sleeping[str(member.id)] = {"time": futuredate_}
+                self.bot.sleeping[str(member.id)] = {"time": futuredate_, "guild_id": ctx.guild.id}
                 with open("latte_config/sleeping.json", "w") as fp:
                     json.dump(self.bot.sleeping, fp , indent=4)
             else:
@@ -351,7 +350,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             await m.delete()
             raise UtilityError("Cancelling sleep time!")
 
-    @commands.command(help="stop sleep timer", aliases=['slstop'])
+    @commands.command(help="Stop timer", aliases=['slstop'])
     @commands.guild_only()
     async def sleep_stop(self, ctx, member: discord.Member = commands.Option(default=None, description="specify member")):
         if member is None:
@@ -409,7 +408,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             embed_response.description = f"{ctx.author.mention}, {format_relative(remind_time)}\n{message}"
             await ctx.channel.send(embed=embed_response, view=view)
 
-    @commands.command(help="Disconnect timer for Voice channel", aliases=['slch'])
+    @commands.command(help="Disconnect timer for all member in Voice channel", aliases=['slch'])
     @commands.guild_only()
     async def sleep_channel(self, ctx, time:TimeConverter=commands.Option(description="specify duration"), channel:discord.VoiceChannel=commands.Option(default=None,description="specify channel")):
 
@@ -468,7 +467,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             await chat_channel.send(embed=embed_edit)
 
             if timewait > 600:
-                self.bot.channel_sleep[str(channel.id)] = {"time": futuredate_}
+                self.bot.channel_sleep[str(channel.id)] = {"time": futuredate_, "guild_id": ctx.guild.id}
                 with open("latte_config/channel_sleep.json", "w") as fp:
                     json.dump(self.bot.channel_sleep, fp , indent=4)
                 await m.edit(embed=embed_edit, view=view)
@@ -482,7 +481,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             await m.delete()
             raise UtilityError("*Cancelling!*")
     
-    @commands.command(help="Stop disconnect timer", aliases=['slchstop'])
+    @commands.command(help="Stop timer", aliases=['slchstop'])
     @commands.guild_only()
     async def sleep_channel_stop(self, ctx, channel:discord.VoiceChannel=None):
         if channel is None:

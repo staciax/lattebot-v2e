@@ -80,14 +80,16 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.set_author(name=f"{self.bot.user.name} Invite", icon_url=self.bot.user.avatar.url, url=invite_url)
         await ctx.reply(embed=embed, view=view, mention_author=False)
     
-    # @commands.command(help="Vote for me")
+    @commands.command(help="Vote for me")
     # @commands.guild_only()
-    # @commands.bot_has_permissions(send_messages=True , embed_links=True)
-    # async def vote(self, ctx):
-    #     view = discord.ui.View()
-    #     vote_button = discord.ui.Button(style=discord.ButtonStyle.gray , label="Vote for me", url="") 
-    #     view.add_item(item=vote_button)
-    #     await ctx.send(view=view)
+    @commands.bot_has_permissions(send_messages=True , embed_links=True)
+    async def vote(self, ctx):
+        view = discord.ui.View()
+        vote_button = discord.ui.Button(style=discord.ButtonStyle.gray , label="Vote for me", url="https://top.gg/bot/894156599906689095/vote") 
+        view.add_item(item=vote_button)
+        embed = discord.Embed(color=self.bot.white_color)
+        embed.set_author(name=f"{self.bot.user.name} Vote for me", icon_url=self.bot.user.avatar.url, url=self.bot.latte_supprt_url)
+        await ctx.reply(embed=embed, view=view, mention_author=False)
     
     @commands.command(help="Sends the support server of the bot.")
     # @commands.guild_only()

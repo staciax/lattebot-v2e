@@ -82,7 +82,7 @@ class TagName(commands.clean_content):
 
         first_word, _, _ = lower.partition(' ')
 
-        # # get tag command.
+        # # get tag command. #group commands
         # root = ctx.bot.get_command('tag')
         # if first_word in root.all_commands:
         #     raise commands.BadArgument('This tag name starts with a reserved word.')
@@ -105,47 +105,54 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='createthread', id=903346472509141023, animated=False)
 
+    async def find_data(self, tag, guild_id):
+        find_data = await self.bot.latte_tags.find_by_custom({"guild_id": guild_id, "tag": str(tag)})
+        if find_data is None:
+            raise RuntimeError('Tag not found')
+        else:
+            return find_data
+
+    async def remove_data(self, tag, guild_id, tag_name):
+        data_deleted = await self.bot.latte_tags.delete_by_custom({"guild_id": guild_id, "tag": str(tag)})
+        if data_deleted and data_deleted.acknowledged:
+            embed = discord.Embed(color=0xFF7878)
+            embed.description=f"You have successfully deleted **{tag_name}**."
+            embed.timestamp = discord.utils.utcnow()
+            return embed
+        else:
+            raise RuntimeError('I could not find tag')
+
+    async def get_tag(self, guild_id, tag):  
+        def disambiguate(rows):
+            if rows is None or len(rows) == 0:
+                raise RuntimeError('Tag not found.')
+            names = (r['tag'] for r in rows)
+            matches = get_close_matches(tag, names)
+            matches = "\n".join(matches)
+            raise RuntimeError(f"Tag not found. Did you mean...\n`{matches}`")
+
+        query = {"guild_id": guild_id, "tag": str(tag)}
+        row = await self.bot.latte_tags.find_by_custom(query)
+        if row is None:
+            query = {"guild_id": guild_id}
+            rows = await self.bot.latte_tags.find_many_by_custom(query)
+            return disambiguate(rows)
+        else:
+            return row
+            
     @commands.command(help="Tag command")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag(self, ctx, *, tag:TagName =commands.Option(description="Input name or id")):
-        isInt = True
+    async def tag(self, ctx, *, tag:TagName =commands.Option(description="Input name")):
         try:
-            int(tag)
-        except ValueError:
-            isInt = False
+            tag = await self.get_tag(ctx.guild.id, tag)
+        except RuntimeError as e:
+            raise TagError(f'{e}')
 
-        #check_int_true_or_false
-        if isInt:
-            check_data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag_id": int(tag)})
-            if bool(check_data) == False:
-                check_data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
-        else:
-            check_data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
-        
-        #found_or_not_found
-        if check_data is not None:
-            message = check_data['content']
-            # try:
-            #     check_img = is_url_image(image_url=message)
-            # except Exception:
-            #     check_img = False
-            # if ctx.clean_prefix != "/" or check_img is True:
-            #     return await ctx.send(message)
-            if ctx.clean_prefix != "/" or message.lower().endswith(('png','jpeg','jpg','gif','webp','mp4')):
-                return await ctx.send(message)
-            await ctx.send(f"**`{check_data['tag']}`**\n{message}")
-        else:
-            not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
-            names = (r['tag'] for r in not_found)
-            matches = get_close_matches(tag , names)
-            if matches:
-                matches = "\n".join(matches)
-                description = f"Tag not found. Did you mean...\n`{matches}`"
-            else:
-                description = f"Tag not found."
-            raise TagError(description)
-
+        if ctx.clean_prefix != "/" or tag.lower().endswith(('png','jpeg','jpg','gif','webp','mp4')):
+            return await ctx.send(tag['content'])
+        await ctx.send(f"**`{tag['tag']}`**\n{tag['content']}")
+            
     @commands.command(aliases=['tagcreate','tagc'], help="Creates a new tag owned by you.")
     @commands.guild_only()
     @is_latte_guild()
@@ -221,64 +228,34 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     async def tag_remove(self, ctx, *, name: TagName = commands.Option(description="Input your tag name")):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer()
-        
-        isInt = True
+    
         try:
-            int(name)
-        except ValueError:
-            isInt = False
-
-        #check_int_true_or_false
-        if isInt:
-            data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag_id": int(name)})
-            if bool(data_check) == False:
-                data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(name)})
-        else:
-            data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(name)})
-        
-        #check_data
-        if bool(data_check) == False:
-            raise TagError("Tag not found")
+            data = await self.find_data(name, ctx.guild.id)
+        except RuntimeError as e:
+            raise TagError(f'{e}')
 
         #check_owner_tag
-        if data_check["user_id"] != ctx.author.id:
+        if data["user_id"] != ctx.author.id:
             raise TagError("You are not the owner of the tag")
-        
-        #deletd_data
-        if isInt:
-            data_deleted = await self.bot.latte_tags.delete_by_custom({"guild_id": ctx.guild.id, "tag_id": int(name)})
-            if bool(data_deleted) == False:
-                data_deleted = await self.bot.latte_tags.delete_by_custom({"guild_id": ctx.guild.id, "tag": str(name)})
-        else:
-            data_deleted = await self.bot.latte_tags.delete_by_custom({"guild_id": ctx.guild.id, "tag": str(name)})
-        
-        # #check_data_deleted?
-        # if bool(data_deleted) == False:
-        #     print("data deleted false")
-        #     return
 
-        embed = discord.Embed(color=0xFF7878)
-        #delete_is_true_or_false
-        if data_deleted and data_deleted.acknowledged:
-            embed.description=f"You have successfully deleted **{data_check['tag']}**."
-            embed.timestamp = discord.utils.utcnow()
-            return await ctx.reply(embed=embed, mention_author=False)
-        else:
-            raise TagError('I could not find tag')
+        try:
+            deleted = await self.remove_data(name, ctx.guild.id, data['tag'])
+        except RuntimeError as e:
+            raise TagError(f'{e}')
+        
+        await ctx.reply(embed=deleted, mention_author=False)
 
     @commands.command(aliases=['tagrename','tagre'], help="rename your tag")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_rename(self, ctx, name_old:TagName = commands.Option(description="tag old name"), *, name_new:TagName=commands.Option(description="tag new name")):
-        #find_data
-        data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name_old})
-        
-        #check_data
-        if bool(data_check) == False:
-            raise TagError('Tag not found')
+        try:
+            data = await self.find_data(name_old, ctx.guild.id)
+        except RuntimeError as e:
+            raise TagError(f'{e}')
 
         #check_owner_tag
-        if str(data_check["user_id"]) != str(ctx.author.id):
+        if str(data["user_id"]) != str(ctx.author.id):
             raise TagError("You are not the owner of the tag")
 
         #find_again
@@ -302,31 +279,15 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['tagedit','tage'], help="edit your tag")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_edit(self, ctx, *, tag:TagName =commands.Option(description="Input your tag name or id")):
+    async def tag_edit(self, ctx, *, tag:TagName =commands.Option(description="Input your tag name")):
         #embed
         embed_error = discord.Embed(color=0xFF7878)
         embed = discord.Embed(color=0xfdfd96)
         
-        #check_name_or_id
-        isInt = True
         try:
-            int(tag)
-        except ValueError:
-            isInt = False
-        
-        if isInt:
-            data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag_id": int(tag)})
-            type_data = 'int'
-            if bool(data_check) == False:
-                data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
-                type_data = 'int_but_str'
-        else:
-            data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
-            type_data = 'str'
-        
-        #check_data
-        if bool(data_check) == False:
-            raise TagError('Tag not found')
+            data_check = await self.find_data(tag, ctx.guild.id)
+        except RuntimeError as e:
+            raise TagError(f'{e}')
 
         #check_owner_tag
         if data_check["user_id"] != ctx.author.id:
@@ -354,26 +315,15 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         if not view.value:
             return
         elif view.value:
-            
             data_check["content"] = content
-
-            if type_data == 'int':
-                await self.bot.latte_tags.update_by_custom(
-                    {"guild_id": ctx.guild.id, "tag_id": int(tag)}, data_check
-                )
-            elif type_data in ['str','int_but_str']:
-                await self.bot.latte_tags.update_by_custom(
-                    {"guild_id": ctx.guild.id, "tag": str(tag)}, data_check
-                )
-        
+            await self.bot.latte_tags.update_by_custom(
+                {"guild_id": ctx.guild.id, "tag": str(tag)}, data_check)
             embed_edit = discord.Embed(description=f"You have successfully edited **{data_check['tag']}**", timestamp=discord.utils.utcnow())
             embed_edit.color = 0x77dd77
             if ctx.author.avatar is not None:
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
             else:
                 embed_edit.set_footer(text=f"Edited by {ctx.author.display_name}")
-            # await message_response.delete()
-            # await view.message.edit(embed=embed_edit, view=None)
             await view.delete_message()
             await ctx.channel.send(embed=embed_edit)
 
@@ -469,43 +419,29 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.command(aliases=['taginfo','tagi'], help="Shows information about the specified tag.")
     @commands.guild_only()
     @is_latte_guild()
-    async def tag_info(self, ctx, *, tag:TagName =commands.Option(description="Input your tag name or id")):
-        isInt = True
+    async def tag_info(self, ctx, *, tag:TagName =commands.Option(description="Input your tag name or id")):        
         try:
-            int(tag)
-        except ValueError:
-            isInt = False
+            data = await self.find_data(tag, ctx.guild.id)
+        except RuntimeError as e:
+            raise TagError(f'{e}')
 
-        #check_int_true_or_false
-        if isInt:
-            data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag_id": int(tag)})
-            if bool(data) == False:
-                data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
-        else:
-            data = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": str(tag)})
-        
         #found_or_not_found
         if data is not None:
             view = content_button(ctx=ctx , content=data['content'])
             owner_tag = ctx.guild.get_member(int(data['user_id']))
-
             embed = discord.Embed(color=self.bot.white_color)
             embed.title = f"Tag Info"
-            embed.description = f"**Tag name:** {data['tag']}\n"
-            embed.description += f"**Author:** {owner_tag.mention}\n"
+            embed.description = f"**Tag name:** {data['tag']}\n**Author:** {owner_tag.mention}"
             embed.set_footer(text=f"ID : {data['tag_id']}")
-
-            await ctx.reply(embed=embed, view=view, mention_author=False)
-
+            return await ctx.reply(embed=embed, view=view, mention_author=False)
         else:
             not_found = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
             names = (r['tag'] for r in not_found)
             matches = get_close_matches(tag , names)
+            description = f"Tag not found."
             if matches:
                 matches = "\n".join(matches)
                 description = f"Tag not found. Did you mean...\n`{matches}`"
-            else:
-                description = f"Tag not found."
             raise TagError(description)
 
     @commands.command(aliases=['tag_count'], help="Total tag in your server")

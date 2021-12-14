@@ -41,7 +41,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
         if data is None:
             data = {
                 "id" : member.id,
-                "xp" : 100,
+                "xp" : 50,
                 "guild_id": guilds.id
             }
             #add_role_xp_bar
@@ -119,7 +119,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             p.embed.color = 0x77dd77
             await p.start()
         except:
-            raise commands.BadArgument('error')
+            raise CantRun('An unknown error occurred, please try again !')
 
     @commands.command(help="Shows exp the specified member.", aliases=['lvl' , 'exp'])
     @commands.guild_only()
@@ -128,38 +128,38 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
         if ctx.interaction is not None:
             await ctx.interaction.response.defer()
         try:
-            async with ctx.typing():
-                if not member:
-                    member = ctx.author
-                member_id = member.id 
-                stats = await self.bot.latte_level.find_by_custom({"id": member_id, "guild_id": ctx.guild.id})
-                if stats is None:
-                    embed = discord.Embed(description="You haven't sent any messages, **no xp**!!",color=0xffffff)
-                    await ctx.send(embed=embed)
-                else:
-                    xp = stats["xp"]
-                    lvl = 0
-                    rank = 0
-                    while True:
-                        if xp < ((50*(lvl**2))+(50*lvl)):
-                            break
-                        lvl += 1
-                    xp -= ((50*((lvl-1)**2))+(50*(lvl-1)))
-                    filter_member = await self.bot.latte_level.find_many_by_custom({"guild_id": ctx.guild.id})
-                    filter_member = sorted(filter_member, key=lambda x: x["xp"] , reverse=True)
-                    for x in filter_member:
-                        rank += 1
-                        if stats["id"] == x["id"]:
-                            break
-                    final_xp = (200*((1/2)*lvl))
-                    
-                    embedlv = discord.Embed(title=f"{member.name}'s level stats | {ctx.guild.name}",color=0x77dd77)
-                    embedlv.set_image(url="attachment://latte-level.png")
-                    if ctx.channel.id in chat_channel:
-                        if ctx.clean_prefix != "/":
-                            await ctx.message.delete()
-                        return await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15)
-                    await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
+            if ctx.clean_prefix != "/":
+                await ctx.trigger_typing()
+            member = member or ctx.author
+            member_id = member.id 
+            stats = await self.bot.latte_level.find_by_custom({"id": member_id, "guild_id": ctx.guild.id})
+            
+            if stats is None:
+                raise CantRun("You haven't sent any messages, **no xp**!!")
+            
+            xp = stats["xp"]
+            lvl = 0
+            rank = 0
+            while True:
+                if xp < ((50*(lvl**2))+(50*lvl)):
+                    break
+                lvl += 1
+            xp -= ((50*((lvl-1)**2))+(50*(lvl-1)))
+            filter_member = await self.bot.latte_level.find_many_by_custom({"guild_id": ctx.guild.id})
+            filter_member = sorted(filter_member, key=lambda x: x["xp"] , reverse=True)
+            for x in filter_member:
+                rank += 1
+                if stats["id"] == x["id"]:
+                    break
+            final_xp = (200*((1/2)*lvl))
+            
+            embedlv = discord.Embed(title=f"{member.name}'s level stats | {ctx.guild.name}",color=0x77dd77)
+            embedlv.set_image(url="attachment://latte-level.png")
+            if ctx.channel.id in chat_channel:
+                if ctx.clean_prefix != "/":
+                    await ctx.message.delete()
+                return await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15)
+            await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
         except:
             raise CantRun('An unknown error occurred, please try again !')
 

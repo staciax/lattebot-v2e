@@ -593,9 +593,9 @@ class Events(commands.Cog):
                 else:
                     return
 
-                offline = ['<@&886193080997384222>']
-                if new_roles == offline: return
-                if old_roles == offline: return
+                offline = ['<@&886193080997384222>','@deleted-role']
+                if new_roles in offline: return
+                if old_roles in offline: return
             
                 if new_roles == ['<@&842309176104976387>']:
                     # print("new role")

@@ -61,9 +61,9 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
                     stick = self.bot.get_sticker(sticker_choice)
                     await message.channel.send(stickers = [stick])
                 
-                # if message.content.startswith('shadowplay'):
-                #     stick = self.bot.get_sticker(878702176413810699)
-                #     await message.channel.send(stickers = [stick])
+                if message.content.startswith('shadowplay'):
+                    stick = self.bot.get_sticker(878702176413810699)
+                    await message.channel.send(stickers = [stick])
                 
                 if message.content.startswith(('เอาซันไลต์มาล้างตาดิ','เอาซันไลมา','ล้างตา','ซันไล')):
                     stick = self.bot.get_sticker(872926576847777842)

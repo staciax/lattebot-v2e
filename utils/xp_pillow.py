@@ -10,7 +10,7 @@ import requests
 
 # Local
 
-def level_images(member ,final_xp , lvl , rank , xp):
+def level_images(member, final_xp, lvl, rank, xp):
     background = Image.open('latte_config/images/level.png')
     
     if member.display_avatar != member.avatar:

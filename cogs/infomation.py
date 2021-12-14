@@ -44,11 +44,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def server_info(self, ctx):
-
-        #afk_channel_check and timeout
-        afk_channels = afk_channel_check(ctx)      
-        afk_timeouts = afk_channel_timeout(ctx)
-
         #member_status and emoji_member_status
         statuses = member_status(ctx)
         
@@ -56,22 +51,14 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         emoji_total = len(ctx.guild.emojis)
         emoji_regular = len([emoji for emoji in ctx.guild.emojis if not emoji.animated])
         emoji_animated = len([emoji for emoji in ctx.guild.emojis if emoji.animated])
+        stickers = len(ctx.guild.stickers)
 
         #boost_checker
         boost = check_boost(ctx)
+        
+        #get_embed_color
+        dominant_color = get_dominant_color(url=ctx.guild.icon.replace(format='png'))
 
-        #dominant_colour_icon_guild
-        try:
-            url = ctx.guild.icon.replace(format='png')
-            resp = requests.get(url)      
-            out = BytesIO(resp.content)
-            out.seek(0)
-            icon_color = ColorThief(out).get_color(quality=1)
-            icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-            dominant_color = int(icon_hex, 16)
-        except:
-            dominant_color = self.bot.white_color
-           
         embed = discord.Embed(title=f"Server infomation - {ctx.guild.name}", color=dominant_color)
         fields = [("Server name",ctx.guild.name, True),
 				("Server Owner",f"{ctx.guild.owner}", True),
@@ -83,14 +70,14 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
                 ("Voice Channels",len(ctx.guild.voice_channels), True),
                 ("Stage Chennels",len(ctx.guild.stage_channels), True),
                 ("Category size",len(ctx.guild.categories), True),
-                ("AFK Chennels",afk_channels, True),
-                ("AFK Timer",afk_timeouts,True),
-                ("Rules Channel",rules_channel(ctx),True),
-                ("System Channel",system_channel(ctx),True),
-                ("Verification Level",guild_verification_level(ctx),True),
+                ("AFK Chennels",ctx.guild.afk_channel or '\u200B', True),
+                ("AFK Timer", f"{int(ctx.guild.afk_timeout / 60)} Minutes" if ctx.guild.afk_channel else '\u200B',True),
+                ("Rules Channel", ctx.guild.rules_channel.mention if ctx.guild.rules_channel else '\u200B',True),
+                ("System Channel", ctx.guild.system_channel.mention if ctx.guild.system_channel else '\u200B',True),
+                ("Verification Level", ctx.guild.verification_level or '\u200B', True),
                 ("Activity",f"{emoji_converter('member')} **Total:** {str(ctx.guild.member_count)}\n{status_converter('online')} **Online:** {statuses[0]} \n{status_converter('idle')} **Idle:** {statuses[1]} \n{status_converter('dnd')} **Dnd:** {statuses[2]} \n{status_converter('offline')} **Offline:** {statuses[3]}",True),
                 ("Boosts",boost,True),
-                ("Emoji",f"**Total:** {emoji_total}\n**Regular:** {emoji_regular}\n**Animated:** {emoji_animated}",True)]
+                ("Emoji",f"**Total:** {emoji_total}\n**Regular:** {emoji_regular}\n**Animated:** {emoji_animated}\n**Sticker:** {stickers}",True)]
 
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
@@ -104,17 +91,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     async def server_icon(self, ctx):
         guild = ctx.guild
         embed = discord.Embed(title = f"{guild.name}'s Icon:")
-        try:
-            #dominant_colour_icon_guild
-            url = guild.icon.replace(format='png')
-            resp = requests.get(url)      
-            out = BytesIO(resp.content)
-            out.seek(0)
-            icon_color = ColorThief(out).get_color(quality=1)
-            icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-            dominant_color = int(icon_hex, 16)
-        except:
-            dominant_color = self.bot.white_color
+
+        #get_embed_color
+        dominant_color = get_dominant_color(url=guild.icon.replace(format='png'))
+
         try:
             embed.color = dominant_color
             embed.set_image(url = guild.icon.url)
@@ -123,7 +103,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         except:
             raise CantRun('Server icon not found')
 
-        await ctx.send(embed = embed , view=view)
+        await ctx.send(embed=embed, view=view)
 
     
     @server.command(name="banner", help="Shows the server banner.", aliases=["serverbanner","sb","guildbanner"], message_command=False)
@@ -189,10 +169,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
             dominant_color = int(icon_hex, 16)
         except:
+            dominant_color = self.bot.white_color
             if member.color != discord.Colour.default():
                 dominant_color = member.colour
-            else:
-                dominant_color = self.bot.white_color
 
         #start_view
         view = discord.ui.View()
@@ -248,16 +227,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.set_image(url=fetch_member.banner.url)
             
             #dominant_colour_banner
-            try:
-                url = fetch_member.banner.replace(format='png')
-                resp = requests.get(url)      
-                out = BytesIO(resp.content)
-                out.seek(0)
-                icon_color = ColorThief(out).get_color(quality=1)
-                icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-                dominant_color = int(icon_hex, 16)
-            except:
-                dominant_color = self.bot.white_color
+            dominant_color = get_dominant_color(url=fetch_member.banner.replace(format='png'))
             
             #dominant_color
             embed.color = dominant_color

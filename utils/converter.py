@@ -4,12 +4,14 @@ import re
 import requests
 from discord.ext import commands
 from datetime import datetime, timedelta
+from io import BytesIO
+from colorthief import ColorThief
 
 # Third
 import emojis
 
 # Local
-from utils.formats import format_relative
+# from utils.formats import format_relative
 
 class UnicodeEmojiNotFound(commands.BadArgument):
     def __init__(self, argument):
@@ -46,44 +48,29 @@ def check_boost(ctx):
 
     return boosts
 
-def afk_channel_check(ctx):
-    if ctx.guild.afk_channel: afk_channels = ctx.guild.afk_channel
-    else: afk_channels = "⠀"
-    return afk_channels
-
-def afk_channel_timeout(ctx):
-    if ctx.guild.afk_channel:
-        if ctx.guild.afk_timeout: afk_time = f"{int(ctx.guild.afk_timeout / 60)} Minutes"
-    else: afk_time = "⠀"
-    return afk_time
-
-def rules_channel(ctx):
-    if ctx.guild.rules_channel is None: rs = "⠀"
-    else: rs = ctx.guild.rules_channel.mention   
-    return rs
-
-def system_channel(ctx):
-    if ctx.guild.system_channel is None: sy = "⠀"
-    else: sy = ctx.guild.system_channel.mention
-    return sy
-
-def guild_verification_level(ctx):
-    if str(ctx.guild.verification_level) == "none": gvl = "⠀"
-    else: gvl = ctx.guild.verification_level
-    return gvl
-
 def status_icon(current_status):
     status = str(current_status)
-    if status == "online":
-        output = "https://cdn.discordapp.com/emojis/864171414466592788.png"
-    elif status == "idle":
-        output = "https://cdn.discordapp.com/emojis/864185381833277501.png"
-    elif status == "dnd":
-        output = "https://cdn.discordapp.com/emojis/864173608321810452.png"
-    elif status == "offline":
-        output = "https://cdn.discordapp.com/emojis/864171414750625812.png"
-
+    icons = {
+        'online':'https://cdn.discordapp.com/emojis/864171414466592788.png',
+        'idle':'https://cdn.discordapp.com/emojis/864185381833277501.png',
+        'dnd':'https://cdn.discordapp.com/emojis/864173608321810452.png',
+        'offline':'https://cdn.discordapp.com/emojis/864171414750625812.png',
+    }
+    output = icons[status]
     return output
+
+def get_dominant_color(url):
+    try:
+        resp = requests.get(url)      
+        out = BytesIO(resp.content)
+        out.seek(0)
+        icon_color = ColorThief(out).get_color(quality=1)
+        icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
+        dominant_color = int(icon_hex, 16)
+    except:
+        dominant_color = 0xffffff
+    return dominant_color
+
 
 time_regex = re.compile(r"(\d{1,5}(?:[.,]?\d{1,5})?)([smhd])")
 time_dict = {"h":3600, "s":1, "m":60, "d":86400}
