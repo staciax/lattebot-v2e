@@ -365,7 +365,7 @@ class Events(commands.Cog):
                             color=0xCCCCFF
         
                 )
-                if member.avatar.url is not None:
+                if member.avatar is not None:
                     embed.set_author(name=member, icon_url=member.avatar.url)
                     embed.set_thumbnail(url=member.avatar.url)
                 else:
@@ -394,6 +394,9 @@ class Events(commands.Cog):
         
         except KeyError: 
             pass
+            
+        except Exception as ex:
+            print(ex)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -593,9 +596,12 @@ class Events(commands.Cog):
                 else:
                     return
 
-                offline = ['<@&886193080997384222>','@deleted-role']
-                if new_roles in offline: return
-                if old_roles in offline: return
+                offline = ['<@&886193080997384222>']
+                delete_role = ['@deleted-role']
+                if new_roles == offline: return
+                if old_roles == offline: return
+                if new_roles == delete_role: return
+                if old_roles == delete_role: return
             
                 if new_roles == ['<@&842309176104976387>']:
                     # print("new role")

@@ -56,7 +56,11 @@ class Cancel_button(discord.ui.View):
 
     async def on_timeout(self):
         self.value = False
-        await self.message.edit(view=None)
+        if self.message:
+            try:
+                await self.message.edit(view=None)
+            except:
+                pass
 
     async def delete_message(self):  
         self.value = False
