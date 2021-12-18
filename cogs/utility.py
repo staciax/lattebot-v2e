@@ -207,10 +207,9 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         if type == 'message':
             
             try:
-                message , content, author, channel , time = self.bot.sniped[ctx.guild.id]
+                message, content, author, channel, time = self.bot.sniped[ctx.guild.id]
             except:
-                embed.description = "Couldn't find a message to snipe!"
-                return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+                raise UtilityError("Couldn't find a message to snipe!")
 
             embed.timestamp = time
                             
@@ -226,7 +225,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             if message.attachments:
                 embed.set_image(url=message.attachments[0].url)
 
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed)
         
         if type == 'embed':
             try:
@@ -234,7 +233,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             except:
                 raise UtilityError("Couldn't find a embed to snipe!")
 
-            await ctx.send(embed=embed_snipe, ephemeral=True)
+            await ctx.send(embed=embed_snipe)
 
     @commands.command(help="Converter text to binary")
     @commands.guild_only()
