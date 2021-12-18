@@ -93,7 +93,7 @@ class Reaction(commands.Cog):
 
             await member.add_roles(role)
 
-        if self.matcha_color == payload.message_id:
+        if self.matcha_verify == payload.message_id:
             if emoji == '873028548724670555':
                 role = discord.utils.get(guild.roles, id = 735500646882607156) #name="♡ ~ 𝙈𝘼𝙄𝘿𝙀𝙉 ~♡")
             if emoji == '873029782592446464':
