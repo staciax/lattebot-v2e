@@ -111,7 +111,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="Custom role color")
     @commands.guild_only()
     @is_latte_guild()
-    async def colors(self, ctx, color=commands.Option(descriotion="Specify the color you want to change.")):
+    async def colors(self, ctx, color=commands.Option(description="Specify the color you want to change.")):
         embed = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
         embed.set_author(name=f'{ctx.guild.name} | Color Request', icon_url=ctx.guild.icon.url)
         embed.description = f"**Color:** {color}"
