@@ -8,7 +8,7 @@ from discord.ext import commands
 
 # Local
 from utils.checks import is_latte_guild
-from utils.errors import CantRun
+from utils.errors import UserInputErrors
 
 class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
     """Commands only latte server"""
@@ -100,7 +100,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
         member_role = discord.utils.get(
             member.roles, id=879258879987449867)
         if member_role:
-            raise CantRun(f"{member.name} is already a temp role!")
+            raise UserInputErrors(f"{member.name} is already a temp role!")
         await member.add_roles(role)
         embed = discord.Embed(
             description="Temp is ready\n`This role will disappear within 2 hour.`", color=self.bot.white_color)
