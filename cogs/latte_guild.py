@@ -10,7 +10,7 @@ from discord.ext import commands
 from utils.checks import is_latte_guild
 from utils.errors import UserInputErrors
 
-class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
+class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Commands only latte server"""
     def __init__(self, bot):
         self.bot = bot
