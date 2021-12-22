@@ -33,6 +33,8 @@ class Error(commands.Cog):
                 cm_error = f"I couldn't find that command. Did you mean...\n`{matches}`"
             else:
                 return
+        elif isinstance(error, commands.UserInputError):
+            cm_error = f"{error}"
         elif isinstance(error, commands.DisabledCommand):
             cm_error = f"Command is disabled"
         elif isinstance(error, commands.CommandOnCooldown):
@@ -56,20 +58,20 @@ class Error(commands.Cog):
         elif isinstance(error, commands.MissingAnyRole):
             cm_error = f"You don't have **{error.missing_role}** role(s) to run this command!"
         elif isinstance(error, commands.MissingRequiredArgument):
-            cm_error = "You didn't pass a required argument!"
+            cm_error = f"You didn't pass a required argument!"
         elif isinstance(error, commands.NSFWChannelRequired):
             cm_error = f"This channel isn't NSFW"
         elif isinstance(error, commands.CheckFailure):
             cm_error = f"You can't use this command."
         elif isinstance(error, commands.DisabledCommand):
             cm_error = f"This command is restricted to slash commands." 
-        elif isinstance(error, commands.CommandError):
-            cm_error = f"{error}"
+        # elif isinstance(error, commands.CommandError):
+        #     cm_error = f"{error}"
         else:
+            cm_error = f"An unknown error occurred, sorry"
             print(error)
-            return
         embed.description = cm_error
-        await ctx.send(embed=embed, delete_after=20, ephemeral=True)
+        await ctx.send(embed=embed, delete_after=30, ephemeral=True)
     
 def setup(bot):
     bot.add_cog(Error(bot))

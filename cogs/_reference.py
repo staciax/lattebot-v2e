@@ -1,6 +1,6 @@
 # Standard
 import discord
-from discord.ext import commands , tasks
+from discord.ext import commands, tasks
 
 # Third
 

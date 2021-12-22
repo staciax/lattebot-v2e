@@ -619,9 +619,11 @@ class APEX_RANDOM(discord.ui.View):
         self.counts = 0
 
     async def on_timeout(self):
-        self.clear_items()
         if self.message:
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=None)
+            except:
+                pass
 
     async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
         embed_error = discord.Embed(color=0xffffff)

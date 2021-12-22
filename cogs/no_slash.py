@@ -5,10 +5,6 @@ from discord.ext import commands
 # Third party
 # Local
 
-
-class No_slashError(commands.CommandError):
-    pass
-
 class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
     """Only message command."""
     

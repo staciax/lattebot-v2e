@@ -19,7 +19,7 @@ from utils.converter import *
 from utils.formats import format_dt , deltaconv
 from utils.custom_button import base_Button_URL
 from utils.buttons import NewSimpage
-from utils.errors import CantRun
+from utils.errors import UserInputErrors
 
 class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     """All informative commands"""
@@ -101,7 +101,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
             view = base_Button_URL(label="Server icon URL", url=guild.icon.url)
         except:
-            raise CantRun('Server icon not found')
+            raise UserInputErrors('Server icon not found')
 
         await ctx.send(embed=embed, view=view)
 
@@ -115,7 +115,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             view = base_Button_URL(label="Server banner URL", url=guild.banner.url)
             await ctx.send(embed = embed, view=view)
         except:
-            raise CantRun('Server banner not found')
+            raise UserInputErrors('Server banner not found')
     
     @server.command(name="splash", help="Shows the server invite banner.", aliases=["serversplash","ssp","invitebanner"], message_command=False)
     @commands.guild_only()
@@ -126,7 +126,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             view = base_Button_URL(label="Splash URL", url=guild.splash.url)
             await ctx.send(embed=embed , view=view)
         except:
-            raise CantRun('Server splash not found')
+            raise UserInputErrors('Server splash not found')
 
     @commands.command(name="userinfo", help="Shows information about the specified member.", aliases=["ui", "userinformation","memberinfo"])
     @commands.guild_only()
@@ -214,7 +214,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             view = AvatarView(ctx, member)
             await view.start()
         else:
-            raise CantRun(f'**{member.display_name}** must have a avatar.')
+            raise UserInputErrors(f'**{member.display_name}** must have a avatar.')
 
     @commands.command(help="Shows the banner of the specified member.", aliases=["bn"])
     @commands.guild_only()
@@ -246,7 +246,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.add_field(name=f"this user don't have banner\n\nAccent color:" , value=f"{fetch_member.accent_color} (HEX)", inline=False)
             await ctx.send(file=f, embed=embed)
         else:
-            raise CantRun("this user don't have a banner.")
+            raise UserInputErrors("this user don't have a banner.")
 
     @commands.group(help="Role commands")
     @commands.guild_only()
@@ -293,9 +293,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             try:
                 emoji = await emoji.guild.fetch_emoji(emoji.id)
             except discord.NotFound:
-                raise CantRun("I could not find this emoji in the given server.")
+                raise UserInputErrors("I could not find this emoji in the given server.")
             except discord.HTTPException:
-                raise CantRun("An error occurred fetching the emoji.")
+                raise UserInputErrors("An error occurred fetching the emoji.")
             is_managed = "Yes" if emoji.managed else "No"
             is_animated = "Yes" if emoji.animated else "No"
             is_available = "Yes" if emoji.available else "No"
@@ -349,7 +349,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed , view=view)
 
         else:
-            raise CantRun(f"{emoji} <- This is unicode emoji")
+            raise UserInputErrors(f"{emoji} <- This is unicode emoji")
 
     @emoji.command(name="list",help="Shows you a list of emotes from the server.")
     @commands.guild_only()
@@ -358,7 +358,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         guild = ctx.guild
         guildEmotes = guild.emojis
         if not guildEmotes or len(guildEmotes) == 0:
-            raise CantRun("This server don't have emoji")
+            raise UserInputErrors("This server don't have emoji")
 
         emotes = []
 
@@ -449,10 +449,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
 
         #embed
         embed = discord.Embed(color=member.colour)
-        if member.display_avatar.url is not None:
-            embed.set_author(name=member , icon_url=member.display_avatar.url)
-        else:
-            embed.set_author(name=member)
+        embed.set_author(name=member , icon_url=ctx.author.avatar or ctx.author.default_avatar)
         embed.description = f"{d} Desktop\n{m} Mobile\n{w} Web"
 
         await ctx.send(embed=embed, ephemeral=True, delete_after=15)
@@ -482,7 +479,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed, view=view)
 
         else:
-            raise CantRun("That member doesn't have a spotify status!")
+            raise UserInputErrors("That member doesn't have a spotify status!")
             
     @commands.command(
     help="Shows you a list of members from the server.")

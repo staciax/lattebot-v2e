@@ -17,8 +17,9 @@ from utils.mod_converter import do_removal , TimeConverter
 from utils.paginator import SimplePages
 from utils.useful import RenlyEmbed
 from utils.checks import bypass_for_owner
+from utils.errors import UserInputErrors
 
-class ModError(commands.CommandError):
+class UserInputErrors(commands.UserInputError):
     pass
 
 class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
@@ -54,9 +55,9 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                         await ses.close()
                     else:
                         await ses.close()
-                        raise ModError(f'Error when making request | {r.status} response.')
+                        raise UserInputErrors(f'Error when making request | {r.status} response.')
                 except discord.HTTPException:
-                    raise ModError(f'File size is too big!')
+                    raise UserInputErrors(f'File size is too big!')
     
     @commands.command(help="Remove custom emoji from server")
     @commands.guild_only()
@@ -69,7 +70,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.send(embed=embed)
             await emoji.delete()
         except:
-            raise ModError('Error delete emoji!')
+            raise UserInputErrors('Error delete emoji!')
 
     @commands.command(name="kick", help="kick member from your server")
     @commands.guild_only()
@@ -78,13 +79,13 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.dynamic_cooldown(bypass_for_owner)
     async def kick(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
-            raise ModError("You can't kick bot")
+            raise UserInputErrors("You can't kick bot")
         
         if member == ctx.author:
-            raise ModError("You can't kick yourself.")
+            raise UserInputErrors("You can't kick yourself.")
         
         if member == ctx.guild.owner:
-            raise ModError("You can't kick owner.")
+            raise UserInputErrors("You can't kick owner.")
 
         embed = discord.Embed(description=f'Member {member.mention} has been Kicked\nReason : {reason}', color=self.bot.white_color)
         
@@ -92,11 +93,11 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await member.kick(reason=reason)
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            raise ModError('Unable to kick user.')
+            raise UserInputErrors('Unable to kick user.')
         except discord.HTTPException:
-            raise ModError(f'Kick **{member}** is Failed')
+            raise UserInputErrors(f'Kick **{member}** is Failed')
         except Exception:
-            raise ModError(f'Kick **{member}** is Failed')
+            raise UserInputErrors(f'Kick **{member}** is Failed')
 
     @commands.command(help="ban member from your server")
     @commands.guild_only()
@@ -105,13 +106,13 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.dynamic_cooldown(bypass_for_owner)
     async def ban(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
         if member == self.bot.user:
-            raise ModError("You can't ban the bot")
+            raise UserInputErrors("You can't ban the bot")
         
         if member == ctx.author:
-            raise ModError("You can't ban yourself.")
+            raise UserInputErrors("You can't ban yourself.")
         
         if member == ctx.guild.owner:
-            raise ModError("You can't ban owner.")
+            raise UserInputErrors("You can't ban owner.")
 
         embed = discord.Embed(description=f'{member} has been banned from server\nReason: {reason}', timestamp=datetime.now(timezone.utc),color=0xffffff)
         if ctx.author.display_avatar.url is not None: 
@@ -123,11 +124,11 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await member.ban(reason=reason)
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            raise ModError('Unable to ban user.')
+            raise UserInputErrors('Unable to ban user.')
         except discord.HTTPException:
-            raise ModError(f'Ban **{member}** is Failed')
+            raise UserInputErrors(f'Ban **{member}** is Failed')
         except Exception:
-            raise ModError(f'Ban **{member}** is Failed')
+            raise UserInputErrors(f'Ban **{member}** is Failed')
     
     @commands.command(help="Gets the current guild's list of bans")
     @commands.guild_only()
@@ -136,7 +137,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def bans(self, ctx) -> discord.Message:
         bans = await ctx.guild.bans()
         if not bans:
-            raise ModError("There are no banned users in this server")
+            raise UserInputErrors("There are no banned users in this server")
         ban_list = []
         for ban_entry in bans:
             ban_list.append(f"{ban_entry.user}")
@@ -155,13 +156,13 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.interaction.response.defer(ephemeral=True)
 
         if amount> 500 or amount <0:
-            raise ModError('Invalid amount. Maximum is 500')
+            raise UserInputErrors('Invalid amount. Maximum is 500')
         try:
             deleted = await ctx.channel.purge(limit=amount)            
         except discord.Forbidden:
-            raise ModError("You do not have permissions to purge message")
+            raise UserInputErrors("You do not have permissions to purge message")
         except discord.HTTPException:
-            raise ModError("Purging the messages failed.")
+            raise UserInputErrors("Purging the messages failed.")
         
         embed = discord.Embed(
                 description=f" `#{ctx.channel.name}`: **{len(deleted)}** messages were cleared",
@@ -203,28 +204,28 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 await do_removal(self, ctx, search, lambda e: not e.pinned)
                 embed.description=f"`{ctx.channel.name}` : message NOT pinned were cleared"
             except:
-                raise ModError("i can't cleanup messages")
+                raise UserInputErrors("i can't cleanup messages")
         
         if type == "bot":
             try:
                 await do_removal(self, ctx, search, lambda e: e.author.bot)
                 embed.description=f"`{ctx.channel.name}` : bot message were cleared"
             except:
-                raise ModError("i can't cleanup bot messages")
+                raise UserInputErrors("i can't cleanup bot messages")
         
         if type == "attachments":
             try:
                 await do_removal(self, ctx, search, lambda e: len(e.attachments))
                 embed.description=f"`{ctx.channel.name}` : message attachments were cleared"
             except:
-                raise ModError(f"i can't cleanup messages attachments")
+                raise UserInputErrors(f"i can't cleanup messages attachments")
         
         if type == "embed":
             try:
                 await do_removal(self , ctx , search, lambda e: len(e.embeds))
                 embed.description=f"`{ctx.channel.name}` : embed were cleared"
             except:
-                raise ModError(f"i can't cleanup embed")
+                raise UserInputErrors(f"i can't cleanup embed")
                 
         if type == "custom emoji":
             custom_emoji = re.compile(r'<a?:[a-zA-Z0-9_]+:([0-9]+)>')
@@ -234,14 +235,14 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 await do_removal(self, ctx, search, predicate)
                 embed.description=f"`{ctx.channel.name}` : emoji were cleared"
             except:
-                raise ModError(f"i can't custom emoji message")
+                raise UserInputErrors(f"i can't custom emoji message")
     
         if type == "all":
             try:
                 await do_removal(self, ctx, search, lambda e: True)
                 embed.description=f"`{ctx.channel.name}` : all messsage were cleared"
             except:
-                raise ModError(f"i can't message")
+                raise UserInputErrors(f"i can't message")
           
         await ctx.send(embed=embed , ephemeral=True, delete_after=15)
 
@@ -263,7 +264,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         try:
             await do_removal(self, ctx, search, lambda e: e.author == member)
         except:
-            raise ModError("i can't cleanup messages")
+            raise UserInputErrors("i can't cleanup messages")
         embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
         await ctx.send(embed=embed , ephemeral=True, delete_after=15)
         
@@ -294,22 +295,22 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         role = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
 
         if not role:
-            raise ModError("Your server don't have : **`Muted Role`**")
+            raise UserInputErrors("Your server don't have : **`Muted Role`**")
 
         if member == self.bot.user:
-            raise ModError("You cannot mute the bot")
+            raise UserInputErrors("You cannot mute the bot")
         
         if member == ctx.author:
-            raise ModError("You cannot mute yourself.")
+            raise UserInputErrors("You cannot mute yourself.")
                 
         member_role = discord.utils.get(member.roles, name="⠀ mute ♡ ₊˚")
         if member_role:
-            raise ModError("member's already have a mute role.")
+            raise UserInputErrors("member's already have a mute role.")
 
         try:
             await member.add_roles(role)
         except:
-            raise ModError("i can't mute this member")
+            raise UserInputErrors("i can't mute this member")
         
         if time is not None:
             minutes, seconds = divmod(time, 60)
@@ -373,7 +374,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             for channel in guild.channels:
                 await channel.set_permissions(mutedRole, speak=False, send_messages=False) #read_message_history=True, read_messages=False
         else:
-            raise ModError("Your server has a muted role.")
+            raise UserInputErrors("Your server has a muted role.")
 
     @commands.command(aliases=["nick"], help="change nickname")
     @commands.guild_only()
@@ -384,9 +385,9 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             embed = discord.Embed(description=f"{member.mention} : Nickname was changed for `{member.display_name}`", color=self.bot.white_color)
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            raise ModError('You do not have a permissions to change nickname')
+            raise UserInputErrors('You do not have a permissions to change nickname')
         except discord.HTTPException:
-            raise ModError('Change nickname failed')
+            raise UserInputErrors('Change nickname failed')
         except Exception as Ex:
             print(Ex)
     
@@ -397,10 +398,10 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def slowmode(self, ctx , time: TimeConverter = commands.Option(description="slowmode duration / time = 0s for disable")):
         
         if time == 0:
-            raise ModError("Time is invalid")
+            raise UserInputErrors("Time is invalid")
         
         if int(time) > 21600:
-            raise ModError("slowmode is a maximum of 6 hours.")
+            raise UserInputErrors("slowmode is a maximum of 6 hours.")
 
         seconds = int(time)
         minutes, seconds = divmod(time, 60)
@@ -416,7 +417,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await ctx.channel.edit(slowmode_delay=seconds)
             return await ctx.send(embed=embed)
         except:
-            raise ModError(f"i can't set the slowmode this channel")
+            raise UserInputErrors(f"i can't set the slowmode this channel")
 
     @commands.command(help="Mutes the specified member with a specified reason.")
     @commands.has_guild_permissions(mute_members=True)
@@ -431,15 +432,15 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             reason = commands.Option(default=None, description="reason")
         ):
         if member.id == ctx.author.id:
-            raise ModError("You can't Voice mute yourself!")
+            raise UserInputErrors("You can't Voice mute yourself!")
 
         if isinstance(member, discord.Member):
             if ctx.me.top_role < member.top_role:
-                raise ModError(f"Can't mute this member")
+                raise UserInputErrors(f"Can't mute this member")
             elif ctx.me.top_role >= member.top_role:
                 pass
             if member == ctx.guild.owner:
-                raise ModError(f"Can't mute The Owner")
+                raise UserInputErrors(f"Can't mute The Owner")
         
         if reason == None:
             reason = "None"
@@ -454,7 +455,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed.set_footer(text=f"Muted by {ctx.author}")
             await ctx.send(embed=embed)
         except:
-            raise ModError("Target user is not connected to voice.")
+            raise UserInputErrors("Target user is not connected to voice.")
 
     @commands.command(help="Deafens the specified member with a specified reason.")
     @commands.guild_only()
@@ -471,15 +472,15 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         if ctx.author.guild_permissions.deafen_members:
 
             if member.id == ctx.author.id:
-                raise ModError("You can't VC deafen yourself!")
+                raise UserInputErrors("You can't VC deafen yourself!")
 
             if isinstance(member, discord.Member):
                 if ctx.me.top_role < member.top_role:
-                    raise ModError(f"Can't deafen this member")
+                    raise UserInputErrors(f"Can't deafen this member")
                 elif ctx.me.top_role >= member.top_role:
                     pass
                 if member == ctx.guild.owner:
-                    raise ModError(f"Can't deafen The Owner")
+                    raise UserInputErrors(f"Can't deafen The Owner")
             
             if reason == None:
                 reason = "None"
@@ -494,7 +495,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                     embed.set_footer(text=f"Deafened by {ctx.author}")
                 await ctx.send(embed=embed)
             except:
-                raise ModError(f"Target user is not connected to voice.")
+                raise UserInputErrors(f"Target user is not connected to voice.")
         else:
             raise commands.MissingPermissions(['Deafen Members'])
     

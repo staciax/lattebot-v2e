@@ -12,6 +12,7 @@ from utils.paginator import SimplePages
 from utils.checks import is_latte_guild
 from utils.custom_button import content_button
 from utils.converter import is_url_image
+from utils.errors import UserInputErrors
 
 class Cancel_button(discord.ui.View):
     def __init__(self, ctx, content=None):
@@ -93,9 +94,6 @@ class TagName(commands.clean_content):
 
         return converted if not self.lower else lower
 
-class TagError(commands.CommandError):
-    pass
-
 class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Commands to fetch something by a tag name"""
     def __init__(self, bot):
@@ -154,7 +152,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         try:
             tag = await self.get_tag(ctx.guild.id, name)
         except RuntimeError as e:
-            raise TagError(f'{e}')
+            raise UserInputErrors(f'{e}')
         
         content = tag['content']
         if ctx.clean_prefix != "/" or content.lower().endswith(('png','jpeg','jpg','gif','webp','mp4')):
@@ -172,12 +170,12 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         #data_user_count
         data_user = await self.bot.latte_tags.find_by_custom({"user_id": ctx.author.id})
         if len(data_user) >= 50 and ctx.author != self.bot.renly:
-            raise TagError("You can't have more than 50 tags at the moment.")
+            raise UserInputErrors("You can't have more than 50 tags at the moment.")
 
         #find_data
         data_check = await self.bot.latte_tags.find_by_custom({"guild_id": ctx.guild.id, "tag": name})
         if bool(data_check) == True:
-            raise TagError('This tag already exists, please use another tag.')
+            raise UserInputErrors('This tag already exists, please use another tag.')
         
         #data_count
         data_tags = await self.bot.latte_tags.find_many_by_custom({})
@@ -211,7 +209,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         content = message_response.content
         #when_content_more_2000
         if len(content) > 2000:
-            raise TagError('Tag content is a maximum of 2000 characters.')
+            raise UserInputErrors('Tag content is a maximum of 2000 characters.')
         
         if not view.value:
             return
@@ -240,16 +238,16 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         try:
             data = await self.find_data(name, ctx.guild.id)
         except RuntimeError as e:
-            raise TagError(f'{e}')
+            raise UserInputErrors(f'{e}')
 
         #check_owner_tag
         if data["user_id"] != ctx.author.id:
-            raise TagError("You are not the owner of the tag")
+            raise UserInputErrors("You are not the owner of the tag")
 
         try:
             deleted = await self.remove_data(name, ctx.guild.id, data['tag'])
         except RuntimeError as e:
-            raise TagError(f'{e}')
+            raise UserInputErrors(f'{e}')
         
         await ctx.reply(embed=deleted, mention_author=False)
 
@@ -260,11 +258,11 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         try:
             data = await self.find_data(name_old, ctx.guild.id)
         except RuntimeError as e:
-            raise TagError(f'{e}')
+            raise UserInputErrors(f'{e}')
 
         #check_owner_tag
         if str(data["user_id"]) != str(ctx.author.id):
-            raise TagError("You are not the owner of the tag")
+            raise UserInputErrors("You are not the owner of the tag")
 
         #find_again
         data = await self.bot.latte_tags.find_by_custom({"user_id": ctx.author.id, "guild_id": ctx.guild.id, "tag": name_old})
@@ -295,11 +293,11 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         try:
             data_check = await self.find_data(tag, ctx.guild.id)
         except RuntimeError as e:
-            raise TagError(f'{e}')
+            raise UserInputErrors(f'{e}')
 
         #check_owner_tag
         if data_check["user_id"] != ctx.author.id:
-            raise TagError('You are not the owner of this tag.')
+            raise UserInputErrors('You are not the owner of this tag.')
 
         old_content = data_check['content'] or None
 
@@ -318,7 +316,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         content = message_response.content
         #when_content_more_2000
         if len(content) > 2000:
-            raise TagError('Tag content is a maximum of 2000 characters.')
+            raise UserInputErrors('Tag content is a maximum of 2000 characters.')
 
         if not view.value:
             return
@@ -349,7 +347,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
 
         #check_data
         if bool(data) == False:
-            raise TagError(f"**{member.display_name}** doesn't have any tags.")
+            raise UserInputErrors(f"**{member.display_name}** doesn't have any tags.")
         data = sorted(data, key=lambda x: x["tag"])
         
         #count_tag
@@ -364,7 +362,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             p.embed.color = 0xBFA2DB
             await p.start()
         else:
-            raise TagError(f"**{member.display_name}** doesn't have any tags.")
+            raise UserInputErrors(f"**{member.display_name}** doesn't have any tags.")
     
     @commands.command(aliases=['tagall'], help="Lists all server-specific tags for this server.")
     @commands.guild_only()
@@ -377,7 +375,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
 
         #check_data
         if bool(data) == False:
-            raise TagError('Not found tag from this server.')
+            raise UserInputErrors('Not found tag from this server.')
         data = sorted(data, key=lambda x: x["tag"])
         
         #count_tag
@@ -392,7 +390,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             p.embed.color = 0xBFA2DB
             await p.start()
         else:
-            raise TagError(f"This server doesn't have any tags.")
+            raise UserInputErrors(f"This server doesn't have any tags.")
 
     @commands.command(aliases=['tagsearch','tags'], help="Searches for a tag.")
     @commands.guild_only()
@@ -422,7 +420,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             p.embed.color = 0xBFA2DB
             await p.start()
         else:
-            raise TagError(f"**{name}** This tag not found")
+            raise UserInputErrors(f"**{name}** This tag not found")
 
     @commands.command(aliases=['taginfo','tagi'], help="Shows information about the specified tag.")
     @commands.guild_only()
@@ -431,7 +429,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
         try:
             data = await self.find_data(tag, ctx.guild.id)
         except RuntimeError as e:
-            raise TagError(f'{e}')
+            raise UserInputErrors(f'{e}')
 
         #found_or_not_found
         if data is not None:
@@ -450,7 +448,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             if matches:
                 matches = "\n".join(matches)
                 description = f"Tag not found. Did you mean...\n`{matches}`"
-            raise TagError(description)
+            raise UserInputErrors(description)
 
     @commands.command(aliases=['tag_count'], help="Total tag in your server")
     @commands.guild_only()
@@ -458,7 +456,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     async def tagcount(self, ctx):            
         data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
         if bool(data) == False:
-            raise TagError("This server doesn't have any tags.")
+            raise UserInputErrors("This server doesn't have any tags.")
 
         embed = discord.Embed(description=f"Total tags : `{len(data)}`",color=0x77dd77)
         await ctx.reply(embed=embed, mention_author=False)

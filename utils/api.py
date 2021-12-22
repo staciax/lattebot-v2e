@@ -81,9 +81,11 @@ class base_waifu_im_api(discord.ui.View):
         self.add_item(discord.ui.Button(label='API site', url="https://waifu.im/"))
 
     async def on_timeout(self):
-        self.clear_items()
         if self.message:
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=None)
+            except:
+                pass
     
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
@@ -186,9 +188,11 @@ class base_waifu_im_api_nsfw(discord.ui.View):
         self.add_item(discord.ui.Button(label='API site', url="https://waifu.im/"))
 
     async def on_timeout(self):
-        self.clear_items()
         if self.message:
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=None)
+            except:
+                pass
     
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
@@ -300,9 +304,11 @@ class base_waifu_pisc_api(discord.ui.View):
         self.add_item(discord.ui.Button(label='API site', url='https://waifu.pics/'))
 
     async def on_timeout(self):
-        self.clear_items()
         if self.message:
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=None)
+            except:
+                pass
         
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
@@ -416,9 +422,11 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
         self.add_item(discord.ui.Button(label='API site', url="https://waifu.pics/"))
 
     async def on_timeout(self):
-        self.clear_items()
         if self.message:
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=None)
+            except:
+                pass
     
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):

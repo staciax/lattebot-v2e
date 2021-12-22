@@ -13,9 +13,22 @@ from utils.emoji import emoji_converter
 from utils.buttons import Confirm
 from utils.json_loader import latte_read, latte_write
 from utils.buttons import NewSimpage
+from utils.errors import UserInputErrors
 
-class OwnerError(commands.CommandError):
-    pass
+# class PrivateLiteral(commands.Converter):
+#     """A class for custom Literal"""
+#     values: tuple[str, ...] | str
+
+#     def __class_getitem__(cls, item):
+#         self = cls()
+#         self.values = item
+#         return self
+
+#     async def convert(self, ctx, argument):
+#         """Converts the argument to any of the exact value given"""
+#         if argument in self.values:
+#             return argument
+#         raise UserInputErrors(f"An unknown error occurred, sorry")
 
 class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[887274968012955679])):
     """Owner related commands."""
@@ -64,10 +77,10 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         ):
 
         if user == self.bot.user:
-            raise OwnerError("You cannot blacklist the bot")
+            raise UserInputErrors("You cannot blacklist the bot")
         
         if user == ctx.author:
-            raise OwnerError("You cannot blacklist yourself.")
+            raise UserInputErrors("You cannot blacklist yourself.")
         
         if reason is None:
             reason = "no reason"
@@ -78,7 +91,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         row = await con.fetchrow(query, user.id)
         if row:
             if row['user_id'] == user.id:
-                raise OwnerError('This user already exists.')
+                raise UserInputErrors('This user already exists.')
 
         #create_blacklist
         try:
@@ -89,7 +102,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             self.bot.blacklist[user.id] = True
             await ctx.send(embed=embed)
         except:
-            raise OwnerError('Could not blacklist this user.')
+            raise UserInputErrors('Could not blacklist this user.')
 
     @commands.command(aliases=['blr'], help="Removes the user from the blacklist.")
     @commands.guild_only()
@@ -108,9 +121,9 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 await ctx.send(embed=embed)
                 self.bot.blacklist[user.id] = False
             except:
-                raise OwnerError('Could not remove this user. Please try again!')
+                raise UserInputErrors('Could not remove this user. Please try again!')
         else:
-            raise OwnerError('User not found!')
+            raise UserInputErrors('User not found!')
 
     @commands.command(aliases=['blc'], help="Checks if the user is blacklisted.")
     @commands.guild_only()
@@ -142,7 +155,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         blacklist = await self.bot.pg_con.fetch(query)
         
         if blacklist is None or len(blacklist) == 0:
-            raise OwnerError("Not found blacklisted users.")
+            raise UserInputErrors("Not found blacklisted users.")
 
         for data in blacklist:
             user = self.bot.get_user(data["user_id"])
@@ -163,7 +176,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             embed.description=f"{file_target}.json\n```json\n{json.dumps(data, indent = 1)}```"
             return await ctx.send(embed=embed, ephemeral=True)
         except:
-            raise OwnerError("file not found!")
+            raise UserInputErrors("file not found!")
 
     @commands.command(name="config_set", help="edit config files")
     @commands.guild_only()
@@ -189,7 +202,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             embed.add_field(name="config", value=f'```css\n"{keys}":"{value}"```', inline=False)
             return await ctx.send(embed=embed)
         except:
-            raise OwnerError('Write json error')
+            raise UserInputErrors('Write json error')
 
     @commands.command(help="logout bot")
     @commands.guild_only()
@@ -214,7 +227,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             await self.bot.logout()
         else:
             await msg.delete()
-            raise OwnerError("Cancelled...")
+            raise UserInputErrors("Cancelled...")
 
     @commands.command(name="bot_status",help="change bot status")
     @commands.guild_only()
@@ -240,7 +253,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             elif activity == "watching": # Setting `Watching ` status
                 await self.bot.change_presence(status=bot_status, activity=discord.Activity(type=discord.ActivityType.watching, name=text))
         except:
-            raise OwnerError("Change status error")
+            raise UserInputErrors("Change status error")
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.title = "Status Changed!"
@@ -279,16 +292,16 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             embed.color = 0x8be28b
             return await ctx.send(embed=embed)
         except commands.ExtensionNotFound:
-            raise OwnerError("Extension Not Found")
+            raise UserInputErrors("Extension Not Found")
         except commands.ExtensionAlreadyLoaded:
-            raise OwnerError("The extension is already loaded.")
+            raise UserInputErrors("The extension is already loaded.")
         except commands.NoEntryPointError:
-            raise OwnerError("The extension does not have a setup function.")
+            raise UserInputErrors("The extension does not have a setup function.")
         except commands.ExtensionFailed:
-            raise OwnerError("The extension load failed")
+            raise UserInputErrors("The extension load failed")
         except Exception as ex:
             print(ex)
-            raise OwnerError("The extension load failed")
+            raise UserInputErrors("The extension load failed")
            
     @commands.command(help="unload cog")
     @commands.guild_only()
@@ -305,12 +318,12 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             embed.color = 0x8be28b
             return await ctx.send(embed=embed)
         except commands.ExtensionNotFound:
-            raise OwnerError("Extension Not Found")
+            raise UserInputErrors("Extension Not Found")
         except commands.ExtensionNotLoaded:
-            raise OwnerError("The extension was not loaded.")
+            raise UserInputErrors("The extension was not loaded.")
         except Exception as ex:
             print(ex)
-            raise OwnerError("The extension unload failed")
+            raise UserInputErrors("The extension unload failed")
 
     @commands.command(help="reload cog")
     @commands.guild_only()
@@ -323,16 +336,16 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             embed.color = 0x8be28b
             return await ctx.send(embed=embed)
         except commands.ExtensionNotLoaded:
-            raise OwnerError("The extension was not loaded.")
+            raise UserInputErrors("The extension was not loaded.")
         except commands.ExtensionNotFound:
-            raise OwnerError("TExtension Not Found")
+            raise UserInputErrors("TExtension Not Found")
         except commands.NoEntryPointError:
-            raise OwnerError("The extension does not have a setup function.")
+            raise UserInputErrors("The extension does not have a setup function.")
         except commands.ExtensionFailed:
-            raise OwnerError("The extension reload failed")
+            raise UserInputErrors("The extension reload failed")
         except Exception as ex:
             print(ex)
-            raise OwnerError("The extension reload failed")
+            raise UserInputErrors("The extension reload failed")
     
     @commands.command(help="reload all cogs")
     @commands.guild_only()

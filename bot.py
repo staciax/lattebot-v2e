@@ -33,7 +33,7 @@ async def get_prefix(bot, message):
 class LatteBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.bot_version = '0.0.1s'
-        self.last_update = [2021, 12, 10]
+        self.last_update = [2021, 12, 22]
         self.launch_time = datetime.utcnow()
         self.latte_avtivity = 'mirror ♡ ₊˚'
         self.tester = ''

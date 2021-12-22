@@ -16,6 +16,7 @@ import aiohttp
 from utils.emoji import emoji_converter
 from utils.formats import format_dt , count_python
 from utils import fuzzy
+from utils.errors import UserInputErrors
 
 class SphinxObjectFileReader:
     # Inspired by Sphinx's InventoryFileReader
@@ -294,7 +295,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
 
         e = discord.Embed(colour=discord.Colour.blurple())
         if len(matches) == 0:
-            raise commands.CommandError('Could not find anything. Sorry.')
+            raise UserInputErrors('Could not find anything. Sorry.')
 
         e.description = '\n'.join(f'[`{key}`]({url})' for key, url in matches)
         await ctx.send(embed=e)

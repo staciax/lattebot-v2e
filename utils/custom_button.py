@@ -31,8 +31,7 @@ class roleinfo_view(discord.ui.View):
                 await self.message.edit(view=self)
         except:
             if self.message:
-                self.clear_items()
-                return await self.message.edit(view=self)
+                await self.message.edit(view=None)
 
     async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
         embed_error = discord.Embed(color=0xffffff)

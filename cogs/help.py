@@ -10,9 +10,7 @@ from datetime import datetime, timedelta, timezone
 from utils.json_loader import latte_read
 from bot import LatteBot
 from utils.useful import RenlyEmbed
-
-class HelpCustomError(commands.CommandError):
-    pass
+from utils.errors import UserInputErrors
 
 class HelpView(discord.ui.View):
     def __init__(self, ctx: commands.context, data: Dict[commands.Cog, List[commands.Command]], help_command: commands.HelpCommand, total_cmd:int):
@@ -255,7 +253,7 @@ class MyHelp(commands.HelpCommand):
 
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
         if command.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
-            raise HelpCustomError(f'No command called "{command.name}" found.')
+            raise UserInputErrors(f'No command called "{command.name}" found.')
 
         command_cd = []
         try:
@@ -291,7 +289,7 @@ class MyHelp(commands.HelpCommand):
         
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
         if cog.qualified_name in ignored_cogs and ctx.author != ctx.bot.renly:
-            raise HelpCustomError(f'No commands found in "{cog.qualified_name}"')
+            raise UserInputErrors(f'No commands found in "{cog.qualified_name}"')
 
         if entries:
             command_signatures = [self.get_minimal_command_signature(entry) for entry in entries]
@@ -305,7 +303,7 @@ class MyHelp(commands.HelpCommand):
             embed.set_footer(text="<> = required argument | [] = optional argument")
             await self.context.reply(embed=embed, mention_author=False)
         else:
-            raise HelpCustomError(f'No commands found in {cog.qualified_name}')
+            raise UserInputErrors(f'No commands found in {cog.qualified_name}')
 
     async def send_group_help(self, group):
         ctx = self.context
@@ -314,7 +312,7 @@ class MyHelp(commands.HelpCommand):
 
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
         if group.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
-            raise HelpCustomError(f'No command called "{group.name}" found.')
+            raise UserInputErrors(f'No command called "{group.name}" found.')
 
         command_signatures = [self.get_minimal_command_signature(c) for c in entries]
         if command_signatures:
@@ -379,7 +377,7 @@ class MyHelp(commands.HelpCommand):
 
     async def send_error_message(self, error):
         print(f"Help error - {error}")
-        raise HelpCustomError("Command Not Found")
+        raise UserInputErrors("Command Not Found")
         
     async def on_help_command_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
@@ -387,6 +385,66 @@ class MyHelp(commands.HelpCommand):
             embed.set_footer(text=f"Command requested by {ctx.author}", icon_url=ctx.author.avatar.url)
 
             await ctx.reply(embed=embed, mention_author=False)
+    
+    async def command_callback(self, ctx, *, command=commands.Option(default=None, description="Command name")):
+        """|coro|
+
+        The actual implementation of the help command.
+
+        It is not recommended to override this method and instead change
+        the behaviour through the methods that actually get dispatched.
+
+        - :meth:`send_bot_help`
+        - :meth:`send_cog_help`
+        - :meth:`send_group_help`
+        - :meth:`send_command_help`
+        - :meth:`get_destination`
+        - :meth:`command_not_found`
+        - :meth:`subcommand_not_found`
+        - :meth:`send_error_message`
+        - :meth:`on_help_command_error`
+        - :meth:`prepare_help_command`
+        """
+        await self.prepare_help_command(ctx, command)
+        bot = ctx.bot
+
+        if command is None:
+            mapping = self.get_bot_mapping()
+            return await self.send_bot_help(mapping)
+
+        # Check if it's a cog
+        cog = bot.get_cog(command.capitalize())
+        if cog is not None:
+            return await self.send_cog_help(cog)
+
+        maybe_coro = discord.utils.maybe_coroutine
+
+        # If it's not a cog then it's a command.
+        # Since we want to have detailed errors when someone
+        # passes an invalid subcommand, we need to walk through
+        # the command group chain ourselves.
+        keys = command.split(" ")
+        cmd = bot.all_commands.get(keys[0])
+        if cmd is None:
+            string = await maybe_coro(self.command_not_found, self.remove_mentions(keys[0]))
+            return await self.send_error_message(string)
+
+        for key in keys[1:]:
+            try:
+                found = cmd.all_commands.get(key)
+            except AttributeError:
+                string = await maybe_coro(self.subcommand_not_found, cmd, self.remove_mentions(key))
+                return await self.send_error_message(string)
+            else:
+                if found is None:
+                    string = await maybe_coro(self.subcommand_not_found, cmd, self.remove_mentions(key))
+                    return await self.send_error_message(string)
+                cmd = found
+
+        if isinstance(cmd, commands.Group):
+            return await self.send_group_help(cmd)
+        else:
+            return await self.send_command_help(cmd)
 
 class Help(commands.Cog, command_attrs = dict(slash_command=True)):
     def __init__(self, bot):

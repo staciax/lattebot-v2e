@@ -8,7 +8,7 @@ from discord.ext import commands
 from utils.xp_pillow import level_images
 from utils.buttons import NewSimpage
 from utils.checks import is_latte_guild
-from utils.errors import CantRun
+from utils.errors import UserInputErrors
 
 # xp_channel
 chat_channel = 861883647070437386 , 840398821544296480 , 863438518981361686 , 859960606761549835 #chat,game,anime,kdbot
@@ -119,7 +119,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             p.embed.color = 0x77dd77
             await p.start()
         except:
-            raise CantRun('An unknown error occurred, please try again !')
+            raise UserInputErrors('An unknown error occurred, please try again !')
 
     @commands.command(help="Shows exp the specified member.", aliases=['lvl' , 'exp'])
     @commands.guild_only()
@@ -135,7 +135,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             stats = await self.bot.latte_level.find_by_custom({"id": member_id, "guild_id": ctx.guild.id})
             
             if stats is None:
-                raise CantRun("You haven't sent any messages, **no xp**!!")
+                raise UserInputErrors("You haven't sent any messages, **no xp**!!")
             
             xp = stats["xp"]
             lvl = 0
@@ -161,7 +161,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
                 return await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15)
             await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
         except:
-            raise CantRun('An unknown error occurred, please try again !')
+            raise UserInputErrors('An unknown error occurred, please try again !')
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):

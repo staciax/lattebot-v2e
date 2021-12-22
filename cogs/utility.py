@@ -20,9 +20,7 @@ from utils.buttons import Confirm
 from utils.useful import RenlyEmbed
 from utils.emoji import emoji_converter
 from utils.custom_button import base_Button_URL
-
-class UtilityError(commands.CommandError):
-    pass
+from utils.errors import UserInputErrors
 
 class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     """Some useful commands"""
@@ -136,13 +134,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         member = ctx.author
 
         if member.id in self.bot.afk_user.keys():
-            raise UtilityError(f"**You already have afk status**\n*reason:* {self.bot.afk_user[member.id]['reason']}")
+            raise UserInputErrors(f"**You already have afk status**\n*reason:* {self.bot.afk_user[member.id]['reason']}")
 
         embed = Embed(color=self.bot.white_color)
         if reason is None:
             reason = "personal problems"
         elif len(reason) > 100:
-            raise UtilityError("**reason** is a maximum of 100 characters.")
+            raise UserInputErrors("**reason** is a maximum of 100 characters.")
         
         self.bot.afk_user[member.id] = {"reason": reason, "name": member.display_name}
         try:
@@ -209,7 +207,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             try:
                 message, content, author, channel, time = self.bot.sniped[ctx.guild.id]
             except:
-                raise UtilityError("Couldn't find a message to snipe!")
+                raise UserInputErrors("Couldn't find a message to snipe!")
 
             embed.timestamp = time
                             
@@ -231,7 +229,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             try:
                 embed_snipe = self.bot.sniped_embed[ctx.guild.id]
             except:
-                raise UtilityError("Couldn't find a embed to snipe!")
+                raise UserInputErrors("Couldn't find a embed to snipe!")
 
             await ctx.send(embed=embed_snipe)
 
@@ -263,20 +261,20 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         list_input = list(input_value.split())
 
         if len(list_input) == 1:
-            raise UtilityError("There must be at least 2 split messages.")
+            raise UserInputErrors("There must be at least 2 split messages.")
 
         #try_random
         try:
             await ctx.send(random.choice(list_input))
         except ValueError:
-            raise UtilityError("Invalid Range")
+            raise UserInputErrors("Invalid Range")
 
     @commands.command(help="create poll")
     @commands.guild_only()
     async def poll(self, ctx, *, message= commands.Option(description="poll message")):
 
         if len(message) > 2000:
-            raise UtilityError('poll message is a maximum of 2000 characters.')
+            raise UserInputErrors('poll message is a maximum of 2000 characters.')
 
         
         poll_color = ctx.author.color
@@ -298,7 +296,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             member = ctx.author
 
         if int(time) > 86400:
-            raise UtilityError("You can't set timer duration more than 24 hours")
+            raise UserInputErrors("You can't set timer duration more than 24 hours")
 
         timewait = int(time)
         futuredate = datetime.now(timezone.utc) + timedelta(seconds=timewait) 
@@ -347,7 +345,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 await member.move_to(channel=None)
         else:
             await m.delete()
-            raise UtilityError("Cancelling sleep time!")
+            raise UserInputErrors("Cancelling sleep time!")
 
     @commands.command(help="Stop timer", aliases=['slstop'])
     @commands.guild_only()
@@ -364,10 +362,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed = discord.Embed(description=f"{member.mention} has stopped the timer." , color=self.bot.white_color)
                 return await ctx.reply(embed=embed, mention_author=False)
             except:
-                raise UtilityError("Error stop timer")
+                raise UserInputErrors("Error stop timer")
 
         else:
-            raise UtilityError(f"**{member}** : sleep timer not found")
+            raise UserInputErrors(f"**{member}** : sleep timer not found")
 
     @commands.command(help="Reminder")
     @commands.guild_only()
@@ -378,7 +376,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         if message is None:
             message = "..."
         elif len(message) > 2000:
-            raise UtilityError('Remind message is a maximum of 2000 characters.')
+            raise UserInputErrors('Remind message is a maximum of 2000 characters.')
         
         channel = ctx.channel
         
@@ -389,7 +387,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             remind_timed = remind_time.strftime("%d%m%Y%H%M")
             future_data = humanize.naturaldelta(future, minimum_unit='milliseconds')
         except:
-            raise UtilityError("Time is invalid")
+            raise UserInputErrors("Time is invalid")
         
         embed = discord.Embed(color=self.bot.white_color)
         embed.description = f'Alright {ctx.author.mention}, {future_data} : {message}'
@@ -415,23 +413,23 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.color = self.bot.white_color
 
         if int(time) > 86400:
-            raise UtilityError("You can't set timer duration more than 24 hours")
+            raise UserInputErrors("You can't set timer duration more than 24 hours")
 
         if time == 0:
-            raise UtilityError("Time is invalid")
+            raise UserInputErrors("Time is invalid")
 
         if channel is None:
             try:
                 channel = ctx.author.voice.channel
                 in_channel = ctx.author.voice.channel.members
             except:
-                raise UtilityError('You must join a voice channel first.')
+                raise UserInputErrors('You must join a voice channel first.')
 
         else:
             in_channel = channel.members
         
         if channel and len(in_channel) == 0:
-            raise UtilityError(f'No members found in {channel.mention}')
+            raise UserInputErrors(f'No members found in {channel.mention}')
 
         timewait = int(time)
         futuredate = datetime.now(timezone.utc) + timedelta(seconds=timewait) 
@@ -460,25 +458,26 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed_edit.set_footer(text='Requested by %s' % (ctx.author) , icon_url=ctx.author.avatar.url)
             else:
                 embed_edit.set_footer(text='Requested by %s' % (ctx.author))
-
+            
             #chat_send
-            chat_channel = ctx.guild.get_channel(861883647070437386)            
-            await chat_channel.send(embed=embed_edit)
+            if ctx.guild == self.bot.latte:
+                chat_channel = ctx.guild.get_channel(861883647070437386)            
+                await chat_channel.send(embed=embed_edit)
 
             if timewait > 600:
                 self.bot.channel_sleep[str(channel.id)] = {"time": futuredate_, "guild_id": ctx.guild.id}
                 with open("latte_config/channel_sleep.json", "w") as fp:
                     json.dump(self.bot.channel_sleep, fp , indent=4)
-                await m.edit(embed=embed_edit, view=view)
+                await m.edit(embed=embed_edit, view=None)
 
             else:
-                await m.edit(embed=embed_edit, view=view)
+                await m.edit(embed=embed_edit, view=None)
                 await asyncio.sleep(timewait)
                 for member in in_channel:
                     await member.move_to(channel=None)
         else:
             await m.delete()
-            raise UtilityError("*Cancelling!*")
+            raise UserInputErrors("*Cancelling!*")
     
     @commands.command(help="Stop timer", aliases=['slchstop'])
     @commands.guild_only()
@@ -496,28 +495,28 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed = discord.Embed(description=f"{channel.mention} has stopped the timer." , color=self.bot.white_color)
                 return await ctx.reply(embed=embed, mention_author=False)
             except:
-                UtilityError("Error stop timer")
+                UserInputErrors("Error stop timer")
 
         else:
-            UtilityError("Timer not found")
+            UserInputErrors("Timer not found")
 
     @commands.command(aliases=["trans"], help="Translate your message")
     @commands.guild_only()
     async def translate(self, ctx, to_lang=commands.Option(description="language you want to translate. like en, th, jp"), *, source=commands.Option(description="The source language you want to translate.")):
         if len(source) > 2000:
-            raise UtilityError(f"The message character a maximum of 2000 characters.")
+            raise UserInputErrors(f"The message character a maximum of 2000 characters.")
     
         translator = Translator()
         try:
             a = translator.detect(str(source))
         except:
-            raise UtilityError(f"**{to_lang}** <- This language is not found")
+            raise UserInputErrors(f"**{to_lang}** <- This language is not found")
 
         try:
             result =  translator.translate(f'{source}' , dest=f'{to_lang}')
             b = translator.detect(str(result.text))
         except:
-            raise UtilityError("An unknown error occurred, sorry")
+            raise UserInputErrors("An unknown error occurred, sorry")
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name="Translate" , icon_url="https://upload.wikimedia.org/wikipedia/commons/d/db/Google_Translate_Icon.png")

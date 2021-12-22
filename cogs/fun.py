@@ -8,9 +8,7 @@ from discord.ext import commands
 # Local
 from utils.custom_button import Random_member
 from utils.game_random import APEX_RANDOM, ValorantView
-
-class FunError(commands.CommandError):
-    pass
+from utils.errors import UserInputErrors
 
 class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     """Fun commands"""
@@ -33,7 +31,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
         # check
         if channel is None:
             if not ctx.author.voice:
-                raise FunError("You must join a voice channel first.")
+                raise UserInputErrors("You must join a voice channel first.")
             channel = ctx.author.voice.channel
             in_channel = ctx.author.voice.channel.members
         else:

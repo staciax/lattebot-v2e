@@ -108,5 +108,19 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True)):
         await asyncio.sleep(7200)
         await member.remove_roles(role)
     
+    @commands.command(help="Custom role color")
+    @commands.guild_only()
+    @is_latte_guild()
+    async def colors(self, ctx, color=commands.Option(descriotion="Specify the color you want to change.")):
+        embed = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
+        embed.set_author(name=f'{ctx.guild.name} | Color Request', icon_url=ctx.guild.icon.url)
+        embed.description = f"**Color:** {color}"
+        embed.set_footer(text="Requested by", icon_url=ctx.author.avatar or ctx.author.default_avatar)
+        await self.bot.renly.send(embed=embed)
+
+        embed_send = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
+        embed_send.description = 'I have sent your request to the moderator. <3'
+        await ctx.send(embed=embed_send)
+    
 def setup(bot):
     bot.add_cog(Latte(bot))

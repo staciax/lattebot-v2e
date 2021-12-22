@@ -10,7 +10,7 @@ from datetime import datetime, timezone , timedelta
 from re import search
 
 # Third
-from googletrans import Translator
+# from googletrans import Translator
 
 # Local
 from utils.json_loader import latte_read
@@ -125,14 +125,17 @@ class Events(commands.Cog):
     #ต้องเอาออกในอนาคต
     @tasks.loop(minutes=30)
     async def afk_check(self):
-        if self.bot.afk_user or len(self.bot.afk_user):
-            return
-        else:
+        try:
+            if self.bot.afk_user or len(self.bot.afk_user):
+                return
+
             guild = self.bot.get_guild(self.bot.latte_guild_id)
             member_all = guild.members
             for x in member_all:
                 if x.display_name.startswith('[AFK]'):
                     await x.edit(nick=None)
+        except:
+            pass
 
     @afk_check.before_loop
     async def before_afk_check(self):
@@ -149,10 +152,12 @@ class Events(commands.Cog):
         if int(time) == 0:
             try:
                 await message_log.purge(limit=15, check=is_me)
-            except discord.Forbidden:
-                pass
-            except discord.HTTPException:
-                pass
+            except Exception as Ex:
+                print(f"Error clear message-log : {Ex}")
+            # except discord.Forbidden:
+            #     pass
+            # except discord.HTTPException:
+            #     pass
             
     @clear_message_log.before_loop
     async def before_clear_message_log(self):
@@ -183,12 +188,8 @@ class Events(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
-  
-        if message.content.startswith(f'.afk'):
-            return
-        if message.content.startswith(f'{self.bot.defaul_prefix}afk'):
-            return
-        if message.content.startswith(f'/afk'):
+
+        if message.content.startswith((f'.afk',f'{self.bot.defaul_prefix}afk',f'/afk')):
             return
                     
         for user_id in self.bot.afk_user.keys():
@@ -365,11 +366,14 @@ class Events(commands.Cog):
                             color=0xCCCCFF
         
                 )
-                if member.avatar is not None:
-                    embed.set_author(name=member, icon_url=member.avatar.url)
-                    embed.set_thumbnail(url=member.avatar.url)
-                else:
-                    embed.set_author(name=member)
+                embed.set_author(name=member, icon_url=member.avatar or member.default_avatar)
+                embed.set_thumbnail(url=member.avatar.url or member.default_avatar)
+                
+                # if member.avatar is not None:
+                #     embed.set_author(name=member, icon_url=member.avatar.url)
+                #     embed.set_thumbnail(url=member.avatar.url)
+                # else:
+                #     embed.set_author(name=member)
 
                 if self.welcome_image is not None:
                     embed.set_image(url=self.welcome_image)
@@ -414,8 +418,9 @@ class Events(commands.Cog):
             embed_log = discord.Embed(
                         description=f"**Leave Server\n`{member}`**",
                         color=0xdbd7d2)
-            if member.avatar.url is not None:
-                embed_log.set_thumbnail(url=member.avatar.url)
+            # if member.avatar.url is not None:
+            #     embed_log.set_thumbnail(url=member.avatar.url)
+            embed_log.set_thumbnail(url=member.avatar or member.default_avatar)
             embed_log.set_footer(text="—・see you next time ♡")
             embed_log.timestamp = datetime.now(timezone.utc)
 
@@ -452,7 +457,9 @@ class Events(commands.Cog):
         
         except KeyError: # records exist but not set up a logging channel
             pass
-
+            
+        except Exception as Ex:
+            print(f'on_invite_update - {Ex}')
 
     @commands.Cog.listener()
     async def on_invite_create(self, invite:discord.Invite):
@@ -484,6 +491,9 @@ class Events(commands.Cog):
         
         except KeyError: # records exist but not set up a logging channel
             pass
+            
+        except Exception as Ex:
+            print(f'on_invite_create - {Ex}')
     
     @commands.Cog.listener()
     async def on_user_update(self, before, after):
@@ -542,6 +552,7 @@ class Events(commands.Cog):
     
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
+        
         if before.guild.id == self.bot.latte_guild_id:
             #load_json
             self.server_log = self.bot.get_channel(self.json_read["server-log"])
@@ -570,46 +581,30 @@ class Events(commands.Cog):
             elif before.roles != after.roles:
                 new_roles = [x.mention for x in after.roles if x not in before.roles]
                 old_roles = [x.mention for x in before.roles if x not in after.roles]
-
-                if new_roles:
-                    role_update = "**Add role**"
-                    nr_str = str(new_roles)[2:-2]
-                    nr_valur = " ".join(reversed([r.mention for r in after.roles]))
-                    color = 0x52D452
-                else:
-                    role_update = "**Remove role**"
-                    nr_str = str(old_roles)[2:-2]
-                    nr_valur = " ".join(reversed([r.mention for r in after.roles])) #' '.join(reversed([r.mention for r in member.roles][1:]))
-                    color = 0xFF6961
                 
-                embed = discord.Embed(colour=color, #colour=after.colour,
-						            timestamp=datetime.now(timezone.utc))
-                
-                if after.avatar is not None:
-                    embed.set_author(name=f"{after.display_name} | Role updates", icon_url=after.avatar.url)
-                else:
-                    embed.set_author(name=f"{after.display_name} | Role updates")
-
-                if role_update and nr_valur and nr_str:
-                    embed.add_field(name="**Role**",value=nr_valur[:-22],inline=False)
-                    embed.add_field(name=role_update,value=nr_str,inline=False)
-                else:
-                    return
-
+                update = "**Add role**" if new_roles else "**Remove role**"
+                name_role = str(new_roles)[2:-2]
+                after_role = " ".join(reversed([r.mention for r in after.roles]))
+                color_embed = 0x52D452 if new_roles else 0xFF6961
+                if name_role == '@deleted-role': return
                 offline = ['<@&886193080997384222>']
-                delete_role = ['@deleted-role']
                 if new_roles == offline: return
                 if old_roles == offline: return
-                if new_roles == delete_role: return
-                if old_roles == delete_role: return
-            
+
                 if new_roles == ['<@&842309176104976387>']:
-                    # print("new role")
                     if self.bot.new_members[str(after.id)] is True:
                         chat_channel = after.guild.get_channel(861883647070437386)
                         await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{after.mention}')
+                
+                embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc)) 
+                embed.set_author(name=f"{after.display_name} | Role updates")
+                if after.avatar is not None:
+                    embed.set_author(name=f"{after.display_name} | Role updates", icon_url=after.avatar.url)
 
-                await self.roles_log.send(embed=embed)
+                if update and name_role and after_role:
+                    embed.add_field(name="**Role**", value=after_role[:-22], inline=False)
+                    embed.add_field(name=update, value=name_role, inline=False)
+                    await self.roles_log.send(embed=embed)
 
             elif before.display_avatar != after.display_avatar:
                 embed = discord.Embed(title="Server avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
@@ -624,7 +619,6 @@ class Events(commands.Cog):
 
                 await self.server_log.send(embed=embed)
 
-    
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         self.voice_log = self.bot.get_channel(self.json_read["voice-log"])
@@ -738,6 +732,9 @@ class Events(commands.Cog):
 
         except KeyError: # records exist but not set up a logging channel
             pass
+            
+        except Exception as Ex:
+            print(f'on_voice_state_update - {Ex}')
         
     @commands.Cog.listener()
     async def on_presence_update(self, before, after):
@@ -775,7 +772,7 @@ class Events(commands.Cog):
         embed = Embed(title="Bot just joined: "+str(guild.name), color=self.bot.white_color)
         embed.add_field(name='Server Name:',value=f'{guild.name}')
         embed.add_field(name='Server ID:',value=f'{guild.id}')
-        embed.add_field(name='Server region:',value=f'{guild.region}')
+        # embed.add_field(name='Server region:',value=f'{guild.region}')
         embed.add_field(name='Server Creation Date:',value=f'{guild.created_at.strftime(r"%d/%m/%Y %H:%M")}')
         embed.add_field(name='Server Owner:',value=f'{guild.owner}')
         embed.add_field(name='Server Owner ID:',value=f'{guild.owner_id}')
@@ -798,7 +795,7 @@ class Events(commands.Cog):
         embed = Embed(title="Bot just left: "+str(guild.name), color=self.bot.white_color)
         embed.add_field(name='Server Name:',value=f'{guild.name}')
         embed.add_field(name='Server ID:',value=f'{guild.id}')
-        embed.add_field(name='Server region:',value=f'{guild.region}')
+        # embed.add_field(name='Server region:',value=f'{guild.region}')
         embed.add_field(name='Server Creation Date:',value=f'{guild.created_at.strftime(r"%d/%m/%Y %H:%M")}')
         embed.add_field(name='Server Owner:',value=f'{guild.owner}')
         embed.add_field(name='Server Owner ID:',value=f'{guild.owner_id}')
