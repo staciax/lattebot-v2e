@@ -53,7 +53,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                         emoji = await guild.create_custom_emoji(image=b_value, name=name)
                         embed.color = 0x77dd77
                         embed.description = f'Successfully created emoji: <:{name}:{emoji.id}>'
-                        await ctx.send(embed=embed)
+                        await ctx.reply(embed=embed, mention_author=False)
                         await ses.close()
                     else:
                         await ses.close()
@@ -69,7 +69,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         try:
             embed.color = 0x77dd77
             embed.description = f'Successfully deleted : {emoji}'
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed, mention_author=False)
             await emoji.delete()
         except:
             raise UserInputErrors('Error delete emoji!')
@@ -95,7 +95,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         
         try:
             await member.kick()
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed, mention_author=False)
         except discord.Forbidden:
             raise UserInputErrors("I don't have permissions to Kick member")
         except discord.HTTPException:
@@ -130,7 +130,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
        
         try:
             await member.ban(delete_message_days=1)
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed, mention_author=False)
         except discord.Forbidden:
             raise UserInputErrors("Bot don't have permissions to ban member")
         except discord.HTTPException:
@@ -176,7 +176,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 description=f" `#{ctx.channel.name}`: **{len(deleted)}** messages were cleared",
                 color=self.bot.white_color
             )
-        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+        await ctx.reply(embed=embed, ephemeral=True, delete_after=15, mention_author=False)
     
     # @commands.command(help="Cleanup the bot's messages")
     # @commands.guild_only()
@@ -252,7 +252,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             except:
                 raise UserInputErrors(f"i can't message")
           
-        await ctx.send(embed=embed , ephemeral=True, delete_after=15)
+        await ctx.reply(embed=embed , ephemeral=True, delete_after=15, mention_author=False)
 
     @commands.command(help="Cleanup member messages")
     @commands.guild_only()
@@ -274,7 +274,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         except:
             raise UserInputErrors("i can't cleanup messages")
         embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
-        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+        await ctx.reply(embed=embed, ephemeral=True, delete_after=15, mention_author=False)
         
     @commands.command(help="Mute member")
     @commands.guild_only()
@@ -285,12 +285,12 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             self,
             ctx,
             member: discord.Member = commands.Option(description="Mention member"),
-            time = commands.Option(default=None, description="duration such as 10m , 30m , 3h")  
+            duration = commands.Option(description="duration such as 10m , 30m , 3h")  
         ):
         embed = discord.Embed(title='Mute command is disabled', color=self.bot.white_color)
         embed.description = f'Please use `{ctx.clean_prefix}timeout` command instead `{ctx.clean_prefix}mute` command.'
-        await self.timeout(ctx, member, time)
-        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+        await self.timeout(ctx, member, duration)
+        await ctx.reply(embed=embed, ephemeral=True, delete_after=15, mention_author=False)
        
     # @commands.command(help="Unmute member")
     # @commands.guild_only()
@@ -373,7 +373,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             embed = discord.Embed(color=self.bot.white_color)
             embed.description = f"Set the slowmode delay in this channel to {time_format}"
             await ctx.channel.edit(slowmode_delay=seconds)
-            return await ctx.send(embed=embed)
+            return await ctx.reply(embed=embed, mention_author=False)
         except:
             raise UserInputErrors(f"i can't set the slowmode this channel")
 
@@ -411,7 +411,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 embed.set_footer(text=f"Muted by {ctx.author}", icon_url=ctx.author.avatar.url)
             else:
                 embed.set_footer(text=f"Muted by {ctx.author}")
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed, mention_author=False)
         except:
             raise UserInputErrors("Target user is not connected to voice.")
 
@@ -453,7 +453,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                     embed.set_footer(text=f"Deafened by {ctx.author}", icon_url=ctx.author.avatar.url)
                 else:
                     embed.set_footer(text=f"Deafened by {ctx.author}")
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed, mention_author=False)
             except:
                 raise UserInputErrors(f"Target user is not connected to voice.")
         else:
@@ -492,13 +492,13 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         except Exception:
             raise UserInputErrors("Failed to timeout member")
         
-        embed = discord.Embed(title="Timeout Member", color=self.bot.white_color)
+        embed = discord.Embed(title="Timeout Member", color=self.bot.white_color, timestamp=ctx.message.created_at)
         embed.description = f"**Member:** {member.mention}"
         embed.add_field(name="Duration:", value=f"{format_dt(future_date, style='f')}({format_dt(future_date, style='R')})", inline=False)
         embed.set_footer(text=f"Timeout by {ctx.author.display_name}")
         if ctx.author.display_avatar is not None:
             embed.set_footer(text=f"Timeout by {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
     
     @commands.command(help="Remove timeout member")
     @commands.has_permissions(timeout_members = True)
@@ -514,7 +514,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 raise UserInputErrors(f"My role isn't high enough to moderate this member.")
             if member.top_role >= ctx.author.top_role:
                 raise UserInputErrors(f"Sorry, **{member}** is a higher role or the same role as you, you can't do that bruh.")
-            
+            remaining_time = member.timeout_until
             try:
                 await member.edit(timeout_until=None)
             except discord.Forbidden:
@@ -524,13 +524,13 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             except Exception:
                 raise UserInputErrors("Failed to remove timeout member")
             
-            embed = discord.Embed(title="Remove Timeout", color=self.bot.white_color)
+            embed = discord.Embed(title="Remove Timeout", color=self.bot.white_color, timestamp=ctx.message.created_at)
             embed.description = f"**Member:** {member.mention}"
-            embed.add_field(name="Timeout remaining before remove:", value=f"{format_dt(member.timeout_until, style='f')}({format_dt(member.timeout_until, style='R')})", inline=False)
+            embed.add_field(name="Timeout remaining before remove:", value=f"{format_dt(remaining_time, style='f')}({format_dt(remaining_time, style='R')})", inline=False)
             embed.set_footer(text=f"Removed timeout by {ctx.author.display_name}")
             if ctx.author.display_avatar is not None:
                 embed.set_footer(text=f"Removed timeout by{ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            return await ctx.reply(embed=embed, mention_author=False)
         raise UserInputErrors(f"**{member}** Don't have the timeout") 
 
     # @commands.command(help="Remove permissions for members to send messages in a channel")

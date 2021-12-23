@@ -90,7 +90,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @is_latte_guild()
     async def latte_template(self, ctx):
         if ctx.clean_prefix == "/":
-            await ctx.send('** **', ephemeral=True)
+            await ctx.reply('** **', ephemeral=True, mention_author=False)
         await ctx.channel.send("https://discord.new/sFYKgkknRN5f")
 
     @commands.command(name='temprole', aliases=['ltemp'], help="lattte temp role")
@@ -107,7 +107,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         await member.add_roles(role)
         embed = discord.Embed(
             description="Temp is ready\n`This role will disappear within 2 hour.`", color=self.bot.white_color)
-        await ctx.send(embed=embed, ephemeral=True)
+        await ctx.reply(embed=embed, ephemeral=True, mention_author=False)
         await asyncio.sleep(7200)
         await member.remove_roles(role)
     
@@ -123,7 +123,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
 
         embed_send = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
         embed_send.description = 'I have sent your request to the moderator. <3'
-        await ctx.send(embed=embed_send)
+        await ctx.reply(embed=embed_send, mention_author=False)
 
     @commands.command(help="Move all members in your current channel")
     @commands.guild_only()

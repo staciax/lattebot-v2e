@@ -50,7 +50,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             await member.add_roles(lvl_bar)
 
         xp = data["xp"]
-        data["xp"] += get_xp or 10
+        data["xp"] += get_xp or 20
         await self.bot.latte_level.update_by_custom(
             {"id": member.id, "guild_id": guilds.id}, data
         )
@@ -158,8 +158,8 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             if ctx.channel.id in chat_channel:
                 if ctx.clean_prefix != "/":
                     await ctx.message.delete()
-                return await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15)
-            await ctx.send(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv)
+                return await ctx.reply(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15, mention_author=False)
+            await ctx.reply(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, mention_author=False)
         except:
             raise UserInputErrors('An unknown error occurred, please try again !')
 
@@ -169,7 +169,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             if member.guild.id == self.bot.latte_guild_id:
                 if not before.channel and after.channel: #join
                     try:
-                        await self.xp_update(member, member.guild, get_xp=2)
+                        await self.xp_update(member, member.guild, get_xp=5)
                     except:
                         pass
         except:
