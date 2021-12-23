@@ -127,10 +127,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
 
     @commands.command(help="Move all members in your current channel")
     @commands.guild_only()
-    async def move(self, ctx, to_channel:Literal['Totsuki','general','game','music - 1','music - 2','listen only','movie','working','afk',"don't know",'underworld','moonlight','angel','death','temp']=commands.Option(description="Spectify channel")):
-        if ctx.interaction is not None:
-            await ctx.interaction.response.defer(ephemeral=True)
-        
+    async def move(self, ctx, to_channel:Literal['Totsuki','general','game','music - 1','music - 2','listen only','movie','working','afk',"don't know",'underworld','moonlight','angel','death','temp']=commands.Option(description="Spectify channel")):        
         try:
             now_channel = ctx.author.voice.channel
             in_channel = now_channel.members
@@ -152,7 +149,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             raise UserInputErrors(f'Failed to move member')
         
         embed = Embed(description = f'You moved `{len(in_channel)}` members to {to_channels.mention}')
-        await ctx.reply(embed=embed, ephemeral=True, mention_author=False)
+        await ctx.reply(embed=embed, mention_author=False)
 
         
     

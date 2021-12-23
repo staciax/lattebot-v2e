@@ -14,11 +14,12 @@ import requests
 import time_str
 
 # Local
-from utils.mod_converter import do_removal , TimeConverter
+from utils.mod_converter import do_removal, TimeConverter
 from utils.paginator import SimplePages
 from utils.useful import RenlyEmbed
 from utils.checks import bypass_for_owner
 from utils.errors import UserInputErrors
+from utils.formats import format_dt
 
 class UserInputErrors(commands.UserInputError):
     pass
@@ -78,58 +79,64 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(send_messages=True, embed_links=True, ban_members=True)
     @commands.dynamic_cooldown(bypass_for_owner)
-    async def kick(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
+    async def kick(self, ctx, member: discord.Member = commands.Option(description="Member")):
         if member == self.bot.user:
             raise UserInputErrors("You can't kick bot")
-        
         if member == ctx.author:
             raise UserInputErrors("You can't kick yourself.")
-        
         if member == ctx.guild.owner:
             raise UserInputErrors("You can't kick owner.")
+        if ctx.me.top_role <= member.top_role:
+            raise UserInputErrors(f"My role isn't high enough to moderate this member.")
+        if member.top_role >= ctx.author.top_role:
+            raise UserInputErrors(f"Sorry, **{member}** is a higher role or the same role as you, you can't do that bruh.")
 
-        embed = discord.Embed(description=f'Member {member.mention} has been Kicked\nReason : {reason}', color=self.bot.white_color)
+        embed = discord.Embed(description=f'Member {member.mention} has been Kicked', color=self.bot.white_color)
         
         try:
-            await member.kick(reason=reason)
+            await member.kick()
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            raise UserInputErrors('Unable to kick user.')
+            raise UserInputErrors("I don't have permissions to Kick member")
         except discord.HTTPException:
-            raise UserInputErrors(f'Kick **{member}** is Failed')
+            raise UserInputErrors(f'Failed to kick member')
         except Exception:
-            raise UserInputErrors(f'Kick **{member}** is Failed')
+            raise UserInputErrors(f'Failed to kick member')
 
     @commands.command(help="ban member from your server")
     @commands.guild_only()
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(send_messages=True, embed_links=True, ban_members=True)
     @commands.dynamic_cooldown(bypass_for_owner)
-    async def ban(self, ctx, member: discord.Member = commands.Option(description="Member"), *, reason= commands.Option(default=None, description="Reason")):
+    async def ban(self, ctx, member: discord.Member = commands.Option(description="Member")):
         if member == self.bot.user:
             raise UserInputErrors("You can't ban the bot")
         
         if member == ctx.author:
             raise UserInputErrors("You can't ban yourself.")
-        
         if member == ctx.guild.owner:
             raise UserInputErrors("You can't ban owner.")
+        if member == self.bot.user:
+            raise UserInputErrors("You cannot ban the bot")
+        if ctx.me.top_role <= member.top_role:
+            raise UserInputErrors(f"My role isn't high enough to moderate this member.")
+        if member.top_role >= ctx.author.top_role:
+            raise UserInputErrors(f"Sorry, **{member}** is a higher role or the same role as you, you can't do that bruh.")
 
-        embed = discord.Embed(description=f'{member} has been banned from server\nReason: {reason}', timestamp=datetime.now(timezone.utc),color=0xffffff)
+        embed = discord.Embed(description=f'{member} has been banned from server', timestamp=datetime.now(timezone.utc),color=0xffffff)
+        embed.set_footer(text=f"Banned by {ctx.author}")
         if ctx.author.display_avatar.url is not None: 
             embed.set_footer(text=f"Banned by {ctx.author}" , icon_url = ctx.author.display_avatar.url)
-        else:
-            embed.set_footer(text=f"Banned by {ctx.author}")
        
         try:
-            await member.ban(reason=reason)
+            await member.ban(delete_message_days=1)
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            raise UserInputErrors('Unable to ban user.')
+            raise UserInputErrors("Bot don't have permissions to ban member")
         except discord.HTTPException:
-            raise UserInputErrors(f'Ban **{member}** is Failed')
+            raise UserInputErrors(f'Failed to ban member')
         except Exception:
-            raise UserInputErrors(f'Ban **{member}** is Failed')
+            raise UserInputErrors(f'Failed to ban member')
     
     @commands.command(help="Gets the current guild's list of bans")
     @commands.guild_only()
@@ -161,7 +168,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         try:
             deleted = await ctx.channel.purge(limit=amount)            
         except discord.Forbidden:
-            raise UserInputErrors("You do not have permissions to purge message")
+            raise UserInputErrors("I don't have permissions to purge message")
         except discord.HTTPException:
             raise UserInputErrors("Purging the messages failed.")
         
@@ -267,7 +274,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         except:
             raise UserInputErrors("i can't cleanup messages")
         embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
-        await ctx.send(embed=embed , ephemeral=True, delete_after=15)
+        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
         
     @commands.command(help="Mute member")
     @commands.guild_only()
@@ -278,61 +285,13 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             self,
             ctx,
             member: discord.Member = commands.Option(description="Mention member"),
-            time: TimeConverter = commands.Option(default=None, description="duration such as 10m , 30m , 3h")  
+            time = commands.Option(default=None, description="duration such as 10m , 30m , 3h")  
         ):
-        if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
-
-        embed = discord.Embed(color=self.bot.white_color)
-
-        # #Remind me to delete this after release
-        # if time is not None and int(time) > 21600:
-        #     embed.description = "i'm sorry it's in beta testing, you can't set the timer for more than 6 hour."
-        #     return await ctx.send(embed=embed, ephemeral=True)
-
-        #mute_role
-        role = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
-
-        if not role:
-            raise UserInputErrors("Your server don't have : **`Muted Role`**")
-
-        if member == self.bot.user:
-            raise UserInputErrors("You cannot mute the bot")
-        
-        if member == ctx.author:
-            raise UserInputErrors("You cannot mute yourself.")
-                
-        member_role = discord.utils.get(member.roles, name="⠀ mute ♡ ₊˚")
-        if member_role:
-            raise UserInputErrors("member's already have a mute role.")
-
-        try:
-            await member.add_roles(role)
-        except:
-            raise UserInputErrors("i can't mute this member")
-        
-        if time is not None:
-            minutes, seconds = divmod(time, 60)
-            hours, minutes = divmod(minutes, 60)
-            msg_format = ""
-            if hours: msg_format += f"{int(hours)} hours "
-            if minutes: msg_format += f"{int(minutes)} minutes "
-            if seconds : msg_format += f"{int(seconds)} seconds"
-            embed.add_field(name="Time:", value=msg_format , inline=False)
-        
-        embed.title = "Mute Member"
-        embed.description = f"member: {member}"
-        if ctx.author.avatar is not None:
-            embed.set_footer(text=f"Muted by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
-        else:
-            embed.set_footer(text=f"Muted by {ctx.author.display_name}")
-
-        await ctx.send(embed=embed)
-
-        if time is not None and time < 6000:
-            await asyncio.sleep(time)
-            await member.remove_roles(role)
-
+        embed = discord.Embed(title='Mute command is disabled', color=self.bot.white_color)
+        embed.description = f'Please use `{ctx.clean_prefix}timeout` command instead `{ctx.clean_prefix}mute` command.'
+        await self.timeout(ctx, member, time)
+        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+       
     # @commands.command(help="Unmute member")
     # @commands.guild_only()
     # @commands.has_guild_permissions(mute_members=True)
@@ -470,16 +429,18 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         ):
         if ctx.author.guild_permissions.deafen_members:
 
-            if member.id == ctx.author.id:
+            if member == ctx.author:
                 raise UserInputErrors("You can't VC deafen yourself!")
+            
+            if member == ctx.guild.owner:
+                raise UserInputErrors(f"Can't deafen The Owner")
 
             if isinstance(member, discord.Member):
                 if ctx.me.top_role < member.top_role:
                     raise UserInputErrors(f"Can't deafen this member")
                 elif ctx.me.top_role >= member.top_role:
                     pass
-                if member == ctx.guild.owner:
-                    raise UserInputErrors(f"Can't deafen The Owner")
+                
             
             if reason == None:
                 reason = "None"
@@ -498,43 +459,80 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         else:
             raise commands.MissingPermissions(['Deafen Members'])
 
-    # @commands.command()
-    # @commands.has_permissions(administrator = True)
-    # async def timeout(
-    #         self,
-    #         ctx,
-    #         member: discord.Member = commands.Option(description="Mention member"),
-    #         time: TimeConverter = commands.Option(default=None, description="duration such as 10m, 30min, 3h, 1w"),
-    #         *,
-    #         reason: str = commands.Option(default=None, description="reason")   
-    #     ):
-    #     future_date = datetime.utcnow() + timedelta(seconds=time) 
+    @commands.command(help="Timeout member")
+    @commands.has_permissions(timeout_members = True)
+    @commands.cooldown(5, 60, commands.BucketType.user)
+    async def timeout(
+            self,
+            ctx,
+            member: discord.Member = commands.Option(description="Spectify member"),
+            duration = commands.Option(description="Duration such as 10m, 30min, 1hour, 3h, 1w, 1week")):
         
-    #     if member == self.bot.user: raise UserInputErrors("You cannot timeout the bot")
-    #     if member == ctx.author: raise UserInputErrors("You cannot timeout yourself.")
+        future_date = datetime.utcnow() + time_str.convert(duration)
+        if future_date >= datetime.utcnow():
+            raise UserInputErrors("Time is invalid")
         
-    #     try:
-    #         await member.edit(timeout_until=future_date, reason=reason)
-    #     except:
-    #         raise UserInputErrors("i can't timeout this member")
-        
-    #     embed = discord.Embed(title="Timeout Member", color=self.bot.white_color)
-    #     embed.description = f"member: {member}"
-    #     embed.set_footer(text=f"Timeout by {ctx.author.display_name}")
-    #     if ctx.author.avatar is not None:
-    #         embed.set_footer(text=f"Timeout by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
-       
-    #     if time is not None:
-    #         minutes, seconds = divmod(time, 60)
-    #         hours, minutes = divmod(minutes, 60)
-    #         msg_format = ""
-    #         if hours: msg_format += f"{int(hours)} hours "
-    #         if minutes: msg_format += f"{int(minutes)} minutes "
-    #         if seconds : msg_format += f"{int(seconds)} seconds"
-    #         embed.add_field(name="Time:", value=msg_format, inline=False)
+        if member == self.bot.user:
+            raise UserInputErrors("You cannot timeout the bot")
+        if member == ctx.author:
+            raise UserInputErrors("You cannot timeout yourself.")
+        if member == ctx.guild.owner:
+            raise UserInputErrors("You cannot timeout server owner.")
+        if ctx.me.top_role <= member.top_role:
+            raise UserInputErrors(f"My role isn't high enough to moderate this member.")
+        if member.top_role >= ctx.author.top_role:
+            raise UserInputErrors(f"Sorry, **{member}** is a higher role or the same role as you, you can't do that bruh.")
 
-    #     await ctx.send(embed=embed)
+        try:
+            await member.edit(timeout_until=future_date)
+        except discord.Forbidden:
+            raise UserInputErrors("I don't have a permissions to timeout")
+        except discord.HTTPException:
+            raise UserInputErrors("Failed to timeout member")
+        except Exception:
+            raise UserInputErrors("Failed to timeout member")
+        
+        embed = discord.Embed(title="Timeout Member", color=self.bot.white_color)
+        embed.description = f"**Member:** {member.mention}"
+        embed.add_field(name="Duration:", value=f"{format_dt(future_date, style='f')}({format_dt(future_date, style='R')})", inline=False)
+        embed.set_footer(text=f"Timeout by {ctx.author.display_name}")
+        if ctx.author.display_avatar is not None:
+            embed.set_footer(text=f"Timeout by {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
+        await ctx.send(embed=embed)
     
+    @commands.command(help="Remove timeout member")
+    @commands.has_permissions(timeout_members = True)
+    async def timeout_remove(self, ctx, member: discord.Member = commands.Option(description="Spectify member")):
+        if member.timed_out:
+            if member == self.bot.user:
+                raise UserInputErrors("You cannot remove timeout the bot")
+            if member == ctx.author:
+                raise UserInputErrors("You cannot remove timeout yourself.")
+            if member == ctx.guild.owner:
+                raise UserInputErrors("You cannot remove timeout server owner.")
+            if ctx.me.top_role <= member.top_role:
+                raise UserInputErrors(f"My role isn't high enough to moderate this member.")
+            if member.top_role >= ctx.author.top_role:
+                raise UserInputErrors(f"Sorry, **{member}** is a higher role or the same role as you, you can't do that bruh.")
+            
+            try:
+                await member.edit(timeout_until=None)
+            except discord.Forbidden:
+                raise UserInputErrors("I don't have a permissions to remove timeout")
+            except discord.HTTPException:
+                raise UserInputErrors("Failed to remove timeout member")
+            except Exception:
+                raise UserInputErrors("Failed to remove timeout member")
+            
+            embed = discord.Embed(title="Remove Timeout", color=self.bot.white_color)
+            embed.description = f"**Member:** {member.mention}"
+            embed.add_field(name="Timeout remaining before remove:", value=f"{format_dt(member.timeout_until, style='f')}({format_dt(member.timeout_until, style='R')})", inline=False)
+            embed.set_footer(text=f"Removed timeout by {ctx.author.display_name}")
+            if ctx.author.display_avatar is not None:
+                embed.set_footer(text=f"Removed timeout by{ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
+        raise UserInputErrors(f"**{member}** Don't have the timeout") 
+
     # @commands.command(help="Remove permissions for members to send messages in a channel")
     # @commands.guild_only()
     # @commands.has_permissions(manage_channels=True)
