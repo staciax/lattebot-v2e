@@ -469,7 +469,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             duration = commands.Option(description="Duration such as 10m, 30min, 1hour, 3h, 1w, 1week")):
         
         future_date = datetime.utcnow() + time_str.convert(duration)
-        if future_date >= datetime.utcnow():
+        if future_date <= datetime.utcnow():
             raise UserInputErrors("Time is invalid")
         
         if member == self.bot.user:
