@@ -59,64 +59,67 @@ class Events(commands.Cog):
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='\N{PERSONAL COMPUTER}')
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(hours=1)
     async def counted(self):
-        guild = self.bot.get_guild(self.bot.latte_guild_id)
-        total_count = guild.member_count
-        if self.total_ != total_count:
-            self.total_ = total_count
-            total_channel = guild.get_channel(876738880282431489)
-            total_name = f"ᴛᴏᴛᴀʟ‌・{self.total_}"
-            await total_channel.edit(name=total_name)
-        
-        member_count = len([member for member in guild.members if not member.bot])
-        if self.member_ != member_count:
-            self.member_ = member_count
-            member_channel = guild.get_channel(876712142160678923)
-            member_name = f"ᴍᴇᴍʙᴇʀs・{self.member_}"
-            await member_channel.edit(name=member_name)
+        try:
+            guild = self.bot.get_guild(self.bot.latte_guild_id)
+            total_count = guild.member_count
+            if self.total_ != total_count:
+                self.total_ = total_count
+                total_channel = guild.get_channel(876738880282431489)
+                total_name = f"ᴛᴏᴛᴀʟ‌・{self.total_}"
+                await total_channel.edit(name=total_name)
+            
+            member_count = len([member for member in guild.members if not member.bot])
+            if self.member_ != member_count:
+                self.member_ = member_count
+                member_channel = guild.get_channel(876712142160678923)
+                member_name = f"ᴍᴇᴍʙᴇʀs・{self.member_}"
+                await member_channel.edit(name=member_name)
 
-        bot_count = len([Member for Member in guild.members if Member.bot])
-        if self.bot_ != bot_count:
-            self.bot_ = bot_count
-            bot_channel = guild.get_channel(876724022686150687)
-            bot_name = f"ʙᴏᴛs‌・{self.bot_}"
-            await bot_channel.edit(name=bot_name)
-        
-        role_count = len(guild.roles)
-        if self.role_ != role_count:
-            self.role_ = role_count
-            role_channel = guild.get_channel(876712169662742588)
-            role_name = f"ʀᴏʟᴇs‌・{self.role_}"
-            await role_channel.edit(name=role_name)
-        
-        channel_count = len(guild.channels)
-        if self.channel_ != channel_count:
-            self.channel_ = channel_count
-            channel_channel = guild.get_channel(876712200214024192)
-            channel_name = f"ᴄʜᴀɴɴᴇʟs・{self.channel_}"
-            await channel_channel.edit(name=channel_name)
-        
-        text_channel_count = len(guild.text_channels)
-        if self.text_ != text_channel_count:
-            self.text_ = text_channel_count
-            text_channel = guild.get_channel(876740437505871922)
-            text_name = f"ᴛᴇxᴛ・{self.text_}"
-            await text_channel.edit(name=text_name)
-        
-        voice_channel_count = len(guild.voice_channels)
-        if self.voice_ != voice_channel_count:
-            self.voice_ = voice_channel_count
-            voice_channel = guild.get_channel(876740515863879711)
-            voice_name = f"ᴠᴏɪᴄᴇ・{self.voice_}"
-            await voice_channel.edit(name=voice_name)
-        
-        boost_count = guild.premium_subscription_count
-        if self.boost_ != boost_count:
-            self.boost_ = boost_count
-            boost_channel = guild.get_channel(876737270051389470)
-            boost_name = f"ʙᴏᴏꜱᴛꜱ・{self.boost_}"
-            await boost_channel.edit(name=boost_name)
+            bot_count = len([Member for Member in guild.members if Member.bot])
+            if self.bot_ != bot_count:
+                self.bot_ = bot_count
+                bot_channel = guild.get_channel(876724022686150687)
+                bot_name = f"ʙᴏᴛs‌・{self.bot_}"
+                await bot_channel.edit(name=bot_name)
+            
+            role_count = len(guild.roles)
+            if self.role_ != role_count:
+                self.role_ = role_count
+                role_channel = guild.get_channel(876712169662742588)
+                role_name = f"ʀᴏʟᴇs‌・{self.role_}"
+                await role_channel.edit(name=role_name)
+            
+            channel_count = len(guild.channels)
+            if self.channel_ != channel_count:
+                self.channel_ = channel_count
+                channel_channel = guild.get_channel(876712200214024192)
+                channel_name = f"ᴄʜᴀɴɴᴇʟs・{self.channel_}"
+                await channel_channel.edit(name=channel_name)
+            
+            text_channel_count = len(guild.text_channels)
+            if self.text_ != text_channel_count:
+                self.text_ = text_channel_count
+                text_channel = guild.get_channel(876740437505871922)
+                text_name = f"ᴛᴇxᴛ・{self.text_}"
+                await text_channel.edit(name=text_name)
+            
+            voice_channel_count = len(guild.voice_channels)
+            if self.voice_ != voice_channel_count:
+                self.voice_ = voice_channel_count
+                voice_channel = guild.get_channel(876740515863879711)
+                voice_name = f"ᴠᴏɪᴄᴇ・{self.voice_}"
+                await voice_channel.edit(name=voice_name)
+            
+            boost_count = guild.premium_subscription_count
+            if self.boost_ != boost_count:
+                self.boost_ = boost_count
+                boost_channel = guild.get_channel(876737270051389470)
+                boost_name = f"ʙᴏᴏꜱᴛꜱ・{self.boost_}"
+                await boost_channel.edit(name=boost_name)
+        except RuntimeError:
+            pass
 
     @counted.before_loop
     async def before_counted(self):
@@ -134,7 +137,7 @@ class Events(commands.Cog):
             for x in member_all:
                 if x.display_name.startswith('[AFK]'):
                     await x.edit(nick=None)
-        except:
+        except RuntimeError:
             pass
 
     @afk_check.before_loop
@@ -165,7 +168,7 @@ class Events(commands.Cog):
     
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        if ctx.author == self.bot.renly:
+        if ctx.author.id in [self.bot.renly.id, 879361086724386837, 834834946832203776]:
             return
 
         self.bot.commands_used = self.bot.commands_used +1
@@ -338,9 +341,9 @@ class Events(commands.Cog):
                 if im is not None:
                     await self.message_log.send(' '.join(im))
 
-                # if message.embeds:
-                #     embed_del = message.embeds[0]
-                #     return await self.message_log.send(embed=embed_del)
+                if message.embeds:
+                    embed_del = message.embeds[0]
+                    await self.message_log.send(embed=embed_del)
                 
         except TypeError: 
             pass
@@ -411,7 +414,7 @@ class Events(commands.Cog):
         
             embed = discord.Embed()
             embed.color = 0xDEBA9D
-            embed.description = f"**{member.name} see you next time ♡**"
+            embed.description = f"**{member.name}** see you next time ♡"
 
             await self.welcome.send(embed=embed)
             
@@ -773,16 +776,16 @@ class Events(commands.Cog):
         embed.add_field(name='Server Name:',value=f'{guild.name}')
         embed.add_field(name='Server ID:',value=f'{guild.id}')
         # embed.add_field(name='Server region:',value=f'{guild.region}')
-        embed.add_field(name='Server Creation Date:',value=f'{guild.created_at.strftime(r"%d/%m/%Y %H:%M")}')
+        embed.add_field(name='Server Creation Date:',value=f'{format_dt(guild.created_at)}')
         embed.add_field(name='Server Owner:',value=f'{guild.owner}')
         embed.add_field(name='Server Owner ID:',value=f'{guild.owner_id}')
         embed.add_field(name='Member Count:',value=f'{guild.member_count}')
         embed.add_field(name='Amount of Channels:',value=f"{len(channels)}")
         embed.add_field(name='Amount of Roles:',value=f"{len(roles)}")
 
-        if guild.icon:
+        try:
             embed.set_thumbnail(url=guild.icon)    
-        else:
+        except:
             pass
 
         join_guild = self.bot.get_channel(self.bot.bot_join)
@@ -795,8 +798,7 @@ class Events(commands.Cog):
         embed = Embed(title="Bot just left: "+str(guild.name), color=self.bot.white_color)
         embed.add_field(name='Server Name:',value=f'{guild.name}')
         embed.add_field(name='Server ID:',value=f'{guild.id}')
-        # embed.add_field(name='Server region:',value=f'{guild.region}')
-        embed.add_field(name='Server Creation Date:',value=f'{guild.created_at.strftime(r"%d/%m/%Y %H:%M")}')
+        embed.add_field(name='Server Creation Date:',value=f'{format_dt(guild.created_at)}')
         embed.add_field(name='Server Owner:',value=f'{guild.owner}')
         embed.add_field(name='Server Owner ID:',value=f'{guild.owner_id}')
         try:
@@ -804,9 +806,9 @@ class Events(commands.Cog):
         except:
             pass
         
-        if guild.icon:
-            embed.set_thumbnail(url = guild.icon.url)
-        else:
+        try:
+            embed.set_thumbnail(url=guild.icon)    
+        except:
             pass
 
         embed.add_field(name='Amount of Channels:',value=f"{len(channels)}")

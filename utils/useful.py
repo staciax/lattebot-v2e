@@ -9,6 +9,12 @@ from typing import Union , Optional , Tuple
 
 # Local
 
+class Embed(discord.Embed):
+    def __init__(self, color=0xffffff, fields=(), field_inline=False, **kwargs):
+        super().__init__(color=color, **kwargs)
+        for n, v in fields:
+            self.add_field(name=n, value=v, inline=field_inline)
+
 #thank_stella_bot
 class RenlyEmbed(discord.Embed):
     """Main purpose is to get the usual setup of Embed for a command or an error embed"""

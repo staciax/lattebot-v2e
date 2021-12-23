@@ -73,7 +73,7 @@ def get_dominant_color(url):
 
 
 time_regex = re.compile(r"(\d{1,5}(?:[.,]?\d{1,5})?)([smhd])")
-time_dict = {"h":3600, "s":1, "m":60, "d":86400}
+time_dict = {"s":1, "m":60, "d":86400, "h":3600, "w":604800}
 
 class TimeConverter(commands.Converter):
     async def convert(self, ctx, argument):

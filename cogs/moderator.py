@@ -11,6 +11,7 @@ from io import BytesIO
 
 # Third
 import requests
+import time_str
 
 # Local
 from utils.mod_converter import do_removal , TimeConverter
@@ -277,9 +278,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             self,
             ctx,
             member: discord.Member = commands.Option(description="Mention member"),
-            time: TimeConverter = commands.Option(default=None, description="duration such as 10m , 30m , 3h"),
-            *,
-            reason: str = commands.Option(default=None, description="reason")   
+            time: TimeConverter = commands.Option(default=None, description="duration such as 10m , 30m , 3h")  
         ):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer()
@@ -334,62 +333,62 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             await asyncio.sleep(time)
             await member.remove_roles(role)
 
-    @commands.command(help="Unmute member")
-    @commands.guild_only()
-    @commands.has_guild_permissions(mute_members=True)
-    @commands.bot_has_guild_permissions(manage_roles=True)
-    async def unmute(
-            self,
-            ctx,
-            member: discord.Member = commands.Option(description="Mention member")  
-        ):
-        role = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
+    # @commands.command(help="Unmute member")
+    # @commands.guild_only()
+    # @commands.has_guild_permissions(mute_members=True)
+    # @commands.bot_has_guild_permissions(manage_roles=True)
+    # async def unmute(
+    #         self,
+    #         ctx,
+    #         member: discord.Member = commands.Option(description="Mention member")  
+    #     ):
+    #     role = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
 
-        embed = discord.Embed(description=f"You has been unmute : `{member}`",color=self.bot.white_color)
-        if ctx.author.display_avatar is not None:
-            embed.set_footer(text=f"Unmuted by {ctx.author}", icon_url = ctx.author.display_avatar.url)
-        else:
-            embed.set_footer(text=f"Unmuted by {ctx.author}")
+    #     embed = discord.Embed(description=f"You has been unmute : `{member}`",color=self.bot.white_color)
+    #     if ctx.author.display_avatar is not None:
+    #         embed.set_footer(text=f"Unmuted by {ctx.author}", icon_url = ctx.author.display_avatar.url)
+    #     else:
+    #         embed.set_footer(text=f"Unmuted by {ctx.author}")
 
-        await member.remove_roles(role)
-        await ctx.send(embed=embed)
+    #     await member.remove_roles(role)
+    #     await ctx.send(embed=embed)
     
-    @commands.command(help="Create mute role and auto setup")
-    @commands.guild_only()
-    @commands.has_permissions(administrator = True)
-    async def muterole(self, ctx): #role: discord.Role = commands.Option(description="Mention role")
-        if ctx.interaction is not None:
-            await ctx.interaction.response.defer()
+    # @commands.command(help="Create mute role and auto setup")
+    # @commands.guild_only()
+    # @commands.has_permissions(administrator = True)
+    # async def muterole(self, ctx): #role: discord.Role = commands.Option(description="Mention role")
+    #     if ctx.interaction is not None:
+    #         await ctx.interaction.response.defer()
 
-        guild = ctx.guild
-        mutedRole = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
-        embed = discord.Embed(color=self.bot.white_color)
+    #     guild = ctx.guild
+    #     mutedRole = discord.utils.get(ctx.guild.roles, name="⠀ mute ♡ ₊˚")
+    #     embed = discord.Embed(color=self.bot.white_color)
 
-        if not mutedRole:
-            mutedRole = await guild.create_role(name="⠀ mute ♡ ₊˚" , colour=self.bot.white_color)
+    #     if not mutedRole:
+    #         mutedRole = await guild.create_role(name="⠀ mute ♡ ₊˚" , colour=self.bot.white_color)
 
-            embed.description = f"Mute role : {mutedRole.mention}\n**Permissions auto setup**\nspeak: `false`\nsend message : `false`"
-            await ctx.send(embed=embed)
+    #         embed.description = f"Mute role : {mutedRole.mention}\n**Permissions auto setup**\nspeak: `false`\nsend message : `false`"
+    #         await ctx.send(embed=embed)
 
-            for channel in guild.channels:
-                await channel.set_permissions(mutedRole, speak=False, send_messages=False) #read_message_history=True, read_messages=False
-        else:
-            raise UserInputErrors("Your server has a muted role.")
+    #         for channel in guild.channels:
+    #             await channel.set_permissions(mutedRole, speak=False, send_messages=False) #read_message_history=True, read_messages=False
+    #     else:
+    #         raise UserInputErrors("Your server has a muted role.")
 
-    @commands.command(aliases=["nick"], help="change nickname")
-    @commands.guild_only()
-    @commands.has_permissions(manage_nicknames=True)
-    async def change_nick(self, ctx , member: discord.Member = commands.Option(description="mention member"), *, nick:str = commands.Option(description="New nickname")):
-        try:
-            await member.edit(nick=nick)
-            embed = discord.Embed(description=f"{member.mention} : Nickname was changed for `{member.display_name}`", color=self.bot.white_color)
-            await ctx.send(embed=embed)
-        except discord.Forbidden:
-            raise UserInputErrors('You do not have a permissions to change nickname')
-        except discord.HTTPException:
-            raise UserInputErrors('Change nickname failed')
-        except Exception as Ex:
-            print(Ex)
+    # @commands.command(aliases=["nick"], help="change nickname")
+    # @commands.guild_only()
+    # @commands.has_permissions(manage_nicknames=True)
+    # async def change_nick(self, ctx , member: discord.Member = commands.Option(description="mention member"), *, nick:str = commands.Option(description="New nickname")):
+    #     try:
+    #         await member.edit(nick=nick)
+    #         embed = discord.Embed(description=f"{member.mention} : Nickname was changed for `{member.display_name}`", color=self.bot.white_color)
+    #         await ctx.send(embed=embed)
+    #     except discord.Forbidden:
+    #         raise UserInputErrors('You do not have a permissions to change nickname')
+    #     except discord.HTTPException:
+    #         raise UserInputErrors('Change nickname failed')
+    #     except Exception as Ex:
+    #         print(Ex)
     
     @commands.command(aliases=["slow"], help="set slowmode channel")
     @commands.guild_only()
@@ -498,6 +497,43 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 raise UserInputErrors(f"Target user is not connected to voice.")
         else:
             raise commands.MissingPermissions(['Deafen Members'])
+
+    # @commands.command()
+    # @commands.has_permissions(administrator = True)
+    # async def timeout(
+    #         self,
+    #         ctx,
+    #         member: discord.Member = commands.Option(description="Mention member"),
+    #         time: TimeConverter = commands.Option(default=None, description="duration such as 10m, 30min, 3h, 1w"),
+    #         *,
+    #         reason: str = commands.Option(default=None, description="reason")   
+    #     ):
+    #     future_date = datetime.utcnow() + timedelta(seconds=time) 
+        
+    #     if member == self.bot.user: raise UserInputErrors("You cannot timeout the bot")
+    #     if member == ctx.author: raise UserInputErrors("You cannot timeout yourself.")
+        
+    #     try:
+    #         await member.edit(timeout_until=future_date, reason=reason)
+    #     except:
+    #         raise UserInputErrors("i can't timeout this member")
+        
+    #     embed = discord.Embed(title="Timeout Member", color=self.bot.white_color)
+    #     embed.description = f"member: {member}"
+    #     embed.set_footer(text=f"Timeout by {ctx.author.display_name}")
+    #     if ctx.author.avatar is not None:
+    #         embed.set_footer(text=f"Timeout by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
+       
+    #     if time is not None:
+    #         minutes, seconds = divmod(time, 60)
+    #         hours, minutes = divmod(minutes, 60)
+    #         msg_format = ""
+    #         if hours: msg_format += f"{int(hours)} hours "
+    #         if minutes: msg_format += f"{int(minutes)} minutes "
+    #         if seconds : msg_format += f"{int(seconds)} seconds"
+    #         embed.add_field(name="Time:", value=msg_format, inline=False)
+
+    #     await ctx.send(embed=embed)
     
     # @commands.command(help="Remove permissions for members to send messages in a channel")
     # @commands.guild_only()

@@ -6,7 +6,7 @@ import re
 import os
 import io
 import zlib
-from discord.ext import commands , tasks
+from discord.ext import commands
 from datetime import datetime, timedelta, timezone
 
 # Third
@@ -72,7 +72,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     # @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def invite(self, ctx):
-        invite_url = f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot%20applications.commands"
+        invite_url = f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=19058925630&scope=bot%20applications.commands"
         view = discord.ui.View()
         invite_button = discord.ui.Button(style=discord.ButtonStyle.gray, label="Invite me", url=invite_url) 
         view.add_item(item=invite_button)
@@ -129,6 +129,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         memberCount = len(set(self.bot.get_all_members()))
         # totalcogs = len(self.bot.cogs)
         totalcommands = len(self.bot.commands)
+        totalslash = f"\n{emoji_converter('bot_commands')} Slash : `{len([c for c in self.bot.commands if c.slash_command == True])}`"
 
         latte_db = "\u200B"
         if ctx.guild.id == self.bot.latte_guild_id:
@@ -136,7 +137,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
 
         fields = [
             ("About Developer" , f"Owner: [{owner_bot}](https://discord.com/users/{owner_bot.id})" , False),
-            ("Stats " , f"{emoji_converter('cursor')} Line count : `{count_python('.'):,}`\n{emoji_converter('latte_icon')} Servers : `{serverCount}`\n{emoji_converter('member')} Users : `{memberCount}`\n{emoji_converter('bot_commands')} Commands : `{totalcommands}`" , False), #{platform.system()}
+            ("Stats " , f"{emoji_converter('cursor')} Line count : `{count_python('.'):,}`\n{emoji_converter('latte_icon')} Servers : `{serverCount}`\n{emoji_converter('member')} Users : `{memberCount}`\n{emoji_converter('bot_commands')} Commands : `{totalcommands}`" + totalslash if ctx.author == self.bot.renly else '\u200B' , False), #{platform.system()}
             ("Bot Info" , f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`{latte_db}" , False),
         ]
         
@@ -152,15 +153,6 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         #Vote.gg = discord.ui.Button(style=style, label="Source code", url=self.bot.latte_source)
         # view.add_item(item=Source_code)
     
-        await ctx.send(embed=embed)
-
-    @commands.command(name='uptime', help="Gets the uptime of the bot")
-    @commands.guild_only()
-    async def uptime(self, ctx):
-        uptime = datetime.utcnow() - self.bot.launch_time
-        futuredate = datetime.now(timezone.utc) - timedelta(seconds=int(uptime.total_seconds())) 
-
-        embed = discord.Embed(description=f"🕘 I started {format_dt(futuredate, style='R')}", color=self.bot.white_color)
         await ctx.send(embed=embed)
 
     @commands.command(help="Shows the latency of the bot")
@@ -189,7 +181,21 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.add_field(name=f"{emoji_converter('postgresql')} Postgresql", value=f"```nim\n{round((sqlend-sqlstart)*1000)} ms```", inline=True)
         await ctx.send(embed=embed)
     
+    @commands.command(help="Report to owner bot")
+    @commands.guild_only()
+    async def report(self, ctx, *, message=commands.Option(description="Input report message")):
+        embed = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
+        embed.set_author(name=f'{ctx.guild.name} | User report',)
+        if ctx.guild.icon:
+            embed.set_author(name=f'{ctx.guild.name} | User report', icon_url=ctx.guild.icon.url)
+        embed.description = f"{message}"
+        embed.set_footer(text="Reported by", icon_url=ctx.author.avatar or ctx.author.default_avatar)
+        await self.bot.renly.send(embed=embed)
 
+        embed_send = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
+        embed_send.description = 'Thanks you, Message successfully sent! <3"'
+        await ctx.send(embed=embed_send)
+    
 # ---------- Search the documentation ---------- #
 
     def parse_object_inv(self, stream, url):

@@ -1,6 +1,8 @@
 # Standard 
 import discord
 from discord.ext import commands
+from datetime import datetime, timedelta, timezone
+from utils.formats import format_dt 
 
 # Third party
 # Local
@@ -28,6 +30,14 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
     @commands.guild_only()
     async def color(self, ctx):
         await ctx.reply("https://www.color-hex.com/", mention_author=False)
+    
+    @commands.command(name='uptime', help="Gets the uptime of the bot")
+    @commands.guild_only()
+    async def uptime(self, ctx):
+        uptime = datetime.utcnow() - self.bot.launch_time
+        futuredate = datetime.now(timezone.utc) - timedelta(seconds=int(uptime.total_seconds())) 
+        embed = discord.Embed(description=f"🕘 I started {format_dt(futuredate, style='R')}", color=self.bot.white_color)
+        await ctx.send(embed=embed)
          
 def setup(bot):
     bot.add_cog(No_slash(bot))

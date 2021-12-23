@@ -148,7 +148,6 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
     @commands.guild_only()
     @is_latte_guild()
     async def tag(self, ctx, *, name:TagName = commands.Option(description="Input name")):
-        print(name)
         try:
             tag = await self.get_tag(ctx.guild.id, name)
         except RuntimeError as e:

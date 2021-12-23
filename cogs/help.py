@@ -13,12 +13,12 @@ from utils.useful import RenlyEmbed
 from utils.errors import UserInputErrors
 
 class HelpView(discord.ui.View):
-    def __init__(self, ctx: commands.context, data: Dict[commands.Cog, List[commands.Command]], help_command: commands.HelpCommand, total_cmd:int):
+    def __init__(self, ctx: commands.context, data: Dict[commands.Cog, List[commands.Command]]=None, help_command: commands.HelpCommand=None):
         super().__init__()
         self.ctx = ctx
         self.data = data
         self.help_command = help_command
-        self.total_cmd = total_cmd
+        self.total_cmd = help_command.total_commands if help_command is not None else None
         self.bot: LatteBot = ctx.bot
         self.main_embed = self.build_main_page()
         self.current_page = 0
@@ -41,20 +41,17 @@ class HelpView(discord.ui.View):
             self.clear_items()
             self.add_item(self.category_select)
             self.check_view = True
-            await interaction.response.edit_message(embed=self.main_embed, view=self)
+            return await interaction.response.edit_message(embed=self.main_embed, view=self)
         cog = self.bot.get_cog(select.values[0])
         if not cog:
-            return await interaction.response.send_message('Somehow, that category was not found? 🤔', ephemeral=True)
+            embed = discord.Embed(color=0xffffff)
+            embed.description = 'Somehow, that category was not found?'
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
             self.embeds = self.build_embeds(cog)
             self.current_page = 0
             self._update_buttons()
-            if self.check_view:
-                self.add_item(self.go_to_first_page)
-                self.add_item(self.previous)
-                self.add_item(self.next)
-                self.add_item(self.go_to_last_page)
-                self.check_view = False
+            self.update_button_cog()
             return await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
 
     def build_embeds(self, cog: commands.Cog) -> List[discord.Embed]:
@@ -64,10 +61,10 @@ class HelpView(discord.ui.View):
         embed = discord.Embed(title=f"{cog.display_emoji} {cog.qualified_name} commands [{len(commands)}]", color=0xffffff,
                               description=cog.description or "No description provided")
         for command in commands:
-            cmd_sig = f'{command.signature}'
-            if cmd_sig == '<"ass"|"ecchi"|"ero"|"hentai"|"maid"|"milf"|"oppai"|"oral"|"paizuri"|"selfies"|"uniform">':
-                cmd_sig = '<tags>'
-            signature = f'{command.qualified_name} {cmd_sig}'
+            cmd_sig = f' {command.signature}'
+            signature = f'{command.qualified_name}'
+            if self.ctx.clean_prefix != '/':
+                signature += cmd_sig
             embed.add_field(name=signature, value=command.short_doc or 'No help given...', inline=False)
             embed.set_footer(text="<> = required argument | [] = optional argument")
             if len(embed.fields) == 5:
@@ -184,6 +181,14 @@ class HelpView(discord.ui.View):
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return False
         return True
+    
+    def update_button_cog(self):
+        if self.check_view:
+            self.add_item(self.go_to_first_page)
+            self.add_item(self.previous)
+            self.add_item(self.next)
+            self.add_item(self.go_to_last_page)
+            self.check_view = False
 
     async def on_timeout(self) -> None:
         self.clear_items()
@@ -196,6 +201,13 @@ class HelpView(discord.ui.View):
         self.build_select()
         self._update_buttons()
         self.message = await self.ctx.reply(embed=self.main_embed, view=self, mention_author=False)
+    
+    async def cog_view(self, cog:commands.Cog):
+        self.remove_item(self.category_select)
+        self.embeds = self.build_embeds(cog)
+        self._update_buttons()
+        self.update_button_cog()
+        self.message = await self.ctx.reply(embed=self.embeds[self.current_page], view=self, mention_author=False)
 
 class MyHelp(commands.HelpCommand):
     def __init__(self, **options):
@@ -242,9 +254,13 @@ class MyHelp(commands.HelpCommand):
         return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
 
     async def send_bot_help(self, mapping):
-        total_commands = len(await self.filter_commands(list(self.context.bot.commands), sort=True))
-        view = HelpView(self.context, data=mapping, help_command=self, total_cmd=total_commands)
+        self.total_cmd = len(await self.filter_commands(list(self.context.bot.commands), sort=True))
+        view = HelpView(self.context, data=mapping, help_command=self)
         await view.start()
+    
+    @property
+    def total_commands(self):
+        return self.total_cmd
 
     async def send_command_help(self, command):
         ctx = self.context
@@ -266,7 +282,7 @@ class MyHelp(commands.HelpCommand):
         try:
             await command.can_run(self.context)
         except Exception as Ex:
-            print(f"Command help error - {Ex}")
+            # print(f"Command help error - {Ex}")
             can_run.append('\n**Can be used?:** No')
         
         cmd_cd = ''.join(command_cd)
@@ -284,26 +300,36 @@ class MyHelp(commands.HelpCommand):
         await ctx.reply(embed=embed, mention_author=False)
         
     async def send_cog_help(self, cog):
-        entries = cog.get_commands()
         ctx = self.context
-        
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
         if cog.qualified_name in ignored_cogs and ctx.author != ctx.bot.renly:
-            raise UserInputErrors(f'No commands found in "{cog.qualified_name}"')
+            raise UserInputErrors(f'Command not found')
+        
+        view = HelpView(self.context)
+        await view.cog_view(cog=cog)
+        
+        # entries = cog.get_commands()
+        # ctx = self.context
+        
+        # ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
+        # if cog.qualified_name in ignored_cogs and ctx.author != ctx.bot.renly:
+        #     raise UserInputErrors(f'Command not found')
+        #     # raise UserInputErrors(f'No commands found in "{cog.qualified_name}"')
 
-        if entries:
-            command_signatures = [self.get_minimal_command_signature(entry) for entry in entries]
-            val = "\n".join(command_signatures)
-            embed = discord.Embed(color=self.context.bot.white_color)
-            embed.title = f"{cog.qualified_name} - Help category"
-            embed.description = f"**Description:**\n{cog.description}\n"
-            embed.description += f"**Commands:**\n```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command"
-            # embed.add_field(name="Description:", value=f'{cog.description}', inline=False)
-            # embed.add_field(name="Commands:", value=f'```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command', inline=False)
-            embed.set_footer(text="<> = required argument | [] = optional argument")
-            await self.context.reply(embed=embed, mention_author=False)
-        else:
-            raise UserInputErrors(f'No commands found in {cog.qualified_name}')
+        # if entries:
+        #     command_signatures = [self.get_minimal_command_signature(entry) for entry in entries]
+        #     val = "\n".join(command_signatures)
+        #     embed = discord.Embed(color=self.context.bot.white_color)
+        #     embed.title = f"{cog.qualified_name} - Help category"
+        #     embed.description = f"**Description:**\n{cog.description}\n"
+        #     embed.description += f"**Commands:**\n```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command"
+        #     # embed.add_field(name="Description:", value=f'{cog.description}', inline=False)
+        #     # embed.add_field(name="Commands:", value=f'```yalm\n{val}\n```\n`(C)` : command\n`[G]` : group command', inline=False)
+        #     embed.set_footer(text="<> = required argument | [] = optional argument")
+        #     await self.context.reply(embed=embed, mention_author=False)
+        # else:
+        #     raise UserInputErrors(f'Command not found')
+        #     # raise UserInputErrors(f'No commands found in {cog.qualified_name}')
 
     async def send_group_help(self, group):
         ctx = self.context
@@ -329,7 +355,7 @@ class MyHelp(commands.HelpCommand):
             try:
                 await group.can_run(self.context)
             except Exception as Ex:
-                print(f"Group help error - {Ex}")
+                # print(f"Group help error - {Ex}")
                 can_run.append('\n**Can be used?:** No')
 
             command_checks = ''.join(command_cd)
@@ -376,8 +402,8 @@ class MyHelp(commands.HelpCommand):
         return command.qualified_name
 
     async def send_error_message(self, error):
-        print(f"Help error - {error}")
-        raise UserInputErrors("Command Not Found")
+        # print(f"Help error - {error}")
+        raise UserInputErrors("Command not found")
         
     async def on_help_command_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):

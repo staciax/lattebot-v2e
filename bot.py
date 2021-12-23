@@ -30,10 +30,10 @@ async def get_prefix(bot, message):
         prefix = '.'
     return commands.when_mentioned_or(prefix)(bot,message)
 
-class LatteBot(commands.Bot):
+class LatteBot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
         self.bot_version = '0.0.1s'
-        self.last_update = [2021, 12, 22]
+        self.last_update = [2021, 12, 23]
         self.launch_time = datetime.utcnow()
         self.latte_avtivity = 'mirror ♡ ₊˚'
         self.tester = ''
@@ -72,7 +72,7 @@ class LatteBot(commands.Bot):
     def latte(self) -> Optional[discord.Guild]:
         """Returns discord.Guild of the owner guild"""
         return self.get_guild(self.latte_guild_id)
-
+    
     #thank_stella_bot
     def get_command_signature(self, ctx, command_name: Union[commands.Command, str]) -> str:
         if isinstance(command_name, str):

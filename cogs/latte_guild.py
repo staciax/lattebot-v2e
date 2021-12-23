@@ -3,12 +3,15 @@ import discord
 import asyncio
 import random
 from discord.ext import commands
+from typing import Literal
 
 # Third
 
 # Local
 from utils.checks import is_latte_guild
 from utils.errors import UserInputErrors
+from utils.latte_converter import latte_voice
+from utils.useful import Embed
 
 class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Commands only latte server"""
@@ -121,6 +124,37 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         embed_send = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
         embed_send.description = 'I have sent your request to the moderator. <3'
         await ctx.send(embed=embed_send)
+
+    @commands.command(help="Move all members in your current channel")
+    @commands.guild_only()
+    async def move(self, ctx, to_channel:Literal['Totsuki','general','game','music - 1','music - 2','listen only','movie','working','afk',"don't know",'underworld','moonlight','angel','death','temp']=commands.Option(description="Spectify channel")):
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer(ephemeral=True)
+        
+        try:
+            now_channel = ctx.author.voice.channel
+            in_channel = now_channel.members
+        except:
+            raise UserInputErrors('You must join a voice channel first.')
+        
+        to_channels = ctx.guild.get_channel(latte_voice[to_channel])
+        if now_channel.id == to_channels.id:
+            raise UserInputErrors(f'You cannot move from {now_channel.mention} to {to_channels.mention}.')
+
+        try:
+            for x in in_channel:
+                await x.move_to(channel=to_channels)
+        except discord.Forbidden:
+            raise UserInputErrors("I don't have the permissions to move member")
+        except discord.HTTPException as e:
+            raise UserInputErrors(f'Failed to move member - {e}')
+        except Exception as e:
+            raise UserInputErrors(f'Failed to move member')
+        
+        embed = Embed(description = f'You moved `{len(in_channel)}` members to {to_channels.mention}')
+        await ctx.reply(embed=embed, ephemeral=True, mention_author=False)
+
+        
     
 def setup(bot):
     bot.add_cog(Latte(bot))

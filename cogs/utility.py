@@ -4,7 +4,7 @@ import asyncio
 import random
 import json
 from discord import Embed
-from discord.ext import commands , tasks
+from discord.ext import commands, tasks
 from datetime import datetime, timedelta, timezone
 from typing import Union , Literal
 
@@ -46,33 +46,36 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @tasks.loop(minutes=1)
     async def sleeped(self):
-        data = latte_read("sleeping")
-        if not data:
-            return
-        for key in data.keys():
-            dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
-            if data[key]["time"] is None:
+        try:
+            data = latte_read("sleeping")
+            if not data:
                 return
-            elif int(data[key]["time"]) <= int(dt):
-                guild = self.bot.get_guild((data[key]['guild_id']))
-                member_sleep = guild.get_member(int(key))
-                if member_sleep:
-                    try:
-                        await member_sleep.move_to(channel=None)
-                        del data[key]
-                        latte_write(data, "sleeping")
-                        # break
-                    except Exception as ex:
-                        print(f"error sleep {ex}")
+            for key in data.keys():
+                dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
+                if data[key]["time"] is None:
+                    return
+                elif int(data[key]["time"]) <= int(dt):
+                    guild = self.bot.get_guild((data[key]['guild_id']))
+                    member_sleep = guild.get_member(int(key))
+                    if member_sleep:
+                        try:
+                            await member_sleep.move_to(channel=None)
+                            del data[key]
+                            latte_write(data, "sleeping")
+                            # break
+                        except RuntimeError:
+                            pass
+        except RuntimeError:
+            pass
 
     @tasks.loop(minutes=1)
     async def reminded(self):
-        guild = self.bot.latte
-        data = latte_read("remind")
-        raw_date = datetime.now(timezone.utc)
-        if not data:
-            return
         try:
+            guild = self.bot.latte
+            data = latte_read("remind")
+            raw_date = datetime.now(timezone.utc)
+            if not data:
+                return
             for key in data.keys():
                 dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
                 if int(data[key]["time"]) <= int(dt):
@@ -87,33 +90,34 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                     await channel.send(embed=embed_response, view=view)
                     del data[key]
                     latte_write(data, "remind")
-                    # break
-                   
-        except Exception as Ex:
-            print(f"remind error {Ex}")
+                    # break         
+        except RuntimeError:
+            pass
     
     @tasks.loop(minutes=1)
     async def channel_sleeped(self):
-        data = latte_read("channel_sleep")
-        if not data:
-            return
-        for key in data.keys():
-            dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
-            if data[key]["time"] is None:
+        try:
+            data = latte_read("channel_sleep")
+            if not data:
                 return
-            elif int(data[key]["time"]) <= int(dt):
-                guild = self.bot.get_guild((data[key]['guild_id']))
-                channel = guild.get_channel(int(key))
-                member_list = channel.members
-                if member_list is not None:
-                    try:
-                        for x in member_list:
-                            await x.move_to(channel=None)
-                        del data[key]
-                        latte_write(data, "channel_sleep")
-                        # break
-                    except Exception as Ex:
-                        print(f"error  channel sleep {Ex}")
+            for key in data.keys():
+                dt = datetime.now(timezone.utc).strftime("%d%m%Y%H%M")
+                if data[key]["time"] is None:
+                    return
+                elif int(data[key]["time"]) <= int(dt):
+                    guild = self.bot.get_guild((data[key]['guild_id']))
+                    channel = guild.get_channel(int(key))
+                    member_list = channel.members
+                    if member_list is not None:
+                        try:
+                            for x in member_list:
+                                await x.move_to(channel=None)
+                            del data[key]
+                            latte_write(data, "channel_sleep")
+                        except RuntimeError:
+                            pass
+        except RuntimeError:
+            pass
 
     @sleeped.before_loop
     async def before_sleeped(self):
@@ -152,7 +156,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
         await ctx.send(embed=embed)
 
-    @commands.command(help="clear afk status", aliases=["afkclear"])
+    @commands.command(help="Clear afk status", aliases=["afkclear"])
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def afk_clear(self, ctx, member:discord.Member=commands.Option(default=None,description="spectify member")):
@@ -253,7 +257,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.add_field(name="Highest Number:",value=f"{highest}")
         await ctx.send(embed=embed)
     
-    @commands.command(name="random", help="random", aliases=['r'])
+    @commands.command(name="random", help="Quick random", aliases=['r'])
     @commands.guild_only()
     async def random_(self, ctx, *, message = commands.Option(description="enter a split message")):
         #convert_to_split
@@ -269,7 +273,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         except ValueError:
             raise UserInputErrors("Invalid Range")
 
-    @commands.command(help="create poll")
+    @commands.command(help="Create quick poll")
     @commands.guild_only()
     async def poll(self, ctx, *, message= commands.Option(description="poll message")):
 
