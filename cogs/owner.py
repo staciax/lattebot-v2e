@@ -30,7 +30,7 @@ from utils.errors import UserInputErrors
 #             return argument
 #         raise UserInputErrors(f"An unknown error occurred, sorry")
 
-class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[887274968012955679])):
+class Owner(commands.Cog):
     """Owner related commands."""
     
     def __init__(self, bot):
@@ -166,7 +166,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         p.embed.color = self.bot.white_color
         await p.start()
 
-    @commands.command(name="view_config", help="view config files")
+    @commands.command(name="view_config", aliases=['configview'], help="view config files")
     @commands.guild_only()
     @commands.is_owner()
     async def latte_view_config(self, ctx, file_target:Literal['channel_sleep','latte_events','remind','sleeping']=commands.Option(description="file name")):
@@ -174,11 +174,11 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         try:
             data = latte_read(str(file_target))
             embed.description=f"{file_target}.json\n```json\n{json.dumps(data, indent = 1)}```"
-            return await ctx.send(embed=embed, ephemeral=True)
+            return await ctx.reply(embed=embed, ephemeral=True, mention_author=False, delete_after=15)
         except:
             raise UserInputErrors("file not found!")
 
-    @commands.command(name="config_set", help="edit config files")
+    @commands.command(name="config_set", aliases=['configedit'], help="edit config files", slash_command=True, slash_command_guilds=[887274968012955679])
     @commands.guild_only()
     @commands.is_owner()
     async def latte_config_set(
@@ -200,7 +200,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             latte_write(data, str(file_target))
             embed.add_field(name="file", value=f"```fix\n{file_target}.json```", inline=False)
             embed.add_field(name="config", value=f'```css\n"{keys}":"{value}"```', inline=False)
-            return await ctx.send(embed=embed)
+            return await ctx.reply(embed=embed, mention_author=False)
         except:
             raise UserInputErrors('Write json error')
 
@@ -217,7 +217,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         embed_e.timestamp = datetime.now(timezone.utc)
 
         view = Confirm(ctx)
-        msg = await ctx.send(embed=embed, view=view)
+        msg = await ctx.reply(embed=embed, view=view, mention_author=False)
         await view.wait()
         if view.value is None:
             return
@@ -229,7 +229,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             await msg.delete()
             raise UserInputErrors("Cancelled...")
 
-    @commands.command(name="bot_status",help="change bot status")
+    @commands.command(name="bot_status", help="change bot status", slash_command=True, slash_command_guilds=[887274968012955679])
     @commands.guild_only()
     @commands.is_owner()
     async def botstatus(
@@ -263,9 +263,9 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         if activity == "watching" and streaming_url is not None:
             embed.add_field(name="URL:", value=f"`{streaming_url}`")
 
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
     
-    @commands.command(help="Toggle command")
+    @commands.command(help="Toggle command", slash_command=True, slash_command_guilds=[887274968012955679])
     @commands.guild_only()
     @commands.is_owner()
     async def toggle(self, ctx, command = commands.Option(description="Command name")):
@@ -275,9 +275,9 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         toggle_color = 0x8be28b if command.enabled else 0xFF7878
         embed = discord.Embed(color=toggle_color)
         embed.description = f"Successfully {ternary} the `{command.name}` command."
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
-    @commands.command(help="load cog")
+    @commands.command(help="Loaded cog")
     @commands.guild_only()
     @commands.is_owner()
     async def load(
@@ -290,7 +290,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             self.bot.load_extension(f'cogs.{extension}')
             embed.description = f"{emoji_converter('greentick')} Load : `{extension}`"
             embed.color = 0x8be28b
-            return await ctx.send(embed=embed)
+            return await ctx.reply(embed=embed, mention_author=False)
         except commands.ExtensionNotFound:
             raise UserInputErrors("Extension Not Found")
         except commands.ExtensionAlreadyLoaded:
@@ -303,7 +303,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             print(ex)
             raise UserInputErrors("The extension load failed")
            
-    @commands.command(help="unload cog")
+    @commands.command(help="Unloaded cog")
     @commands.guild_only()
     @commands.is_owner()
     async def unload(
@@ -316,7 +316,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             self.bot.unload_extension(f'cogs.{extension}')
             embed.description = f"{emoji_converter('greentick')} Unload : `{extension}`"
             embed.color = 0x8be28b
-            return await ctx.send(embed=embed)
+            return await ctx.reply(embed=embed, mention_author=False)
         except commands.ExtensionNotFound:
             raise UserInputErrors("Extension Not Found")
         except commands.ExtensionNotLoaded:
@@ -325,7 +325,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             print(ex)
             raise UserInputErrors("The extension unload failed")
 
-    @commands.command(help="reload cog")
+    @commands.command(help="Reloaded cog")
     @commands.guild_only()
     @commands.is_owner()
     async def reload(self, ctx, extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")):
@@ -347,7 +347,7 @@ class Owner(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             print(ex)
             raise UserInputErrors("The extension reload failed")
     
-    @commands.command(help="reload all cogs")
+    @commands.command(help="Reload all cogs")
     @commands.guild_only()
     @commands.is_owner()
     async def reloadall(self, ctx):

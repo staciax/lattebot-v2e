@@ -449,16 +449,16 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
                 description = f"Tag not found. Did you mean...\n`{matches}`"
             raise UserInputErrors(description)
 
-    @commands.command(aliases=['tag_count'], help="Total tag in your server")
-    @commands.guild_only()
-    @is_latte_guild()
-    async def tagcount(self, ctx):            
-        data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
-        if bool(data) == False:
-            raise UserInputErrors("This server doesn't have any tags.")
+    # @commands.command(aliases=['tag_count'], help="Total tag in your server")
+    # @commands.guild_only()
+    # @is_latte_guild()
+    # async def tagcount(self, ctx):            
+    #     data = await self.bot.latte_tags.find_many_by_custom({"guild_id": ctx.guild.id})
+    #     if bool(data) == False:
+    #         raise UserInputErrors("This server doesn't have any tags.")
 
-        embed = discord.Embed(description=f"Total tags : `{len(data)}`",color=0x77dd77)
-        await ctx.reply(embed=embed, mention_author=False)
+    #     embed = discord.Embed(description=f"Total tags : `{len(data)}`",color=0x77dd77)
+    #     await ctx.reply(embed=embed, mention_author=False)
   
 def setup(bot):
     bot.add_cog(Tags(bot))

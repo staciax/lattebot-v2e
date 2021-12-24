@@ -284,13 +284,13 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     async def mute(
             self,
             ctx,
-            member: discord.Member = commands.Option(description="Mention member"),
-            duration = commands.Option(description="duration such as 10m , 30m , 3h")  
+            member: discord.Member = commands.Option(description="Spectify member"),
+            duration = commands.Option(description="Duration such as 10m, 30min, 1hour, 3h, 1w, 1week (max 28 days)")  
         ):
         embed = discord.Embed(title='Mute command is disabled', color=self.bot.white_color)
         embed.description = f'Please use `{ctx.clean_prefix}timeout` command instead `{ctx.clean_prefix}mute` command.'
         await self.timeout(ctx, member, duration)
-        await ctx.reply(embed=embed, ephemeral=True, delete_after=15, mention_author=False)
+        await ctx.send(embed=embed, ephemeral=True, delete_after=30)
        
     # @commands.command(help="Unmute member")
     # @commands.guild_only()
@@ -417,8 +417,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Deafens the specified member with a specified reason.")
     @commands.guild_only()
-    # @commands.has_guild_permissions(mute_members=True)
-    # @commands.bot_has_guild_permissions(mute_members=True)
+    @commands.has_guild_permissions(deafen_members=True)
+    @commands.bot_has_guild_permissions(deafen_members=True)
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def voice_deafen(
             self,
@@ -466,11 +466,14 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             self,
             ctx,
             member: discord.Member = commands.Option(description="Spectify member"),
-            duration = commands.Option(description="Duration such as 10m, 30min, 1hour, 3h, 1w, 1week")):
+            duration = commands.Option(description="Duration such as 10m, 30min, 1hour, 3h, 1w, 1week (max 28 days)")):
         
-        future_date = datetime.utcnow() + time_str.convert(duration)
+        timeout_date = time_str.convert(duration)
+        future_date = datetime.utcnow() + timeout_date
         if future_date <= datetime.utcnow():
             raise UserInputErrors("Time is invalid")
+        if timeout_date >= timedelta(days=28):
+            raise UserInputErrors("Maximum day of timeout exceeded")
         
         if member == self.bot.user:
             raise UserInputErrors("You cannot timeout the bot")
@@ -492,7 +495,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         except Exception:
             raise UserInputErrors("Failed to timeout member")
         
-        embed = discord.Embed(title="Timeout Member", color=self.bot.white_color, timestamp=ctx.message.created_at)
+        embed = discord.Embed(title="Timeout", color=0xFF7878, timestamp=ctx.message.created_at)
         embed.description = f"**Member:** {member.mention}"
         embed.add_field(name="Duration:", value=f"{format_dt(future_date, style='f')}({format_dt(future_date, style='R')})", inline=False)
         embed.set_footer(text=f"Timeout by {ctx.author.display_name}")
@@ -504,6 +507,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.has_permissions(timeout_members = True)
     async def timeout_remove(self, ctx, member: discord.Member = commands.Option(description="Spectify member")):
         if member.timed_out:
+            remaining_time = member.timeout_until
+
             if member == self.bot.user:
                 raise UserInputErrors("You cannot remove timeout the bot")
             if member == ctx.author:
@@ -514,7 +519,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
                 raise UserInputErrors(f"My role isn't high enough to moderate this member.")
             if member.top_role >= ctx.author.top_role:
                 raise UserInputErrors(f"Sorry, **{member}** is a higher role or the same role as you, you can't do that bruh.")
-            remaining_time = member.timeout_until
+            
             try:
                 await member.edit(timeout_until=None)
             except discord.Forbidden:
@@ -524,12 +529,12 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             except Exception:
                 raise UserInputErrors("Failed to remove timeout member")
             
-            embed = discord.Embed(title="Remove Timeout", color=self.bot.white_color, timestamp=ctx.message.created_at)
+            embed = discord.Embed(title="Timeout removed", color=0xFF7878, timestamp=ctx.message.created_at)
             embed.description = f"**Member:** {member.mention}"
             embed.add_field(name="Timeout remaining before remove:", value=f"{format_dt(remaining_time, style='f')}({format_dt(remaining_time, style='R')})", inline=False)
             embed.set_footer(text=f"Removed timeout by {ctx.author.display_name}")
             if ctx.author.display_avatar is not None:
-                embed.set_footer(text=f"Removed timeout by{ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
+                embed.set_footer(text=f"Removed timeout by {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
             return await ctx.reply(embed=embed, mention_author=False)
         raise UserInputErrors(f"**{member}** Don't have the timeout") 
 

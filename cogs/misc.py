@@ -118,8 +118,10 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def about(self, ctx):
-        owner_bot = self.bot.renly
+        if ctx.interaction is not None:
+            await ctx.interaction.response.defer()
 
+        owner_bot = self.bot.renly
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name=f"About Me", icon_url=self.bot.user.avatar.url)
         embed.set_thumbnail(url=owner_bot.avatar.url)
@@ -153,7 +155,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         #Vote.gg = discord.ui.Button(style=style, label="Source code", url=self.bot.latte_source)
         # view.add_item(item=Source_code)
     
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command(help="Shows the latency of the bot")
     @commands.guild_only()
@@ -194,7 +196,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed_send = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
         embed_send.description = 'Thanks you, Message successfully sent! <3"'
-        await ctx.send(embed=embed_send)
+        await ctx.reply(embed=embed_send, mention_author=False)
     
 # ---------- Search the documentation ---------- #
 
@@ -304,7 +306,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
             raise UserInputErrors('Could not find anything. Sorry.')
 
         e.description = '\n'.join(f'[`{key}`]({url})' for key, url in matches)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e, mention_author=False)
 
     @commands.group(help="Search the documentation", aliases=["rtd", "rtfs"], invoke_without_command=True)
     @commands.guild_only()
