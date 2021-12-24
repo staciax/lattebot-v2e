@@ -3,6 +3,7 @@ import discord
 import os
 import json
 from discord.ext import commands
+import socket
 from time import time
 from datetime import datetime, timedelta, timezone
 from typing import Literal , Union
@@ -14,6 +15,7 @@ from utils.buttons import Confirm
 from utils.json_loader import latte_read, latte_write
 from utils.buttons import NewSimpage
 from utils.errors import UserInputErrors
+from utils.checks import is_my_friend
 
 # class PrivateLiteral(commands.Converter):
 #     """A class for custom Literal"""
@@ -224,7 +226,7 @@ class Owner(commands.Cog):
         elif view.value:
             embed_e.description = f"Shuting down..."
             await msg.edit(embed=embed_e, view=None)
-            await self.bot.logout()
+            await self.bot.close()
         else:
             await msg.delete()
             raise UserInputErrors("Cancelled...")
@@ -364,6 +366,32 @@ class Owner(commands.Cog):
                         return await ctx.send(f"{e}")
 
         await ctx.send(embed=embed)
+
+    @commands.command(help="shutdown stacia pc")
+    @commands.guild_only()
+    @is_my_friend()
+    async def shutdown(self, ctx):
+        embed = discord.Embed(color=self.bot.white_color)
+        embed.description = f"Are you sure you want to shutdown stacia computer?"
+
+        #edit
+        embed_e = discord.Embed(color=self.bot.white_color, timestamp=ctx.message.created_at)
+        embed_e.description = f"Shuting down in 2 minutes"
+        embed_e.set_footer(text="shutdown by", icon_url=ctx.author.display_avatar or ctx.author.default_avatar)
+
+        view = Confirm(ctx)
+        msg = await ctx.reply(embed=embed, view=view, mention_author=False)
+        await view.wait()
+        if view.value is None:
+            return
+        elif view.value:
+            s = socket.socket()
+            host = 'RENLY'
+            port = 4869
+            s.connect((host, port))
+            await msg.edit(embed=embed_e, view=None)
+        else:
+            await msg.delete()
          
 def setup(bot):
     bot.add_cog(Owner(bot))

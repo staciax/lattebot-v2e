@@ -104,22 +104,21 @@ class base_waifu_im_api(discord.ui.View):
 
     @staticmethod
     async def base_embed(self):
-        async with aiohttp.ClientSession() as session:
-            request = await session.get(f'{self.url}/?gif={self.gif}')
-            api = await request.json()
-            if request.status == 200:
-                api_title = api.get('images')[0].get('tags')[0].get('name')
+        request = await self.ctx.bot.session.get(f'{self.url}/?gif={self.gif}')
+        api = await request.json()
+        if request.status == 200:
+            api_title = api.get('images')[0].get('tags')[0].get('name')
 
-                #color_converter
-                dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
-                dominant_color = int(dominant_color1, 16)
+            #color_converter
+            dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
+            dominant_color = int(dominant_color1, 16)
 
 
-                api_color = dominant_color
-                image_url = api.get('images')[0].get('url')
-                source_url = api.get('images')[0].get('source')
-                self.image_url = image_url
-                self.source_url = source_url
+            api_color = dominant_color
+            image_url = api.get('images')[0].get('url')
+            source_url = api.get('images')[0].get('source')
+            self.image_url = image_url
+            self.source_url = source_url
  
             embed_api = Waifu_im_Embed(api_title, api_color, image_url)
             return embed_api
@@ -202,22 +201,21 @@ class base_waifu_im_api_nsfw(discord.ui.View):
     
     @staticmethod
     async def base_embed(self):
-        async with aiohttp.ClientSession() as session:
-            request = await session.get(f'{self.url}/?gif={self.gif}')
-            api = await request.json()
-            if request.status == 200:
-                api_title = api.get('images')[0].get('tags')[0].get('name')
+        request = await self.ctx.bot.session.get(f'{self.url}/?gif={self.gif}')
+        api = await request.json()
+        if request.status == 200:
+            api_title = api.get('images')[0].get('tags')[0].get('name')
 
-                #color_converter
-                dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
-                dominant_color = int(dominant_color1, 16)
+            #color_converter
+            dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
+            dominant_color = int(dominant_color1, 16)
 
 
-                api_color = dominant_color
-                image_url = api.get('images')[0].get('url')
-                source_url = api.get('images')[0].get('source')
-                self.image_url = image_url
-                self.source_url = source_url
+            api_color = dominant_color
+            image_url = api.get('images')[0].get('url')
+            source_url = api.get('images')[0].get('source')
+            self.image_url = image_url
+            self.source_url = source_url
  
             embed_api = Waifu_im_Embed(api_title, api_color, image_url)
             return embed_api
@@ -318,12 +316,11 @@ class base_waifu_pisc_api(discord.ui.View):
 
     @staticmethod
     async def base_api(self):
-        async with aiohttp.ClientSession() as session:
-            request = await session.get(self.url)
-            api = await request.json()
-            if request.status == 200:
-                json = api
-                self.json_url = json["url"]
+        request = await self.ctx.bot.session.get(self.url)
+        api = await request.json()
+        if request.status == 200:
+            json = api
+            self.json_url = json["url"]
 
         embed = Waifu_pisc_Embed(self, json, title=self.title)
         for items in self.children:
@@ -393,12 +390,11 @@ class base_waifu_pisc_api(discord.ui.View):
             self.title = f'{str(select.values[0])}'
         
     async def api_start(self):
-        async with aiohttp.ClientSession() as session:
-            request = await session.get(self.url)
-            api = await request.json()
-            if request.status == 200:
-                json = api
-                self.json_url = json["url"]
+        request = await self.ctx.bot.session.get(self.url)
+        api = await request.json()
+        if request.status == 200:
+            json = api
+            self.json_url = json["url"]
 
         self.add_button()
         embed1 = Waifu_pisc_Embed(self, json, title=self.title)
@@ -436,12 +432,11 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
 
     @discord.ui.button(label='▶', style=discord.ButtonStyle.blurple, custom_id='b1')
     async def button_api(self, button: discord.ui.Button, interaction: discord.Interaction):
-        async with aiohttp.ClientSession() as session:
-            request = await session.get(self.url)
-            api = await request.json()
-            if request.status == 200:
-                json = api
-                self.json_url = json["url"]
+        request = await self.ctx.bot.session.get(self.url)
+        api = await request.json()
+        if request.status == 200:
+            json = api
+            self.json_url = json["url"]
 
         embed1 = Waifu_pisc_Embed(self, json, title=self.title)
         for items in self.children:
@@ -449,8 +444,8 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
                 if items.label == "Image URL":
                     self.remove_item(item=items)
                     self.add_button()
-                    
-        await interaction.response.edit_message(embed=embed1, view=self)
+        if embed1:       
+            await interaction.response.edit_message(embed=embed1, view=self)
 
     @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
     async def disable_all_button(self, button, interaction):
@@ -472,12 +467,11 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
             self.title = f'{str(select.values[0])}'
     
     async def api_start(self):
-        async with aiohttp.ClientSession() as session:
-            request = await session.get(self.url)
-            api = await request.json()
-            if request.status == 200:
-                json = api
-                self.json_url = json["url"]
+        request = await self.ctx.bot.session.get(self.url)
+        api = await request.json()
+        if request.status == 200:
+            json = api
+            self.json_url = json["url"]
 
         self.add_button()
         embed1 = Waifu_pisc_Embed(self, json, title=self.title)

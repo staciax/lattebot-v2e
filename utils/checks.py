@@ -75,6 +75,15 @@ def is_in_guilds(*guild_ids):
 def is_latte_guild():
     return is_in_guilds(840379510704046151)
 
+def is_my_friend():
+    def predicate(ctx):
+        if ctx.author.id in [240350375201341442, 188653422864498688, 371230466319187969, 240137834349068290, 818849641784541234]:
+            return True
+        if ctx.author == ctx.bot.renly:
+            return True
+        False
+    return commands.check(predicate)
+
 def bypass_for_owner(message):
     # Bypasses cooldown, no cooldown for this specific user
     if message.author.id == 240059262297047041:

@@ -13,6 +13,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import motor.motor_asyncio
 import asyncpg
+import aiohttp
 
 # Local
 from utils.json_loader import read_json
@@ -81,6 +82,14 @@ class LatteBot(commands.AutoShardedBot):
         else:
             command = command_name
         return self.help_command.get_command_signature(command, ctx)
+    
+    async def start(self, *args, **kwargs):
+        self.session = aiohttp.ClientSession()
+        await super().start(*args, **kwargs)
+    
+    async def close(self):
+        await self.session.close()
+        await super().close() 
             
 bot = LatteBot(intents=discord.Intents(
     guild_reactions=True,  # reaction add/remove/clear

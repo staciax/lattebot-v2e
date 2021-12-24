@@ -38,6 +38,6 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
         futuredate = datetime.now(timezone.utc) - timedelta(seconds=int(uptime.total_seconds())) 
         embed = discord.Embed(description=f"🕘 I started {format_dt(futuredate, style='R')}", color=self.bot.white_color)
         await ctx.send(embed=embed)
-         
+    
 def setup(bot):
     bot.add_cog(No_slash(bot))

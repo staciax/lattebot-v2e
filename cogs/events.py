@@ -343,7 +343,7 @@ class Events(commands.Cog):
 
                 if message.embeds:
                     embed_del = message.embeds[0]
-                    await self.message_log.send(embed=embed_del)
+                    await self.message_log.send(content=message.clean_content or None, embed=embed_del)
                 
         except TypeError: 
             pass

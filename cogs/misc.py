@@ -10,7 +10,6 @@ from discord.ext import commands
 from datetime import datetime, timedelta, timezone
 
 # Third
-import aiohttp
 
 # Local
 from utils.emoji import emoji_converter
@@ -54,11 +53,6 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     """Misc commands"""
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession()
-    
-    def cog_unload(self):
-        if self.session:
-            self.session.close()
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -192,7 +186,10 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.set_author(name=f'{ctx.guild.name} | User report', icon_url=ctx.guild.icon.url)
         embed.description = f"{message}"
         embed.set_footer(text="Reported by", icon_url=ctx.author.avatar or ctx.author.default_avatar)
-        await self.bot.renly.send(embed=embed)
+        try:
+            await self.bot.renly.send(embed=embed)
+        except (discord.HTTPException, discord.HTTPException, discord.InvalidArgument):
+            raise UserInputErrors('Failed to send message to owner bot')
 
         embed_send = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
         embed_send.description = 'Thanks you, Message successfully sent! <3"'
@@ -259,7 +256,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         cache = {}
         for key, page in page_types.items():
             sub = cache[key] = {}
-            async with self.session.get(page + '/objects.inv') as resp:
+            async with self.bot.session.get(page + '/objects.inv') as resp:
                 if resp.status != 200:
                     raise RuntimeError('Cannot build rtfm lookup table, try again later.')
 

@@ -195,7 +195,10 @@ class HelpView(discord.ui.View):
         self.add_item(self.category_select)
         self.category_select.placeholder = "Timeout."
         self.category_select.disabled = True
-        await self.message.edit(view=self)
+        try:
+            await self.message.edit(view=self)
+        except (discord.Forbidden, discord.HTTPException):
+            pass
 
     async def start(self):
         self.build_select()
