@@ -82,18 +82,18 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                     sticker_list = [872926712776777768, 872922021036707901, 920521517035573259]
                     sticker_choice = random.choice(sticker_list)
                     stick = self.bot.get_sticker(sticker_choice)
-                    await message.channel.send(stickers = [stick], delete_after=30)
+                    await message.channel.send(stickers = [stick])
                 
                 if message.content.startswith('shadowplay'):
                     stick = self.bot.get_sticker(878702176413810699)
-                    await message.channel.send(stickers = [stick], delete_after=30)
+                    await message.channel.send(stickers = [stick])
                 
                 if message.content.startswith(('เอาซันไลต์มาล้างตาดิ','เอาซันไลมา','ล้างตา','ซันไล')):
                     stick = self.bot.get_sticker(872926576847777842)
                     await message.channel.send(stickers = [stick], delete_after=30)
                 
                 if message.content.startswith(('latte','ลาเต้','ลาตู้','ลาติเอ้','ลาตี้')):
-                    stick = self.bot.get_sticker(919839033239146546)
+                    stick = self.bot.get_sticker(random.choice([872921663803621406, 872927105799843871, 872931499324887070, 872933457418940466]))
                     await message.channel.send(content="เรียกเราหยอออ?", stickers = [stick], delete_after=30)
             
                 if message.content.startswith(('invite','invites','เชิญ','autorole','latterole')):
@@ -103,7 +103,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 #     await message.channel.send(random.choice(['เด็กดี','อย่าบูลี้ดิ','รักคนดูนะครับ','น้ำยาหมดละ','สวัสดีครับ น๊องๆ !']))
 
                 if message.content.startswith(('แรงค์','แร้ง','วาโล','เอเปก','rank','ปอนลงแรงค์','ลงแรงค์')):
-                    await message.channel.send(random.choice(['เล่นด้วยๆ แต่เราขอกินข้าวก่อนนะ','ลืมรากเหง้าแล้ววว','แม่เรียกกินข้าวไปละ','ลงแรงค์ไรค้าบ ไม่เอาา','ลงแรงค์ไรค้าบคุณ']), delete_after=30)
+                    await message.channel.send(random.choice(['เล่นด้วยๆ แต่เราขอกินข้าวก่อนนะ','ลืมรากเหง้าแล้ววว','แม่เรียกกินข้าวไปละ','ลงแรงค์ไรค้าบ ไม่เอาา','ลงแรงค์ไรค้าบคุณ']))
                     
                 # if message.content.startswith('tempinvite'):
                 #     await message.delete()

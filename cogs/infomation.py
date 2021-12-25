@@ -487,10 +487,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def memberlist(self, ctx):
         guild = ctx.guild
-        guildMembers = guild.members
         members = []
+        guildMembers = sorted(guild.members, key=lambda m: m.joined_at)
         for member in guildMembers:
-            members.append(f"{member.name} **|** {member.mention} **|** `{member.id}`")
+            members.append(f"{member.name} **|** {member.mention} **|** {member.id}")
         
         p = NewSimpage(entries=members, ctx=ctx)
         p.embed.title = f"{guild.name} members ({len(guildMembers)})"
