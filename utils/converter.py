@@ -125,3 +125,8 @@ def is_url_image(image_url):
     if r.headers["content-type"] in image_formats:
         return True
     return False
+
+def find_invite_by_code(invite_list, code):
+    for inv in invite_list:
+        if inv.code == code:
+            return inv

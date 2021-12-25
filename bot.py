@@ -22,12 +22,29 @@ from utils.mongo import Document
 #json_loader
 data = read_json('bot_var')
 
-dotenv_path = join(dirname(__file__), 'data/settings.env')
+dotenv_path = join(dirname(__file__), 'data/secrets/settings.env')
 load_dotenv(dotenv_path)
+
+class PersistentView(discord.ui.View):
+    def __init__(self, bot):
+        self.bot = bot
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label='Do you like latte?', emoji='<:latte_:902674566655139881>', style=discord.ButtonStyle.primary, custom_id='lattebot_view_verifyv2x')
+    async def latte_view_buttons(self, button: discord.ui.Button, interaction: discord.Interaction):
+        latte_role = discord.utils.get(interaction.user.roles, id=842309176104976387)
+        if not latte_role:
+            embed = discord.Embed(color=0xffffff)
+            embed.description = "Let's check out . . .\n\n﹒<#861883647070437386> \n﹒<#840380566862823425>"
+            role = self.bot.latte.get_role(842309176104976387)
+            await interaction.user.add_roles(role)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            chat_channel = self.bot.latte.get_channel(861883647070437386)
+            await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{interaction.user.mention}', allowed_mentions=discord.AllowedMentions.none())
 
 async def get_prefix(bot, message):
     prefix = 're'
-    if message.guild.id == bot.latte_guild_id:
+    if message.guild == bot.latte:
         prefix = '.'
     return commands.when_mentioned_or(prefix)(bot,message)
 
@@ -49,13 +66,13 @@ class LatteBot(commands.AutoShardedBot):
         self.channel_sleep = {}
         self.current_streamers = list()
         self.no_prefix = False
+        self.latte_invite_code = {}
         self.latte_guild_id = 840379510704046151
         self.latte_sup_guild_id = 887274968012955679
         self.latte_log_id = 909301335743143946
         self.latte_starbot_id = 909485607359758337
         self.latte_invite_url = os.getenv('LATTE_URL', None)
         self.latte_supprt_url = os.getenv('SUPPORT_URL', None)
-        self.new_members = {}
         self.bot_join = 893695417320087573
         self.bot_leave = 893695447309369345
         self.white_color = 0xffffff
@@ -63,6 +80,7 @@ class LatteBot(commands.AutoShardedBot):
         self.token = data["token"]
         self.mongo_url = data["mongo"]
         super().__init__(command_prefix=get_prefix, *args, **kwargs)
+        self.persistent_views_added = False
 
     @property
     def renly(self) -> Optional[discord.User]:
@@ -89,8 +107,19 @@ class LatteBot(commands.AutoShardedBot):
     
     async def close(self):
         await self.session.close()
-        await super().close() 
-            
+        await super().close()
+        
+    async def on_ready(self):
+        if not self.persistent_views_added:
+            self.add_view(PersistentView(self))
+            self.persistent_views_added = True
+            print('LatteView is ready')
+        
+        self.latte_invite_code = await self.latte.invites()
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=self.latte_avtivity))
+        print(f"\nName : {self.user}\nActivity : {self.latte_avtivity}\nServers : {len(self.guilds)}\nUsers : {len(set(self.get_all_members()))}")
+        print("\nCog loaded\n---------\n")
+
 bot = LatteBot(intents=discord.Intents(
     guild_reactions=True,  # reaction add/remove/clear
     guild_messages=True,  # message create/update/delete
@@ -107,24 +136,14 @@ bot = LatteBot(intents=discord.Intents(
     invites=True,  # invite create/delete
     emojis=True,  # emoji update
     bans=True  # member ban/unban
-),help_command = None, case_insensitive = True, owner_id=240059262297047041) #slash_commands = True, slash_command_guilds=[840379510704046151]
- 
-# botdata = {
-#     "token": "this token",
-#     "color": 0xffcccb,
-# }
-# a = testing(**botdata)
+), help_command = None, case_insensitive = True, owner_id=240059262297047041)
 
-@bot.event
-async def on_ready():
-    # await bot.http.bulk_upsert_guild_commands(bot.application_id, 840379510704046151, [])
-    # await bot.http.bulk_upsert_global_commands(bot.application_id, [])
-    bot_avtivity = bot.latte_avtivity
-    await bot.change_presence(activity=discord.Activity(
-        type=discord.ActivityType.listening, name=bot_avtivity
-    ))
-    print(f"\nName : {bot.user}\nActivity : {bot_avtivity}\nServers : {len(bot.guilds)}\nUsers : {len(set(bot.get_all_members()))}")
-    print("\nCog loaded\n---------\n")
+@bot.command()
+@commands.is_owner()
+async def prepare(ctx: commands.Context):
+    file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
+    await ctx.send(file=file, view=PersistentView(bot))
+    await ctx.message.delete()
 
 async def create_db_pool():
     if not bot.tester or len(bot.tester) == 0:
@@ -159,32 +178,25 @@ def blacklist(ctx):
             raise Blacklisted_user
     return True
 
-# @bot.check
-# async def blacklist(ctx):
-#     if ctx.author.id in blacklisted:
-#         return False # or raise an error
-#     return True
-
 bot.load_extension('jishaku')
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
 os.environ["JISHAKU_HIDE"] = "True"
 
 if __name__ == "__main__":
-    
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(bot.mongo_url))
 
-    #db_tag
+    #main database
     bot.latte_db = bot.mongo["latteonly"]
     bot.latte_tags = Document(bot.latte_db, "tags")
     bot.latte_todo = Document(bot.latte_db, "todo")
     bot.latte_stars = Document(bot.latte_db, "stars")
 
-    #db_testing
+    #ping
     bot.db_ping = bot.mongo["lattebot"]
     bot.latte_ping = Document(bot.db_ping, "latency")
 
-    #db_leveling
+    #leveling
     bot.db_level = bot.mongo["discord"]
     bot.latte_level = Document(bot.db_level, "levelling")
     

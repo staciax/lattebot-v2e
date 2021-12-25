@@ -4,10 +4,11 @@ import asyncio
 import random
 from discord.ext import commands
 from typing import Literal
-
+from re import search
 # Third
 
 # Local
+from utils.json_loader import latte_read
 from utils.checks import is_latte_guild
 from utils.errors import UserInputErrors
 from utils.latte_converter import latte_voice
@@ -17,6 +18,8 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     """Commands only latte server"""
     def __init__(self, bot):
         self.bot = bot
+        self.json_read = latte_read("latte_events")
+        self.url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
         self.latte_bot = [861874852050894868, 840381588704591912, 844462710526836756]
         self.underworldx = [873677543453126676, 873679362082369546]
         self.moonlightx = [875037193196945409, 875038018736644166]
@@ -35,7 +38,24 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.Cog.listener()
     async def on_message(self, message):
         try:
-            if message.guild == self.bot.latte:
+            if message.guild == self.bot.latte:#only_image_channel
+                only_image = self.json_read["only-image"]
+                if message.channel.id == only_image:
+                    if message.content and message.attachments:
+                        return
+                    elif search(self.url_regex, message.content):
+                        return
+                    elif message.content:
+                        await message.delete()
+                
+                #only_link_channel
+                only_link = self.json_read["only-link"]
+                if message.channel.id == only_link:
+                    if search(self.url_regex, message.content):
+                        return
+                    else:
+                        await message.delete()
+
                 if message.channel.id in self.latte_bot:
                     if message.content.startswith('uw'):
                         if message.author.voice:
@@ -71,16 +91,23 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 if message.content.startswith(('เอาซันไลต์มาล้างตาดิ','เอาซันไลมา','ล้างตา','ซันไล')):
                     stick = self.bot.get_sticker(872926576847777842)
                     await message.channel.send(stickers = [stick])
+                
+                if message.content.startswith('latte','ลาเต้'):
+                    stick = self.bot.get_sticker(872931348912947261)
+                    await message.channel.send(content="เรียกเราหยอออ?", stickers = [stick])
+            
+                if message.content.startswith(('invite','invites','เชิญ','autorole')):
+                    await message.reply('https://discord.gg/jhK46N6QWU\n**Auto role** : <@&842309176104976387>', allowed_mentions=discord.AllowedMentions.none(), mention_author=False, delete_after=600)
+                
+                # if message.content.startswith('tempinvite'):
+                #     await message.delete()
+                #     await message.channel.send('https://discord.gg/f6adY5B8k2' , delete_after=60)
 
                 if message.channel.id == self.tempx[0]:
                     await asyncio.sleep(60)
                     await message.delete()
 
-        except discord.Forbidden:
-            pass
-        except discord.NotFound:
-            pass
-        except discord.HTTPException:
+        except (discord.Forbidden, discord.NotFound, discord.HTTPException):
             pass
         except Exception as ex:
             print(ex)

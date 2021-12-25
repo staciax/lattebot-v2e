@@ -21,18 +21,17 @@ class Error(commands.Cog):
     
     @commands.Cog.listener()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
-    async def on_command_error(self , ctx, error):
-        embed = discord.Embed()
-        embed.color = self.bot.white_color
+    async def on_command_error(self, ctx, error):
+        embed = discord.Embed(color=self.bot.white_color)
         if isinstance(error, commands.CommandNotFound):
-            # cm_error = f"I couldn't find that command."
+            cm_error = f"I couldn't find that command."
             command_names = [str(x) for x in ctx.bot.commands]
             matches = get_close_matches(ctx.invoked_with, command_names)
             if matches:
                 matches = "\n".join(matches)
                 cm_error = f"I couldn't find that command. Did you mean...\n`{matches}`"
-            else:
-                return
+            # else:
+            #     return
         elif isinstance(error, commands.UserInputError):
             cm_error = f"{error}"
         elif isinstance(error, commands.DisabledCommand):
@@ -62,7 +61,8 @@ class Error(commands.Cog):
         elif isinstance(error, commands.NSFWChannelRequired):
             cm_error = f"This channel isn't NSFW"
         elif isinstance(error, commands.CheckFailure):
-            cm_error = f"You can't use this command."
+            # cm_error = f"You can't use this command."
+            cm_error = f"I couldn't find that command."
         elif isinstance(error, commands.DisabledCommand):
             cm_error = f"This command is restricted to slash commands." 
         # elif isinstance(error, commands.CommandError):

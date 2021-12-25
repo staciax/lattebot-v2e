@@ -367,31 +367,31 @@ class Owner(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(help="shutdown stacia pc")
-    @commands.guild_only()
-    @is_my_friend()
-    async def shutdown(self, ctx):
-        embed = discord.Embed(color=self.bot.white_color)
-        embed.description = f"Are you sure you want to shutdown stacia computer?"
+    # @commands.command(help="shutdown stacia pc")
+    # @commands.guild_only()
+    # @is_my_friend()
+    # async def shutdown(self, ctx):
+    #     embed = discord.Embed(color=self.bot.white_color)
+    #     embed.description = f"Are you sure you want to shutdown stacia computer?"
 
-        #edit
-        embed_e = discord.Embed(color=self.bot.white_color, timestamp=ctx.message.created_at)
-        embed_e.description = f"Shuting down in 2 minutes"
-        embed_e.set_footer(text="shutdown by", icon_url=ctx.author.display_avatar or ctx.author.default_avatar)
+    #     #edit
+    #     embed_e = discord.Embed(color=self.bot.white_color, timestamp=ctx.message.created_at)
+    #     embed_e.description = f"Shuting down in 2 minutes"
+    #     embed_e.set_footer(text="shutdown by", icon_url=ctx.author.display_avatar or ctx.author.default_avatar)
 
-        view = Confirm(ctx)
-        msg = await ctx.reply(embed=embed, view=view, mention_author=False)
-        await view.wait()
-        if view.value is None:
-            return
-        elif view.value:
-            s = socket.socket()
-            host = 'RENLY'
-            port = 4869
-            s.connect((host, port))
-            await msg.edit(embed=embed_e, view=None)
-        else:
-            await msg.delete()
+    #     view = Confirm(ctx)
+    #     msg = await ctx.reply(embed=embed, view=view, mention_author=False)
+    #     await view.wait()
+    #     if view.value is None:
+    #         return
+    #     elif view.value:
+    #         s = socket.socket()
+    #         host = 'RENLY'
+    #         port = 4869
+    #         s.connect((host, port))
+    #         await msg.edit(embed=embed_e, view=None)
+    #     else:
+    #         await msg.delete()
          
 def setup(bot):
     bot.add_cog(Owner(bot))

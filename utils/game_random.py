@@ -197,11 +197,10 @@ class ValorantLog(discord.ui.View):
         self.go_to_first_page.style = styles[page == 0]
     
     async def on_timeout(self) -> None:
-        self.clear_items()
-        self.add_item(self.category_select)
-        self.category_select.placeholder = "Timeout."
-        self.category_select.disabled = True
-        await self.message.edit(view=self)
+        try:
+            await self.message.edit(view=None)
+        except (discord.Forbidden, discord.HTTPException):
+            pass
 
     async def start(self, interaction: discord.Interaction):
         self.embeds = self.build_embeds()

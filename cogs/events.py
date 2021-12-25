@@ -14,13 +14,12 @@ from re import search
 
 # Local
 from utils.json_loader import latte_read
-from utils.converter import status_icon
+from utils.converter import status_icon, find_invite_by_code
 from utils.formats import format_dt
 
 class Events(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
         if not hasattr(self.bot, 'commands_used'):
             self.bot.commands_used = 0
         self.json_read = latte_read("latte_events")
@@ -210,38 +209,7 @@ class Events(commands.Cog):
             if member.mentioned_in(message):
                 embed = discord.Embed(description=f'**{member.display_name}** is afk for: {self.bot.afk_user[user_id]["reason"]}' , color=self.bot.white_color)
                 await message.channel.send(embed=embed , delete_after=15)
-
-        if message.guild.id == self.bot.latte_guild_id:
-            #only_image_channel
-            only_image = self.json_read["only-image"]
-            if message.channel.id == only_image:
-                if message.content and message.attachments:
-                    return
-                elif search(self.url_regex, message.content):
-                    return
-                elif message.content:
-                    await message.delete()
-            
-            #only_link_channel
-            only_link = self.json_read["only-link"]
-            if message.channel.id == only_link:
-                if search(self.url_regex, message.content):
-                    return
-                else:
-                    await message.delete()
-
-            if message.content.startswith('latte'):
-                await message.channel.send('เอะ! เรียกเราหรอ? <:S_CuteGWave3:859660565160001537>')
-            
-            if message.content.startswith('invite'):
-                await message.channel.send('https://discord.gg/jhK46N6QWU\n**Auto role** : Latte・・ ♡' , delete_after=180)
-                await asyncio.sleep(30)
-                await message.delete()
-            
-            if message.content.startswith('tempinvite'):
-                await message.delete()
-                await message.channel.send('https://discord.gg/f6adY5B8k2' , delete_after=60)
-        
+                    
         # #google_translator
         # if message.channel.id == self.translatex:
         #     translator = Translator()
@@ -369,15 +337,13 @@ class Events(commands.Cog):
                             color=0xCCCCFF
         
                 )
-                embed.set_author(name=member, icon_url=member.avatar or member.default_avatar)
-                embed.set_thumbnail(url=member.avatar.url or member.default_avatar)
-                
-                # if member.avatar is not None:
-                #     embed.set_author(name=member, icon_url=member.avatar.url)
-                #     embed.set_thumbnail(url=member.avatar.url)
-                # else:
-                #     embed.set_author(name=member)
 
+                try:
+                    embed.set_author(name=member, icon_url=member.avatar.url if member.avatar is not None else member.default_avatar)
+                    embed.set_thumbnail(url=member.avatar.url if member.avatar is not None else member.default_avatar)
+                except:
+                    pass
+                
                 if self.welcome_image is not None:
                     embed.set_image(url=self.welcome_image)
 
@@ -389,11 +355,22 @@ class Events(commands.Cog):
                 else:
                     embed.set_footer(text=footer_text)
 
+                try:
+                    invites_before_join = self.bot.latte_invite_code
+                    invites_after_join = await member.guild.invites()
+                    for invite in invites_before_join:
+                        if invite.uses < find_invite_by_code(invites_after_join, invite.code).uses:
+                            if invite.code == 'jhK46N6QWU':
+                                latte_roles = discord.utils.get(member.guild.roles, id = 842309176104976387) #name="Latte・・ ♡")
+                                bar_role = discord.utils.get(member.guild.roles, id = 854503426977038338) #name="・ ───────꒰ ・ ♡ ・ ꒱─────── ・")
+                                await member.add_roles(latte_roles, bar_role)
+                except (discord.Forbidden, discord.HTTPException):
+                    pass
+
                 if member.bot:
                     role = discord.utils.get(member.guild.roles, id=840677855460458496)
                     if role:
                         await member.add_roles(role)
-                #content=f"ｈｅｌｌｏ! {member.mention}"
                 await self.welcome.send(embed=embed)
         
         except TypeError: 
@@ -593,11 +570,6 @@ class Events(commands.Cog):
                 offline = ['<@&886193080997384222>']
                 if new_roles == offline: return
                 if old_roles == offline: return
-
-                if new_roles == ['<@&842309176104976387>']:
-                    if self.bot.new_members[str(after.id)] is True:
-                        chat_channel = after.guild.get_channel(861883647070437386)
-                        await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{after.mention}')
                 
                 embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc)) 
                 embed.set_author(name=f"{after.display_name} | Role updates")
@@ -611,15 +583,15 @@ class Events(commands.Cog):
 
             elif before.display_avatar != after.display_avatar:
                 embed = discord.Embed(title="Server avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
+                embed.description = "New image is below, old to the right."
                 
-                try:
-                    embed.description = "New image is below, old to the right."
+                if before.display_avatar is not None:
                     embed.set_thumbnail(url=before.display_avatar.url)
-                except:
-                    pass
-                embed.set_image(url=after.display_avatar.url)
-                embed.set_footer(text=after, icon_url=after.display_avatar.url)
-
+                
+                if after.display_avatar is not None:
+                    embed.set_image(url=after.display_avatar.url)
+                    embed.set_footer(text=after, icon_url=after.display_avatar.url)
+        
                 await self.server_log.send(embed=embed)
 
     @commands.Cog.listener()

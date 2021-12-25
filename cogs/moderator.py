@@ -163,8 +163,8 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer(ephemeral=True)
 
-        if amount> 500 or amount <0:
-            raise UserInputErrors('Invalid amount. Maximum is 500')
+        if amount> 100 or amount < 0:
+            raise UserInputErrors('Invalid amount. Maximum is 100')
         try:
             deleted = await ctx.channel.purge(limit=amount)            
         except discord.Forbidden:

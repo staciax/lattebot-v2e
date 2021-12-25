@@ -11,7 +11,7 @@ import requests
 # Local
 
 def level_images(member, final_xp, lvl, rank, xp):
-    background = Image.open('latte_config/images/level.png')
+    background = Image.open('data/assets/level.png')
     
     if member.display_avatar != member.avatar:
         url = member.display_avatar.replace(format='png') #when avater gif = convert gif to png 
@@ -48,15 +48,15 @@ def level_images(member, final_xp, lvl, rank, xp):
     draw = ImageDraw.Draw(background)
     # draw.ellipse((160, 160, 208, 208), fill="#000")
 
-    big_font = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 90)
-    mid_font = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 80)
-    big_2_font = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 105)
-    big2_font = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 120)
-    medium_font = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 70)
-    small_font = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 50)
+    big_font = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 90)
+    mid_font = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 80)
+    big_2_font = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 105)
+    big2_font = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 120)
+    medium_font = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 70)
+    small_font = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 50)
 
-    textrank = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 130)
-    ranksize = ImageFont.FreeTypeFont("latte_config/fonts/Daisy.ttf", 70)
+    textrank = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 130)
+    ranksize = ImageFont.FreeTypeFont("data/fonts/Daisy.ttf", 70)
 
     #level_num               
     text_size = draw.textsize(str(lvl), font=big2_font)
