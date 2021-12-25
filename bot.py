@@ -111,7 +111,7 @@ class LatteBot(commands.AutoShardedBot):
         
     async def on_ready(self):
         if not self.persistent_views_added:
-            print('addview is ready')
+            print('LatteVerify is ready')
             self.add_view(PersistentView(self))
             self.persistent_views_added = True
         
@@ -122,12 +122,12 @@ class LatteBot(commands.AutoShardedBot):
 
 bot = LatteBot(help_command = None, case_insensitive = True, owner_id=240059262297047041)
 
-# @bot.command()
-# @commands.is_owner()
-# async def prepare(ctx: commands.Context):
-#     file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
-#     await ctx.send(file=file, view=PersistentView(bot=bot))
-#     await ctx.message.delete()
+@bot.command()
+@commands.is_owner()
+async def prepare_verify(ctx: commands.Context):
+    file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
+    await ctx.send(file=file, view=PersistentView(bot=bot) or None)
+    await ctx.message.delete()
 
 async def create_db_pool():
     if not bot.tester or len(bot.tester) == 0:

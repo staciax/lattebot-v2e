@@ -92,7 +92,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                     stick = self.bot.get_sticker(872926576847777842)
                     await message.channel.send(stickers = [stick])
                 
-                if message.content.startswith('latte','ลาเต้'):
+                if message.content.startswith(('latte','ลาเต้')):
                     stick = self.bot.get_sticker(872931348912947261)
                     await message.channel.send(content="เรียกเราหยอออ?", stickers = [stick])
             
