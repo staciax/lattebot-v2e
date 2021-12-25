@@ -335,7 +335,6 @@ class Events(commands.Cog):
                             description=f"**Welcome to ₊˚ {member.guild.name}**\n\n₊˚don’t forget to check out . . .\n﹒<#861883647070437386> \n﹒<#840380566862823425>", 
                             timestamp=datetime.now(timezone.utc),
                             color=0xCCCCFF
-        
                 )
 
                 try:
@@ -364,6 +363,9 @@ class Events(commands.Cog):
                                 latte_roles = discord.utils.get(member.guild.roles, id = 842309176104976387) #name="Latte・・ ♡")
                                 bar_role = discord.utils.get(member.guild.roles, id = 854503426977038338) #name="・ ───────꒰ ・ ♡ ・ ꒱─────── ・")
                                 await member.add_roles(latte_roles, bar_role)
+                                chat_channel = self.bot.latte.get_channel(861883647070437386)
+                                await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
+            
                 except (discord.Forbidden, discord.HTTPException):
                     pass
 
