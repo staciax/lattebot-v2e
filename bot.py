@@ -79,7 +79,7 @@ class LatteBot(commands.AutoShardedBot):
         self.error_color = 0xFF7878
         self.token = data["token"]
         self.mongo_url = data["mongo"]
-        super().__init__(command_prefix=get_prefix, *args, **kwargs)
+        super().__init__(command_prefix=get_prefix, intents=discord.Intents.all(), *args, **kwargs)
         self.persistent_views_added = False
 
     @property
@@ -111,39 +111,23 @@ class LatteBot(commands.AutoShardedBot):
         
     async def on_ready(self):
         if not self.persistent_views_added:
+            print('addview is ready')
             self.add_view(PersistentView(self))
             self.persistent_views_added = True
-            print('LatteView is ready')
         
         self.latte_invite_code = await self.latte.invites()
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=self.latte_avtivity))
         print(f"\nName : {self.user}\nActivity : {self.latte_avtivity}\nServers : {len(self.guilds)}\nUsers : {len(set(self.get_all_members()))}")
         print("\nCog loaded\n---------\n")
 
-bot = LatteBot(intents=discord.Intents(
-    guild_reactions=True,  # reaction add/remove/clear
-    guild_messages=True,  # message create/update/delete
-    guilds=True,  # guild/channel join/remove/update
-    integrations=True,  # integrations update
-    voice_states=True,  # voice state update
-    dm_reactions=True,  # reaction add/remove/clear
-    guild_typing=True,  # on typing
-    dm_messages=True,  # message create/update/delete
-    presences=True,  # member/user update for games/activities
-    dm_typing=True,  # on typing
-    webhooks=True,  # webhook update
-    members=True,  # member join/remove/update
-    invites=True,  # invite create/delete
-    emojis=True,  # emoji update
-    bans=True  # member ban/unban
-), help_command = None, case_insensitive = True, owner_id=240059262297047041)
+bot = LatteBot(help_command = None, case_insensitive = True, owner_id=240059262297047041)
 
-@bot.command()
-@commands.is_owner()
-async def prepare(ctx: commands.Context):
-    file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
-    await ctx.send(file=file, view=PersistentView(bot))
-    await ctx.message.delete()
+# @bot.command()
+# @commands.is_owner()
+# async def prepare(ctx: commands.Context):
+#     file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
+#     await ctx.send(file=file, view=PersistentView(bot=bot))
+#     await ctx.message.delete()
 
 async def create_db_pool():
     if not bot.tester or len(bot.tester) == 0:
