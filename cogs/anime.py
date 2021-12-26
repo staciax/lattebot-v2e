@@ -7,7 +7,7 @@ from typing import Literal
 # Third
 
 # Local
-from utils.api import base_waifu_im_api , base_waifu_pisc_api , base_waifu_pisc_api_nsfw # , base_waifu_im_api_nsfw
+from utils.api import WaifuimView, WaifupiscView, WaifupiscView_nsfw # , base_waifu_im_api_nsfw
 
 class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
     """Anime commands"""
@@ -29,14 +29,9 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
             waifu_url = "https://api.waifu.im/sfw/waifu"
         elif tags == "maid":
             waifu_url = "https://api.waifu.im/sfw/maid"
-        else:
-            tags_list = ["waifu", "maid"]
-            tags_random = random.choice(tags_list)
-            waifu_url = f"https://api.waifu.im/sfw/{tags_random}"
           
-        if waifu_url:
-            view = base_waifu_im_api(ctx=ctx, url=waifu_url)
-            return await view.api_start()
+        view = WaifuimView(ctx=ctx, url=waifu_url)
+        await view.api_start()
     
     @commands.command(name="waifuim_nsfw", help="Display waifu im nsfw.", aliases=['waifuimnsfw','wfnsfw'])
     @commands.guild_only()
@@ -64,24 +59,19 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
             waifu_url = "https://api.waifu.im/nsfw/selfies"
         elif tags == "uniform":
             waifu_url = "https://api.waifu.im/nsfw/uniform"
-        else:
-            tags_list = ["ass","ecchi","ero","hentai","maid","milf","oppai","oral","paizuri","selfies","uniform"]
-            tags_random = random.choice(tags_list)
-            waifu_url = f"https://api.waifu.im/nsfw/{tags_random}"
 
-        if waifu_url:
-            view = base_waifu_im_api(ctx=ctx, url=waifu_url)
-            return await view.api_start()
+        view = WaifuimView(ctx=ctx, url=waifu_url)
+        await view.api_start()
             
     @commands.command(name="waifupisc", help="Display waifu pisc.", aliases=["wfp"])
     @commands.guild_only()
     async def waifu_pisc(self, ctx, type: Literal["sfw", "nsfw"] = commands.Option(description="choose type")):
         if type == "sfw":
-            view = base_waifu_pisc_api(ctx=ctx)
+            view = WaifupiscView(ctx=ctx)
             return await view.api_start()
         elif type == "nsfw":
             if ctx.channel.is_nsfw():
-                view = base_waifu_pisc_api_nsfw(ctx=ctx)
+                view = WaifupiscView_nsfw(ctx=ctx)
                 return await view.api_start()      
             raise commands.NSFWChannelRequired(ctx.channel)
             

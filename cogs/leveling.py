@@ -23,6 +23,8 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
 
     def __init__(self, bot):
         self.bot = bot
+        self.text_channel = 20
+        self.voice_channel = 5
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -50,7 +52,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             await member.add_roles(lvl_bar)
 
         xp = data["xp"]
-        data["xp"] += get_xp or 20
+        data["xp"] += get_xp or self.text_channel
         await self.bot.latte_level.update_by_custom(
             {"id": member.id, "guild_id": guilds.id}, data
         )
@@ -166,12 +168,9 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         try:
-            if member.guild.id == self.bot.latte_guild_id:
-                if not before.channel and after.channel: #join
-                    try:
-                        await self.xp_update(member, member.guild, get_xp=5)
-                    except:
-                        pass
+            if member.guild == self.bot.latte:
+                if not before.channel and after.channel:
+                    await self.xp_update(member, member.guild, get_xp=self.voice_channel)
         except:
             pass
 

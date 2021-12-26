@@ -33,11 +33,13 @@ class PersistentView(discord.ui.View):
     @discord.ui.button(label='Do you like latte?', emoji='<:latte_:902674566655139881>', style=discord.ButtonStyle.primary, custom_id='lattebot_view_verifyv2x')
     async def latte_view_buttons(self, button: discord.ui.Button, interaction: discord.Interaction):
         latte_role = discord.utils.get(interaction.user.roles, id=842309176104976387)
+        # bar_role = discord.utils.get(interaction.user.roles, id=854503426977038338)
         if not latte_role:
             embed = discord.Embed(color=0xffffff)
             embed.description = "Let's check out . . .\n\n﹒<#861883647070437386> \n﹒<#840380566862823425>"
             role = self.bot.latte.get_role(842309176104976387)
-            await interaction.user.add_roles(role)
+            role2 = self.bot.latte.get_role(854503426977038338)
+            await interaction.user.add_roles(role, role2)
             await interaction.response.send_message(embed=embed, ephemeral=True)
             chat_channel = self.bot.latte.get_channel(861883647070437386)
             await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{interaction.user.mention}', allowed_mentions=discord.AllowedMentions.none())

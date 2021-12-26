@@ -561,26 +561,24 @@ class Events(commands.Cog):
 
             #role_log
             elif before.roles != after.roles:
-                new_roles = [x.mention for x in after.roles if x not in before.roles]
-                old_roles = [x.mention for x in before.roles if x not in after.roles]
+                new_role = [x.mention for x in after.roles if x not in before.roles]
+                old_role = [x.mention for x in before.roles if x not in after.roles]
+                update_role = new_role[0] if new_role else old_role[0]
+                if update_role == '<@&886193080997384222>':
+                    return
+                member_role = ' '.join(reversed([r.mention for r in after.roles if r.name != '@everyone']))
                 
-                update = "**Add role**" if new_roles else "**Remove role**"
-                name_role = str(new_roles)[2:-2]
-                after_role = " ".join(reversed([r.mention for r in after.roles]))
-                color_embed = 0x52D452 if new_roles else 0xFF6961
-                if name_role == '@deleted-role': return
-                offline = ['<@&886193080997384222>']
-                if new_roles == offline: return
-                if old_roles == offline: return
-                
-                embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc)) 
-                embed.set_author(name=f"{after.display_name} | Role updates")
-                if after.avatar is not None:
-                    embed.set_author(name=f"{after.display_name} | Role updates", icon_url=after.avatar.url)
+                values = "**NEW**" if new_role else "**REMOVE**"
+                color_embed = 0x52D452 if new_role else 0xFF6961
 
-                if update and name_role and after_role:
-                    embed.add_field(name="**Role**", value=after_role[:-22], inline=False)
-                    embed.add_field(name=update, value=name_role, inline=False)
+                embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc))
+                embed.set_author(name=f"{after.display_name} | Roles update")
+                if after.avatar is not None:
+                    embed.set_author(name=f"{after.display_name} | Roles update", icon_url=after.avatar.url)
+                
+                if update_role and member_role:
+                    embed.add_field(name="**ROLE**", value=member_role or '\u200B', inline=False)
+                    embed.add_field(name=values, value=update_role, inline=False)
                     await self.roles_log.send(embed=embed)
 
             elif before.display_avatar != after.display_avatar:

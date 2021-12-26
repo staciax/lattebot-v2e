@@ -21,69 +21,73 @@ def Color_Thief(url):
     dominant_color = int(icon_hex, 16)
     return dominant_color
 
-class Waifu_im_selection(discord.ui.Select):
-    def __init__(self, types):
-        self.types = types
-        self.typed = ''
+# class Waifu_im_selection(discord.ui.Select):
+#     def __init__(self, types):
+#         self.types = types
+#         self.typed = ''
 
-        if types == 'sfw':
-            options = [
-                discord.SelectOption(label='Waifu', description='Waifu'),
-                discord.SelectOption(label='Maid', description='Maid')
-                # discord.SelectOption(label='All', description='All'),
-            ]
-        elif types == 'nsfw':
-            options = [
-                discord.SelectOption(label='Ass', description='Waifu'),
-                discord.SelectOption(label='Ecchi',  description='Maid'),
-                discord.SelectOption(label='Ero', description='Ero'),
-                discord.SelectOption(label='Hentai', description='Hentai'),
-                discord.SelectOption(label='Maid', description='Maid'),
-                discord.SelectOption(label='Milf',  description='Milf'),
-                discord.SelectOption(label='Oppai', description='Oppai'),
-                discord.SelectOption(label='Oral', description='Oral'),
-                discord.SelectOption(label='Paizuri', description='Paizuri'),
-                discord.SelectOption(label='Selfies', description='Selfies'),
-                discord.SelectOption(label='Uniform', description='Uniform'),
-            ]
-        super().__init__(placeholder='Select a type...', min_values=1, max_values=1, options=options)
+#         if types == 'sfw':
+#             options = [
+#                 discord.SelectOption(label='Waifu', description='Waifu'),
+#                 discord.SelectOption(label='Maid', description='Maid')
+#                 # discord.SelectOption(label='All', description='All'),
+#             ]
+#         elif types == 'nsfw':
+#             options = [
+#                 discord.SelectOption(label='Ass', description='Waifu'),
+#                 discord.SelectOption(label='Ecchi',  description='Maid'),
+#                 discord.SelectOption(label='Ero', description='Ero'),
+#                 discord.SelectOption(label='Hentai', description='Hentai'),
+#                 discord.SelectOption(label='Maid', description='Maid'),
+#                 discord.SelectOption(label='Milf',  description='Milf'),
+#                 discord.SelectOption(label='Oppai', description='Oppai'),
+#                 discord.SelectOption(label='Oral', description='Oral'),
+#                 discord.SelectOption(label='Paizuri', description='Paizuri'),
+#                 discord.SelectOption(label='Selfies', description='Selfies'),
+#                 discord.SelectOption(label='Uniform', description='Uniform'),
+#             ]
+#         super().__init__(placeholder='Select a type...', min_values=1, max_values=1, options=options)
 
-    async def callback(self, interaction: discord.Interaction):
-        self.typed = self.values[0]
+#     async def callback(self, interaction: discord.Interaction):
+#         self.typed = self.values[0]
 
 #-------------------- WAIFU IM --------------------#
 
-    #----- base embed -----#
+# def Waifu_im_Embed(name, color, image_url) -> discord.Embed:
+#     embed = Embed(color=int(color))
+#     embed.set_author(name=name, url=image_url)
+#     embed.set_image(url=image_url)
+#     embed.set_footer(text="Powered by waifu.im")
+#     return embed
 
-def Waifu_im_Embed(api_title, api_color, image_url):
-    embed = Embed(title=api_title, url=image_url, color=int(api_color)) #timestamp=discord.utils.utcnow(),
-    embed.set_image(url=image_url)
-    embed.set_footer(text="Powered by waifu.im")
-    
-    return embed
-
-    #----- SFW -----#
-
-class base_waifu_im_api(discord.ui.View):
+class WaifuimView(discord.ui.View):
     def __init__(self, ctx, url):
         super().__init__(timeout=600)
         self.ctx = ctx
         self.url = url
         self.image_url = ''
-        self.message = None
-        self.gif = False
         self.source_url = ''
+        self.message: discord.Message = None
+        self.gif = False
 
     def add_button(self):
         self.add_item(discord.ui.Button(label='Image URL', url=self.image_url))
     
     def api_site(self):
         self.add_item(discord.ui.Button(label='API site', url="https://waifu.im/"))
+    
+    @discord.ui.button(label='button disabled due to timeout.', style=discord.ButtonStyle.blurple, disabled=True, row=1)
+    async def timeout_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+        pass
 
     async def on_timeout(self):
+        self.clear_items()
+        self.add_button()
+        self.api_site()
+        # self.add_item(self.timeout_button)
         if self.message:
             try:
-                await self.message.edit(view=None)
+                await self.message.edit(view=self)
             except:
                 pass
     
@@ -93,40 +97,34 @@ class base_waifu_im_api(discord.ui.View):
         await interaction.response.send_message('This interaction cannot be controlled by you, sorry!', ephemeral=True)
         return False
     
-    # @staticmethod
-    # def Waifu_im_Embed(api_title, api_color, image_url):
-    #     if api_title == "all": api_title = "random"
-    #     embed = Embed(title=api_title, url=image_url, color=int(api_color)) #timestamp=discord.utils.utcnow(),
-    #     embed.set_image(url=image_url)
-    #     embed.set_footer(text="Powered by waifu.im")
-        
-    #     return embed
+    def build_embed(self, name, color, image_url) -> discord.Embed:
+        embed = Embed(color=int(color))
+        embed.set_author(name=name, url=f"https://waifu.im/preview/?image={(image_url.strip('https://cdn.waifu.im/'))}")
+        embed.set_image(url=image_url)
+        embed.set_footer(text="Powered by waifu.im")
+        return embed
 
-    @staticmethod
+    # @staticmethod
     async def base_embed(self):
-        request = await self.ctx.bot.session.get(f'{self.url}/?gif={self.gif}')
+        #{self.url}/?gif={self.gif}
+        request = await self.ctx.bot.session.get(self.url)
         api = await request.json()
         if request.status == 200:
-            api_title = api.get('images')[0].get('tags')[0].get('name')
-
-            #color_converter
-            dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
-            dominant_color = int(dominant_color1, 16)
-
-
-            api_color = dominant_color
+            name = api.get('images')[0].get('tags')[0].get('name')
+            dominant_color = str(api.get('images')[0].get('dominant_color')).replace('#', '')
+            color = int(dominant_color, 16)
             image_url = api.get('images')[0].get('url')
             source_url = api.get('images')[0].get('source')
             self.image_url = image_url
             self.source_url = source_url
  
-            embed_api = Waifu_im_Embed(api_title, api_color, image_url)
-            return embed_api
+            embed = self.build_embed(name, color, image_url)
+            return embed
 
-    @discord.ui.button(label='▶', style=discord.ButtonStyle.blurple, custom_id='b1')
+    @discord.ui.button(label='▶', style=discord.ButtonStyle.blurple)
     async def button_api(self, button: discord.ui.Button, interaction: discord.Interaction):
         self.gif = False
-        embed = await self.base_embed(self)
+        embed = await self.base_embed()
         for items in self.children:
             if isinstance(items, discord.ui.Button):
                 if items.label == "Image URL":
@@ -147,11 +145,12 @@ class base_waifu_im_api(discord.ui.View):
     
     @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
     async def disable_all_button(self, button:discord.ui.Button, interaction: discord.Interaction):
-        self.clear_items()
-        self.add_button()
-        self.api_site()
-        await interaction.response.edit_message(view=self)
-        self.stop()
+        await self.on_timeout()
+        # self.clear_items()
+        # self.add_button()
+        # self.api_site()
+        # await interaction.response.edit_message(view=self)
+        # self.stop()
 
     # @discord.ui.select(custom_id="Select_waifu_im", placeholder="Select category..", min_values=1, max_values=1, options=[
     #     discord.SelectOption(label='Waifu', value="waifu", description='Waifu'),
@@ -163,115 +162,116 @@ class base_waifu_im_api(discord.ui.View):
 
     async def api_start(self):
         self.gif = False
-        embed = await self.base_embed(self)
+        self.remove_item(self.timeout_button)
+        embed = await self.base_embed()
         if embed:
             self.add_button()
             self.message = await self.ctx.reply(embed=embed, view=self, mention_author=False)
 
     #----- NSFW -----#
 
-class base_waifu_im_api_nsfw(discord.ui.View):
-    def __init__(self, ctx, url):
-        super().__init__(timeout=600)
-        self.ctx = ctx
-        self.url = url
-        self.image_url = ''
-        self.message = None
-        self.gif = False
-        self.source_url = ''
+# class base_waifu_im_api_nsfw(discord.ui.View):
+#     def __init__(self, ctx, url):
+#         super().__init__(timeout=600)
+#         self.ctx = ctx
+#         self.url = url
+#         self.image_url = ''
+#         self.message = None
+#         self.gif = False
+#         self.source_url = ''
 
-    def add_button(self):
-        self.add_item(discord.ui.Button(label='Image URL', url=self.image_url))
+#     def add_button(self):
+#         self.add_item(discord.ui.Button(label='Image URL', url=self.image_url))
     
-    def api_site(self):
-        self.add_item(discord.ui.Button(label='API site', url="https://waifu.im/"))
+#     def api_site(self):
+#         self.add_item(discord.ui.Button(label='API site', url="https://waifu.im/"))
 
-    async def on_timeout(self):
-        if self.message:
-            try:
-                await self.message.edit(view=None)
-            except:
-                pass
+#     async def on_timeout(self):
+#         if self.message:
+#             try:
+#                 await self.message.edit(view=None)
+#             except:
+#                 pass
     
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user in (self.ctx.author, self.ctx.bot.renly):
-            return True
-        await interaction.response.send_message('This interaction cannot be controlled by you, sorry!', ephemeral=True)
-        return False
+#     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+#         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
+#             return True
+#         await interaction.response.send_message('This interaction cannot be controlled by you, sorry!', ephemeral=True)
+#         return False
     
-    @staticmethod
-    async def base_embed(self):
-        request = await self.ctx.bot.session.get(f'{self.url}/?gif={self.gif}')
-        api = await request.json()
-        if request.status == 200:
-            api_title = api.get('images')[0].get('tags')[0].get('name')
+#     @staticmethod
+#     async def base_embed(self):
+#         request = await self.ctx.bot.session.get(f'{self.url}/?gif={self.gif}')
+#         api = await request.json()
+#         if request.status == 200:
+#             api_title = api.get('images')[0].get('tags')[0].get('name')
 
-            #color_converter
-            dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
-            dominant_color = int(dominant_color1, 16)
+#             #color_converter
+#             dominant_color1 = str(api.get('images')[0].get('dominant_color')).replace('#', '')
+#             dominant_color = int(dominant_color1, 16)
 
 
-            api_color = dominant_color
-            image_url = api.get('images')[0].get('url')
-            source_url = api.get('images')[0].get('source')
-            self.image_url = image_url
-            self.source_url = source_url
+#             api_color = dominant_color
+#             image_url = api.get('images')[0].get('url')
+#             source_url = api.get('images')[0].get('source')
+#             self.image_url = image_url
+#             self.source_url = source_url
  
-            embed_api = Waifu_im_Embed(api_title, api_color, image_url)
-            return embed_api
+#             embed_api = Waifu_im_Embed(api_title, api_color, image_url)
+#             return embed_api
 
-    @discord.ui.button(label='▶', style=discord.ButtonStyle.blurple, custom_id='b1')
-    async def button_api(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.gif = False
-        embed = await self.base_embed(self)
-        for items in self.children:
-            if isinstance(items, discord.ui.Button):
-                if items.label == "Image URL":
-                    self.remove_item(item=items)
-                    self.add_button()
-        if embed:           
-            await interaction.response.edit_message(embed=embed, view=self)
+#     @discord.ui.button(label='▶', style=discord.ButtonStyle.blurple, custom_id='b1')
+#     async def button_api(self, button: discord.ui.Button, interaction: discord.Interaction):
+#         self.gif = False
+#         embed = await self.base_embed(self)
+#         for items in self.children:
+#             if isinstance(items, discord.ui.Button):
+#                 if items.label == "Image URL":
+#                     self.remove_item(item=items)
+#                     self.add_button()
+#         if embed:           
+#             await interaction.response.edit_message(embed=embed, view=self)
     
-    # @discord.ui.button(label="GIF", style=discord.ButtonStyle.blurple, custom_id='b3')
-    # async def gif_true_or_false(self, button, interaction):
-    #     if self.url in ['https://api.waifu.im/nsfw/maid', 'https://api.waifu.im/nsfw/selfies/']:
-    #         self.gif = False
-    #     else:
-    #         self.gif = True
-    #     embed = await self.base_embed(self)
-    #     if embed:
-    #         await interaction.response.edit_message(embed=embed, view=self)
+#     # @discord.ui.button(label="GIF", style=discord.ButtonStyle.blurple, custom_id='b3')
+#     # async def gif_true_or_false(self, button, interaction):
+#     #     if self.url in ['https://api.waifu.im/nsfw/maid', 'https://api.waifu.im/nsfw/selfies/']:
+#     #         self.gif = False
+#     #     else:
+#     #         self.gif = True
+#     #     embed = await self.base_embed(self)
+#     #     if embed:
+#     #         await interaction.response.edit_message(embed=embed, view=self)
     
-    @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
-    async def disable_all_button(self, button, interaction):
-        self.clear_items()
-        self.add_button()
-        self.api_site()
-        await interaction.response.edit_message(view=self)
-        self.stop()
+#     @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
+#     async def disable_all_button(self, button, interaction):
+#         self.clear_items()
+#         self.add_button()
+#         self.api_site()
+#         await interaction.response.edit_message(view=self)
+#         self.stop()
 
-    @discord.ui.select(custom_id="Select_waifu_im", placeholder="Select category..", min_values=1, max_values=1, options=[
-        discord.SelectOption(label='Ass', value='ass'),
-        discord.SelectOption(label='Ecchi', value='ecchi'),
-        discord.SelectOption(label='Ero', value='ero'),
-        discord.SelectOption(label='Hentai', value='hentai'),
-        discord.SelectOption(label='Maid', value='maid'),
-        discord.SelectOption(label='Milf', value='milf'),
-        discord.SelectOption(label='Oppai', value='oppi'),
-        discord.SelectOption(label='Oral', value='oral'),
-        discord.SelectOption(label='Paizuri', value='paizuri'),
-        discord.SelectOption(label='Selfies', value='selfies'),
-        discord.SelectOption(label='Uniform', value='uniform')])
-    async def callback(self, select: discord.ui.select, interaction: discord.Interaction):
-        if select.values[0]:
-            self.url = f'https://api.waifu.im/nsfw/{select.values[0]}'
+#     @discord.ui.select(custom_id="Select_waifu_im", placeholder="Select category..", min_values=1, max_values=1, options=[
+#         discord.SelectOption(label='Ass', value='ass'),
+#         discord.SelectOption(label='Ecchi', value='ecchi'),
+#         discord.SelectOption(label='Ero', value='ero'),
+#         discord.SelectOption(label='Hentai', value='hentai'),
+#         discord.SelectOption(label='Maid', value='maid'),
+#         discord.SelectOption(label='Milf', value='milf'),
+#         discord.SelectOption(label='Oppai', value='oppi'),
+#         discord.SelectOption(label='Oral', value='oral'),
+#         discord.SelectOption(label='Paizuri', value='paizuri'),
+#         discord.SelectOption(label='Selfies', value='selfies'),
+#         discord.SelectOption(label='Uniform', value='uniform')])
+#     async def callback(self, select: discord.ui.select, interaction: discord.Interaction):
+#         if select.values[0]:
+#             self.url = f'https://api.waifu.im/nsfw/{select.values[0]}'
     
-    async def api_start(self):
-        self.gif = False
-        embed = await self.base_embed(self)
-        if embed:
-            self.add_button()
-            self.message = await self.ctx.reply(embed=embed, view=self, mention_author=False)
+#     async def api_start(self):
+#         self.gif = False
+#         embed = await self.base_embed(self)
+#         if embed:
+#             self.add_button()
+#             self.message = await self.ctx.reply(embed=embed, view=self, mention_author=False)
 
 #-------------------- WAIFU PISC --------------------#
 
@@ -286,7 +286,7 @@ def Waifu_pisc_Embed(self, json, title):
 
     #----- SFW -----#
 
-class base_waifu_pisc_api(discord.ui.View):
+class WaifupiscView(discord.ui.View):
     def __init__(self, ctx):
         super().__init__(timeout=600)
         self.ctx = ctx
@@ -302,9 +302,12 @@ class base_waifu_pisc_api(discord.ui.View):
         self.add_item(discord.ui.Button(label='API site', url='https://waifu.pics/'))
 
     async def on_timeout(self):
+        self.clear_items()
+        self.add_button()
+        self.api_site()
         if self.message:
             try:
-                await self.message.edit(view=None)
+                await self.message.edit(view=self)
             except:
                 pass
         
@@ -338,10 +341,7 @@ class base_waifu_pisc_api(discord.ui.View):
 
     @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
     async def disable_all_button(self, button, interaction):
-        self.clear_items()
-        self.add_button()
-        self.api_site()
-        await interaction.response.edit_message(view=self)
+        await self.on_timeout()
         self.stop()
 
     @discord.ui.select(custom_id="Select_waifu_pics_1", placeholder="Select category (A - K)", min_values=1, max_values=1, options=[        
@@ -402,7 +402,7 @@ class base_waifu_pisc_api(discord.ui.View):
     
     #----- NSFW -----#
 
-class base_waifu_pisc_api_nsfw(discord.ui.View):
+class WaifupiscView_nsfw(discord.ui.View):
     def __init__(self, ctx):
         super().__init__(timeout=600)
         self.ctx = ctx
@@ -418,6 +418,9 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
         self.add_item(discord.ui.Button(label='API site', url="https://waifu.pics/"))
 
     async def on_timeout(self):
+        self.clear_items()
+        self.add_button()
+        self.api_site()
         if self.message:
             try:
                 await self.message.edit(view=None)
@@ -449,10 +452,7 @@ class base_waifu_pisc_api_nsfw(discord.ui.View):
 
     @discord.ui.button(emoji="❤️", style=discord.ButtonStyle.blurple, custom_id='b2')
     async def disable_all_button(self, button, interaction):
-        self.clear_items()
-        self.add_button()
-        self.api_site()
-        await interaction.response.edit_message(view=self)
+        await self.on_timeout()
         self.stop()
 
     @discord.ui.select(custom_id="Select_waifu_pics_1", placeholder="Select category..", min_values=1, max_values=1, options=[        

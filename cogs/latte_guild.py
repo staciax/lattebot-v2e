@@ -38,23 +38,23 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.Cog.listener()
     async def on_message(self, message):
         try:
-            if message.guild == self.bot.latte:#only_image_channel
+            if message.guild == self.bot.latte:
+                #only image channel
                 only_image = self.json_read["only-image"]
                 if message.channel.id == only_image:
                     if message.content and message.attachments:
                         return
                     elif search(self.url_regex, message.content):
                         return
-                    elif message.content:
-                        await message.delete()
-                
+                    await message.delete()
+                    # elif message.content:
+                        
                 #only_link_channel
                 only_link = self.json_read["only-link"]
                 if message.channel.id == only_link:
                     if search(self.url_regex, message.content):
                         return
-                    else:
-                        await message.delete()
+                    await message.delete()
 
                 if message.channel.id in self.latte_bot:
                     if message.content.startswith('uw'):
@@ -80,8 +80,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
 
                 if message.content.startswith('ร้องไห้'):
                     sticker_list = [872926712776777768, 872922021036707901, 920521517035573259]
-                    sticker_choice = random.choice(sticker_list)
-                    stick = self.bot.get_sticker(sticker_choice)
+                    stick = self.bot.get_sticker(random.choice(sticker_list))
                     await message.channel.send(stickers = [stick])
                 
                 if message.content.startswith('shadowplay'):
@@ -102,8 +101,9 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 # if message.content.startswith('','น้องปอน','ปอน'):
                 #     await message.channel.send(random.choice(['เด็กดี','อย่าบูลี้ดิ','รักคนดูนะครับ','น้ำยาหมดละ','สวัสดีครับ น๊องๆ !']))
 
-                if message.content.startswith(('แรงค์','แร้ง','วาโล','เอเปก','rank','ปอนลงแรงค์','ลงแรงค์')):
-                    await message.channel.send(random.choice(['เล่นด้วยๆ แต่เราขอกินข้าวก่อนนะ','ลืมรากเหง้าแล้ววว','แม่เรียกกินข้าวไปละ','ลงแรงค์ไรค้าบ ไม่เอาา','ลงแรงค์ไรค้าบคุณ']))
+                if message.content.startswith(('แรงค์','แร้ง','วาโล','เอเปก','rank','ปอนลงแรงค์','ลงแรงค์','ปอนลงแร้ง')):
+                    choice_list = random.choice(['เล่นด้วยๆ แต่เราขอกินข้าวก่อนนะ','ลืมรากเหง้าแล้ววว','แม่เรียกกินข้าวไปละ','ลงแรงค์ไรค้าบ ไม่เอาา','ลงแรงค์ไรค้าบคุณ','ดูก่อนๆ','อย่าบอกใครนะ'])
+                    await message.channel.send(choice_list)
                     
                 # if message.content.startswith('tempinvite'):
                 #     await message.delete()

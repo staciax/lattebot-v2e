@@ -69,7 +69,7 @@ class Error(commands.Cog):
         #     cm_error = f"{error}"
         else:
             cm_error = f"An unknown error occurred, sorry"
-            # print(error)
+            print(error)
         embed.description = cm_error
         await ctx.send(embed=embed, delete_after=30, ephemeral=True)
     

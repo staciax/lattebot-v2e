@@ -58,14 +58,11 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                     guild = self.bot.get_guild((data[key]['guild_id']))
                     member_sleep = guild.get_member(int(key))
                     if member_sleep:
-                        try:
-                            await member_sleep.move_to(channel=None)
-                            del data[key]
-                            latte_write(data, "sleeping")
-                            # break
-                        except RuntimeError:
-                            pass
-        except RuntimeError:
+                        await member_sleep.move_to(channel=None)
+                        del data[key]
+                        latte_write(data, "sleeping")
+                        # break
+        except:
             pass
 
     @tasks.loop(minutes=1)
@@ -91,7 +88,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                     del data[key]
                     latte_write(data, "remind")
                     # break         
-        except RuntimeError:
+        except:
             pass
     
     @tasks.loop(minutes=1)
@@ -109,14 +106,11 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
                     channel = guild.get_channel(int(key))
                     member_list = channel.members
                     if member_list is not None:
-                        try:
-                            for x in member_list:
-                                await x.move_to(channel=None)
-                            del data[key]
-                            latte_write(data, "channel_sleep")
-                        except RuntimeError:
-                            pass
-        except RuntimeError:
+                        for x in member_list:
+                            await x.move_to(channel=None)
+                        del data[key]
+                        latte_write(data, "channel_sleep")
+        except:
             pass
 
     @sleeped.before_loop
@@ -188,10 +182,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         member = member or ctx.author
 
         webhook = await ctx.channel.create_webhook(name=member.display_name)
-        if member.display_avatar.url is not None:
-            await webhook.send(message, username=member.display_name, avatar_url=member.display_avatar.url)
+        if member.display_avatar is not None:
+            await webhook.send(message, username=member.display_name, avatar_url=member.display_avatar.url, allowed_mentions=discord.AllowedMentions.none())
         else:
-            await webhook.send(message, username=member.display_name)
+            await webhook.send(message, username=member.display_name, allowed_mentions=discord.AllowedMentions.none())
         webhooks = await ctx.channel.webhooks()
         for webhook in webhooks:
             await webhook.delete()
@@ -259,9 +253,9 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @commands.command(name="random", help="Quick random", aliases=['r'])
     @commands.guild_only()
-    async def random_(self, ctx, *, message = commands.Option(description="enter a split message")):
+    async def random_(self, ctx, *, split_message = commands.Option(description="enter a split message")):
         #convert_to_split
-        input_value = message 
+        input_value = split_message 
         list_input = list(input_value.split())
 
         if len(list_input) == 1:
@@ -507,8 +501,8 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(aliases=["trans"], help="Translate your message")
     @commands.guild_only()
     async def translate(self, ctx, to_lang=commands.Option(description="language you want to translate. like en, th, jp"), *, source=commands.Option(description="The source language you want to translate.")):
-        if len(source) > 2000:
-            raise UserInputErrors(f"The message character a maximum of 2000 characters.")
+        if len(source) > 1000:
+            raise UserInputErrors(f"The message character a maximum of 1000 characters.")
     
         translator = Translator()
         try:

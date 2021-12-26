@@ -67,7 +67,7 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
     async def latte_say(self, ctx, *, message=commands.Option(description="message to be latte say")):
         if ctx.clean_prefix == "/":
             await ctx.send('** **', ephemeral=True)
-        await ctx.channel.send(f'{message}')
+        await ctx.channel.send(f'{message}', allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(help="Genshin impact map guide", aliases=["gsmap"])
     @commands.guild_only()
