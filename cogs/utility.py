@@ -212,10 +212,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             if content is not None or len(content) > 0:
                 embed.description = content
 
-            if author.avatar.url is not None:
+            if author.avatar is not None:
                 embed.set_author(name=f"{author} | {channel.name}", icon_url=author.avatar.url)
                 
-            elif author.avatar.url is None:
+            elif author.avatar is None:
                 embed.set_author(name=f"{author} | {channel.name}")
                 
             if message.attachments:
@@ -308,7 +308,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.add_field(name="Datetime sleep:", value=f"** **\n`{fix_date}({cooldown})`" , inline=False)
-        if member.avatar.url is not None:
+        if member.avatar is not None:
             embed.set_footer(text=member , icon_url=member.avatar.url)
         else:
             embed.set_footer(text=member)
@@ -322,7 +322,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         elif view.value:
             embed_edit = discord.Embed(color=member.colour , timestamp=futuredate)
             embed_edit.description = f"**TIME TO SLEEP** {emoji_converter('sleeping')}\n{format_dt(futuredate, style='f')}({format_dt(futuredate, style='R')})"
-            if member.avatar.url is not None:
+            if member.avatar is not None:
                 embed_edit.set_footer(text=member , icon_url=member.avatar.url)
             else:
                 embed_edit.set_footer(text=member)

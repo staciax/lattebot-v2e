@@ -101,9 +101,9 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 # if message.content.startswith('','น้องปอน','ปอน'):
                 #     await message.channel.send(random.choice(['เด็กดี','อย่าบูลี้ดิ','รักคนดูนะครับ','น้ำยาหมดละ','สวัสดีครับ น๊องๆ !']))
 
-                if message.content.startswith(('แรงค์','แร้ง','วาโล','เอเปก','rank','ปอนลงแรงค์','ลงแรงค์','ปอนลงแร้ง')):
-                    choice_list = random.choice(['เล่นด้วยๆ แต่เราขอกินข้าวก่อนนะ','ลืมรากเหง้าแล้ววว','แม่เรียกกินข้าวไปละ','ลงแรงค์ไรค้าบ ไม่เอาา','ลงแรงค์ไรค้าบคุณ','ดูก่อนๆ','อย่าบอกใครนะ'])
-                    await message.channel.send(choice_list)
+                if message.content.startswith(('แรงค์', 'แร้ง', 'วาโล', 'เอเปก', 'rank', 'ปอนลงแรงค์', 'ลงแรงค์', 'ปอนลงแร้ง')):
+                    choice_list = random.choice(['เล่นด้วยๆ แต่เราขอกินข้าวก่อนนะ', 'ลืมรากเหง้าแล้ววว', 'แม่เรียกกินข้าวไปละ', 'ลงแรงค์ไรค้าบ ไม่เอาา', 'ลงแรงค์ไรค้าบคุณ', 'ดูก่อนๆ', 'อย่าบอกใครนะ'])
+                    await message.channel.send(choice_list, delete_after=60)
                     
                 # if message.content.startswith('tempinvite'):
                 #     await message.delete()

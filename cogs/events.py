@@ -236,7 +236,7 @@ class Events(commands.Cog):
                     embed = discord.Embed(description=f"**Edited in**: {after.channel.mention}\n**Message link:** ||[click]({after.jump_url})||",
                                 colour=0xFF8C00, 
                                 timestamp=datetime.now(timezone.utc))
-                    if after.author.avatar.url is not None:           
+                    if after.author.avatar is not None:           
                         embed.set_author(name=after.author.display_name , url=after.jump_url ,icon_url=after.author.avatar.url)
                     else:
                         embed.set_author(name=after.author.display_name , url=after.jump_url)
@@ -282,7 +282,7 @@ class Events(commands.Cog):
                 im = None
                 # if message.guild.id == self.bot.latte_guild_id:
                 embed = discord.Embed(color=0xDC143C , timestamp=datetime.now(timezone.utc))
-                if message.author.avatar.url is not None:
+                if message.author.avatar is not None:
                     embed.set_author(name=message.author.display_name, url=message.jump_url , icon_url=message.author.avatar.url)
                 else:
                     embed.set_author(name=message.author.display_name, url=message.jump_url)
@@ -462,7 +462,7 @@ class Events(commands.Cog):
                 embed.add_field(name="Max Uses:", value=f"{max_use_count}")
                 embed.add_field(name="Channel:", value=f"#{invite.channel}")
                 # embed.add_field(name=f"temporary membership?", value=f"{ctx.tick(invite.temporary)}")
-                if invite.inviter.avatar.url is not None:
+                if invite.inviter.avatar is not None:
                     embed.set_footer(text = f'Created by {invite.inviter.name}', icon_url =invite.inviter.avatar.url)
                 else:
                     embed.set_footer(text = f'Created by {invite.inviter.name}')
@@ -607,7 +607,7 @@ class Events(commands.Cog):
             if member.guild.id == self.bot.latte_guild_id:
                 
                 embed = discord.Embed(timestamp=datetime.now(timezone.utc))
-                if member.avatar.url is not None:
+                if member.avatar is not None:
                     embed.set_footer(text=member , icon_url=member.display_avatar.url)
                 else:
                     embed.set_footer(text=member)

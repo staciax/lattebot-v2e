@@ -189,10 +189,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
                 ("Top Role",member.top_role.mention, False),
                 ("Roles ({})\n".format(len(member.roles)-1), role_string , False)]
 
-        for name , value , inline in fields:
+        for name, value, inline in fields:
             embed.add_field(name=name , value=value , inline=inline)
 
-        if member.avatar.url is not None:
+        if member.avatar is not None:
             embed.set_thumbnail(url=member.avatar.url)
             item = discord.ui.Button(style=style, label="Avatar URL", url=member.avatar.url)
             view.add_item(item=item)
