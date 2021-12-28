@@ -14,7 +14,7 @@ from colorthief import ColorThief
 
 # Local
 from utils.custom_button import roleinfo_view , channel_info_view , base_Button_URL , AvatarView
-from utils.emoji import profile_converter, emoji_converter , status_converter
+from utils.emoji import profile_converter, emoji_converter, status_converter
 from utils.converter import *
 from utils.formats import format_dt , deltaconv
 from utils.custom_button import base_Button_URL
@@ -57,7 +57,8 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         boost = check_boost(ctx)
         
         #get_embed_color
-        dominant_color = get_dominant_color(url=ctx.guild.icon.replace(format='png'))
+        if ctx.guild.icon:
+            dominant_color = get_dominant_color(url=ctx.guild.icon.replace(format='png')) or 0xffffff
 
         embed = discord.Embed(title=f"Server infomation - {ctx.guild.name}", color=dominant_color)
         fields = [("Server name",ctx.guild.name, True),
@@ -92,18 +93,16 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         guild = ctx.guild
         embed = discord.Embed(title = f"{guild.name}'s Icon:")
 
-        #get_embed_color
-        dominant_color = get_dominant_color(url=guild.icon.replace(format='png'))
-
-        try:
+        if guild.icon:
+            try:
+                dominant_color = get_dominant_color(url=guild.icon.replace(format='png'))
+            except:
+                dominant_color = 0xffffff
             embed.color = dominant_color
             embed.set_image(url = guild.icon.url)
-
             view = base_Button_URL(label="Server icon URL", url=guild.icon.url)
-        except:
-            raise UserInputErrors('Server icon not found')
-
-        await ctx.send(embed=embed, view=view)
+            return await ctx.send(embed=embed, view=view)
+        raise UserInputErrors('Server icon not found')
 
     
     @server.command(name="banner", help="Shows the server banner.", aliases=["serverbanner","sb","guildbanner"], message_command=False)
@@ -159,19 +158,23 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         fetch_member = await self.bot.fetch_user(member.id)
         #if fetchedMember.banner.is_animated() == True:
 
-        #dominant_colour_user_info
+        #dominant_colour_user_info        
         try:
-            url = member.avatar.replace(format='png')
-            resp = requests.get(url)      
-            out = BytesIO(resp.content)
-            out.seek(0)
-            icon_color = ColorThief(out).get_color(quality=1)
-            icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
-            dominant_color = int(icon_hex, 16)
+            if member.avatar is not None:
+                url = member.avatar.replace(format='png')
+                resp = requests.get(url)      
+                out = BytesIO(resp.content)
+                out.seek(0)
+                icon_color = ColorThief(out).get_color(quality=1)
+                icon_hex = '{:02x}{:02x}{:02x}'.format(*icon_color)
+                dominant_color = int(icon_hex, 16)
         except:
             dominant_color = self.bot.white_color
             if member.color != discord.Colour.default():
                 dominant_color = member.colour
+        else:
+            dominant_color = 0xffffff
+            
 
         #start_view
         view = discord.ui.View()
@@ -278,7 +281,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             role_member_list.append(member_role)
 
         view = roleinfo_view(ctx=ctx, embed=embed_role, entries=role_member_list, role=role)
-        view.message = await view.start()
+        await view.start()
     
     @commands.group(help="Emoji commands")
     @commands.guild_only()
@@ -400,7 +403,8 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
               
         embed.add_field(name="Category:" , value=f"{channel.category}" , inline=False)
         embed.add_field(name="Create date:" , value=f"{format_dt(channel.created_at)}" , inline=False)
-        embed.set_thumbnail(url=channel.guild.icon.url)
+        if ctx.guild.icon:
+            embed.set_thumbnail(url=ctx.guild.icon.url)
         embed.set_footer(text=f"ID : {channel.id}")
 
         if str(channel.type) == 'voice':
@@ -427,32 +431,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.set_footer(text=f"Message ID : {message.author.id}")
 
             return await ctx.send(embed=embed, view=view)
-
-    @commands.command(name="status", help="Shows status about the specified member.")
-    @commands.guild_only()
-    async def status_(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
-
-        member = member or ctx.guild.get_member(ctx.author.id)
-
-        def status_converter(name):
-            names_to_status = {
-                "online" : "<:online:900262151992774717>",
-                "dnd" : "<:dnd:900262199828824095>",
-                "idle" : "<:idle:900262218619289650>",
-                "offline" : "<:offline:900262246276538369>",
-            }
-            return names_to_status.get(name)
-
-        m = status_converter(str(member.mobile_status))
-        d = status_converter(str(member.desktop_status))
-        w = status_converter(str(member.web_status))
-
-        #embed
-        embed = discord.Embed(color=member.colour)
-        embed.set_author(name=member , icon_url=ctx.author.avatar or ctx.author.default_avatar)
-        embed.description = f"{d} Desktop\n{m} Mobile\n{w} Web"
-
-        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+        raise UserInputErrors(f'Not found message in {channel}')
 
     @commands.command(help="Shows info about the song the specified member is currently listening to.")
     @commands.guild_only()

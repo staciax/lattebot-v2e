@@ -5,11 +5,13 @@ import random
 from discord.ext import commands
 from typing import Literal
 from re import search
+from datetime import datetime, timedelta
 # Third
 
 # Local
 from utils.json_loader import latte_read
 from utils.checks import is_latte_guild
+from utils.emoji import status_converter
 from utils.errors import UserInputErrors
 from utils.latte_converter import latte_voice
 from utils.useful import Embed
@@ -30,6 +32,10 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__}")
+        # while True:
+        #     await asyncio.sleep(10)
+        #     with open("data/spam_detect.txt", "r+") as file:
+        #         file.truncate(0)
 
     @property
     def display_emoji(self) -> discord.PartialEmoji:
@@ -113,6 +119,28 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                     await asyncio.sleep(60)
                     await message.delete()
 
+                # def _check(m):
+                #     return (m.author == message.author
+                #             and len(m.mentions)
+                #             and (datetime.utcnow() - m.created_at).seconds < 30)
+                
+                # if not message.author.bot:
+                #     if len(list(filter(lambda m: _check(m), self.bot.cached_messages))) >= 4:
+                #         embedspam = discord.Embed(description="Don't spam mentions!", color=0xffffff)
+                #         await message.channel.send(embed=embedspam, delete_after=10)
+                
+                # if message.author != self.bot.renly and not message.author.bot:                             
+                #     counter = 0
+                #     with open("data/spam_detect.txt", "r+") as file:
+                #         for lines in file:
+                #             if lines.strip("\n") == str(message.author.id):
+                #                 counter+=1
+
+                #         file.writelines(f"{str(message.author.id)}\n")
+                #         if counter > 7:
+                #             future_date = datetime.utcnow() + timedelta(seconds=60)
+                #             await message.author.edit(timeout_until=future_date, reason='spam detect')
+                            
         except (discord.Forbidden, discord.NotFound, discord.HTTPException):
             pass
         except Exception as ex:
@@ -160,6 +188,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
 
     @commands.command(help="Move all members in your current channel")
     @commands.guild_only()
+    @is_latte_guild()
     async def move(self, ctx, to_channel:Literal['Totsuki','general','game','music - 1','music - 2','listen only','movie','working','afk',"don't know",'underworld','moonlight','angel','death','temp']=commands.Option(description="Spectify channel")):        
         try:
             now_channel = ctx.author.voice.channel
@@ -183,8 +212,22 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         
         embed = Embed(description = f'You moved `{len(in_channel)}` members to {to_channels.mention}')
         await ctx.reply(embed=embed, mention_author=False)
+    
+    @commands.command(name="status", help="Shows status about the specified member.")
+    @commands.guild_only()
+    @is_latte_guild()
+    async def status_(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
 
-        
+        member = member or ctx.guild.get_member(ctx.author.id)
+        #member_status
+        m_mobile = f"{status_converter(str(member.mobile_status))} Moblie"
+        m_desktop = f"{status_converter(str(member.desktop_status))} Desktop"
+        m_Web = f"{status_converter(str(member.web_status))} Web"
+        #embed
+        embed = discord.Embed(color=member.colour)
+        embed.set_author(name=member, icon_url=ctx.author.avatar or ctx.author.default_avatar)
+        embed.description = f"{m_desktop}\n{m_mobile}\n{m_Web}"
+        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
     
 def setup(bot):
     bot.add_cog(Latte(bot))

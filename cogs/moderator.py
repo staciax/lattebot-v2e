@@ -14,9 +14,8 @@ import requests
 import time_str
 
 # Local
-from utils.mod_converter import do_removal, TimeConverter
-from utils.paginator import SimplePages
-from utils.useful import RenlyEmbed
+from utils.mod_converter import do_removal
+from utils.buttons import NewSimpage
 from utils.checks import bypass_for_owner
 from utils.errors import UserInputErrors
 from utils.formats import format_dt
@@ -149,7 +148,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         ban_list = []
         for ban_entry in bans:
             ban_list.append(f"{ban_entry.user}")
-        p = SimplePages(entries=ban_list, per_page=10, ctx=ctx)
+        p = NewSimpage(entries=ban_list, per_page=10, ctx=ctx)
         p.embed.title = "Bans list"
         p.embed.color = self.bot.white_color
         await p.start()
@@ -194,7 +193,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.command(help="clear the messages")
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
-    @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
+    @commands.bot_has_permissions(manage_messages=True, send_messages=True, embed_links=True)
     @commands.dynamic_cooldown(bypass_for_owner)
     async def clear(
             self,
@@ -209,28 +208,29 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
 
         if type == "message without pinned":
             try:
-                await do_removal(self, ctx, search, lambda e: not e.pinned)
+                len_remove = await do_removal(ctx, search, lambda e: not e.pinned)
+        
                 embed.description=f"`{ctx.channel.name}` : message NOT pinned were cleared"
             except:
                 raise UserInputErrors("i can't cleanup messages")
         
         if type == "bot":
             try:
-                await do_removal(self, ctx, search, lambda e: e.author.bot)
+                await do_removal(ctx, search, lambda e: e.author.bot)
                 embed.description=f"`{ctx.channel.name}` : bot message were cleared"
             except:
                 raise UserInputErrors("i can't cleanup bot messages")
         
         if type == "attachments":
             try:
-                await do_removal(self, ctx, search, lambda e: len(e.attachments))
+                await do_removal(ctx, search, lambda e: len(e.attachments))
                 embed.description=f"`{ctx.channel.name}` : message attachments were cleared"
             except:
                 raise UserInputErrors(f"i can't cleanup messages attachments")
         
         if type == "embed":
             try:
-                await do_removal(self , ctx , search, lambda e: len(e.embeds))
+                await do_removal(ctx , search, lambda e: len(e.embeds))
                 embed.description=f"`{ctx.channel.name}` : embed were cleared"
             except:
                 raise UserInputErrors(f"i can't cleanup embed")
@@ -240,21 +240,21 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
             def predicate(m):
                 return custom_emoji.search(m.content)
             try:
-                await do_removal(self, ctx, search, predicate)
+                await do_removal(ctx, search, predicate)
                 embed.description=f"`{ctx.channel.name}` : emoji were cleared"
             except:
                 raise UserInputErrors(f"i can't custom emoji message")
     
         if type == "all":
             try:
-                await do_removal(self, ctx, search, lambda e: True)
+                await do_removal(ctx, search, lambda e: True)
                 embed.description=f"`{ctx.channel.name}` : all messsage were cleared"
             except:
                 raise UserInputErrors(f"i can't message")
           
         await ctx.reply(embed=embed , ephemeral=True, delete_after=15, mention_author=False)
 
-    @commands.command(help="Cleanup member messages")
+    @commands.command(name="clear_member_message",help="Cleanup member messages")
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True , send_messages=True, embed_links=True)
@@ -270,7 +270,7 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
         
         embed = discord.Embed(color=self.bot.white_color)
         try:
-            await do_removal(self, ctx, search, lambda e: e.author == member)
+            await do_removal(ctx, search, lambda e: e.author == member)
         except:
             raise UserInputErrors("i can't cleanup messages")
         embed.description=f"`{ctx.channel.name}` : {member} messages were cleared"
@@ -349,115 +349,115 @@ class Mod(commands.Cog, command_attrs = dict(slash_command=True)):
     #     except Exception as Ex:
     #         print(Ex)
     
-    @commands.command(aliases=["slow"], help="set slowmode channel")
-    @commands.guild_only()
-    @commands.has_permissions(manage_channels=True)
-    @commands.bot_has_permissions(send_messages=True, embed_links=True, manage_channels=True)
-    async def slowmode(self, ctx , time: TimeConverter = commands.Option(description="slowmode duration / time = 0s for disable")):
+    # @commands.command(aliases=["slow"], help="set slowmode channel")
+    # @commands.guild_only()
+    # @commands.has_permissions(manage_channels=True)
+    # @commands.bot_has_permissions(send_messages=True, embed_links=True, manage_channels=True)
+    # async def slowmode(self, ctx , time: TimeConverter = commands.Option(description="slowmode duration / time = 0s for disable")):
         
-        if time == 0:
-            raise UserInputErrors("Time is invalid")
+    #     if time == 0:
+    #         raise UserInputErrors("Time is invalid")
         
-        if int(time) > 21600:
-            raise UserInputErrors("slowmode is a maximum of 6 hours.")
+    #     if int(time) > 21600:
+    #         raise UserInputErrors("slowmode is a maximum of 6 hours.")
 
-        seconds = int(time)
-        minutes, seconds = divmod(time, 60)
-        hours, minutes = divmod(minutes, 60)
-        time_format = ""
-        if hours: time_format += f"{int(hours)} hours "
-        if minutes: time_format += f"{int(minutes)} minutes "
-        if seconds : time_format += f"{int(seconds)} seconds"
+    #     seconds = int(time)
+    #     minutes, seconds = divmod(time, 60)
+    #     hours, minutes = divmod(minutes, 60)
+    #     time_format = ""
+    #     if hours: time_format += f"{int(hours)} hours "
+    #     if minutes: time_format += f"{int(minutes)} minutes "
+    #     if seconds : time_format += f"{int(seconds)} seconds"
         
-        try:
-            embed = discord.Embed(color=self.bot.white_color)
-            embed.description = f"Set the slowmode delay in this channel to {time_format}"
-            await ctx.channel.edit(slowmode_delay=seconds)
-            return await ctx.reply(embed=embed, mention_author=False)
-        except:
-            raise UserInputErrors(f"i can't set the slowmode this channel")
+    #     try:
+    #         embed = discord.Embed(color=self.bot.white_color)
+    #         embed.description = f"Set the slowmode delay in this channel to {time_format}"
+    #         await ctx.channel.edit(slowmode_delay=seconds)
+    #         return await ctx.reply(embed=embed, mention_author=False)
+    #     except:
+    #         raise UserInputErrors(f"i can't set the slowmode this channel")
 
-    @commands.command(help="Mutes the specified member with a specified reason.")
-    @commands.has_guild_permissions(mute_members=True)
-    @commands.bot_has_guild_permissions(mute_members=True)
-    @commands.guild_only()
-    @commands.cooldown(1, 60, commands.BucketType.user)
-    async def voice_mute(
-            self,
-            ctx,
-            member: discord.Member = commands.Option(description="Spectify member"),
-            *,
-            reason = commands.Option(default=None, description="reason")
-        ):
-        if member.id == ctx.author.id:
-            raise UserInputErrors("You can't Voice mute yourself!")
+    # @commands.command(help="Mutes the specified member with a specified reason.")
+    # @commands.has_guild_permissions(mute_members=True)
+    # @commands.bot_has_guild_permissions(mute_members=True)
+    # @commands.guild_only()
+    # @commands.cooldown(1, 60, commands.BucketType.user)
+    # async def voice_mute(
+    #         self,
+    #         ctx,
+    #         member: discord.Member = commands.Option(description="Spectify member"),
+    #         *,
+    #         reason = commands.Option(default=None, description="reason")
+    #     ):
+    #     if member.id == ctx.author.id:
+    #         raise UserInputErrors("You can't Voice mute yourself!")
 
-        if isinstance(member, discord.Member):
-            if ctx.me.top_role < member.top_role:
-                raise UserInputErrors(f"Can't mute this member")
-            elif ctx.me.top_role >= member.top_role:
-                pass
-            if member == ctx.guild.owner:
-                raise UserInputErrors(f"Can't mute The Owner")
+    #     if isinstance(member, discord.Member):
+    #         if ctx.me.top_role < member.top_role:
+    #             raise UserInputErrors(f"Can't mute this member")
+    #         elif ctx.me.top_role >= member.top_role:
+    #             pass
+    #         if member == ctx.guild.owner:
+    #             raise UserInputErrors(f"Can't mute The Owner")
         
-        if reason == None:
-            reason = "None"
-        elif len(reason) > 500:
-            reason = "Reason was exceeded the 500-character limit."
-        try:    
-            await member.edit(mute=True, reason=reason)
-            embed = RenlyEmbed.to_success(title="Voice Mute", description=f"Successfully Voice muted `{member}`\n reason:**{reason}**")
-            if ctx.author.avatar is not None:
-                embed.set_footer(text=f"Muted by {ctx.author}", icon_url=ctx.author.avatar.url)
-            else:
-                embed.set_footer(text=f"Muted by {ctx.author}")
-            await ctx.reply(embed=embed, mention_author=False)
-        except:
-            raise UserInputErrors("Target user is not connected to voice.")
+    #     if reason == None:
+    #         reason = "None"
+    #     elif len(reason) > 500:
+    #         reason = "Reason was exceeded the 500-character limit."
+    #     try:    
+    #         await member.edit(mute=True, reason=reason)
+    #         embed = RenlyEmbed.to_success(title="Voice Mute", description=f"Successfully Voice muted `{member}`\n reason:**{reason}**")
+    #         if ctx.author.avatar is not None:
+    #             embed.set_footer(text=f"Muted by {ctx.author}", icon_url=ctx.author.avatar.url)
+    #         else:
+    #             embed.set_footer(text=f"Muted by {ctx.author}")
+    #         await ctx.reply(embed=embed, mention_author=False)
+    #     except:
+    #         raise UserInputErrors("Target user is not connected to voice.")
 
-    @commands.command(help="Deafens the specified member with a specified reason.")
-    @commands.guild_only()
-    @commands.has_guild_permissions(deafen_members=True)
-    @commands.bot_has_guild_permissions(deafen_members=True)
-    @commands.cooldown(1, 60, commands.BucketType.user)
-    async def voice_deafen(
-            self,
-            ctx,
-            member: discord.Member = commands.Option(description="Spectify member"),
-            *,
-            reason = commands.Option(default=None, description="reason")
-        ):
-        if ctx.author.guild_permissions.deafen_members:
+    # @commands.command(help="Deafens the specified member with a specified reason.")
+    # @commands.guild_only()
+    # @commands.has_guild_permissions(deafen_members=True)
+    # @commands.bot_has_guild_permissions(deafen_members=True)
+    # @commands.cooldown(1, 60, commands.BucketType.user)
+    # async def voice_deafen(
+    #         self,
+    #         ctx,
+    #         member: discord.Member = commands.Option(description="Spectify member"),
+    #         *,
+    #         reason = commands.Option(default=None, description="reason")
+    #     ):
+    #     if ctx.author.guild_permissions.deafen_members:
 
-            if member == ctx.author:
-                raise UserInputErrors("You can't VC deafen yourself!")
+    #         if member == ctx.author:
+    #             raise UserInputErrors("You can't VC deafen yourself!")
             
-            if member == ctx.guild.owner:
-                raise UserInputErrors(f"Can't deafen The Owner")
+    #         if member == ctx.guild.owner:
+    #             raise UserInputErrors(f"Can't deafen The Owner")
 
-            if isinstance(member, discord.Member):
-                if ctx.me.top_role < member.top_role:
-                    raise UserInputErrors(f"Can't deafen this member")
-                elif ctx.me.top_role >= member.top_role:
-                    pass
+    #         if isinstance(member, discord.Member):
+    #             if ctx.me.top_role < member.top_role:
+    #                 raise UserInputErrors(f"Can't deafen this member")
+    #             elif ctx.me.top_role >= member.top_role:
+    #                 pass
                 
             
-            if reason == None:
-                reason = "None"
-            elif len(reason) > 500:
-                reason = "Reason was exceeded the 500-character limit."
-            try:
-                await member.edit(deafen=True, reason=reason)
-                embed = RenlyEmbed.to_success(title="Voice Deafen", description=f"Successfully Voice deafened `{member}`\n reason:**{reason}**")
-                if ctx.author.avatar is not None:
-                    embed.set_footer(text=f"Deafened by {ctx.author}", icon_url=ctx.author.avatar.url)
-                else:
-                    embed.set_footer(text=f"Deafened by {ctx.author}")
-                await ctx.reply(embed=embed, mention_author=False)
-            except:
-                raise UserInputErrors(f"Target user is not connected to voice.")
-        else:
-            raise commands.MissingPermissions(['Deafen Members'])
+    #         if reason == None:
+    #             reason = "None"
+    #         elif len(reason) > 500:
+    #             reason = "Reason was exceeded the 500-character limit."
+    #         try:
+    #             await member.edit(deafen=True, reason=reason)
+    #             embed = RenlyEmbed.to_success(title="Voice Deafen", description=f"Successfully Voice deafened `{member}`\n reason:**{reason}**")
+    #             if ctx.author.avatar is not None:
+    #                 embed.set_footer(text=f"Deafened by {ctx.author}", icon_url=ctx.author.avatar.url)
+    #             else:
+    #                 embed.set_footer(text=f"Deafened by {ctx.author}")
+    #             await ctx.reply(embed=embed, mention_author=False)
+    #         except:
+    #             raise UserInputErrors(f"Target user is not connected to voice.")
+    #     else:
+    #         raise commands.MissingPermissions(['Deafen Members'])
 
     @commands.command(help="Timeout member")
     @commands.has_permissions(timeout_members = True)

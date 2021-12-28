@@ -151,6 +151,16 @@ class HelpView(discord.ui.View):
         self.current_page = last
         self._update_buttons()
         await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+    
+    @discord.ui.button(label='Home', style=discord.ButtonStyle.green)
+    async def home_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.current_page = 0
+        self.embeds = [self.main_embed]
+        self._update_buttons()
+        self.clear_items()
+        self.add_item(self.category_select)
+        self.check_view = True
+        return await interaction.response.edit_message(embed=self.main_embed, view=self)
 
     def _update_buttons(self):
         styles = {True: discord.ButtonStyle.gray, False: discord.ButtonStyle.blurple}
@@ -188,6 +198,7 @@ class HelpView(discord.ui.View):
             self.add_item(self.previous)
             self.add_item(self.next)
             self.add_item(self.go_to_last_page)
+            self.add_item(self.home_button)
             self.check_view = False
 
     async def on_timeout(self) -> None:
@@ -210,6 +221,7 @@ class HelpView(discord.ui.View):
         self.embeds = self.build_embeds(cog)
         self._update_buttons()
         self.update_button_cog()
+        self.remove_item(self.home_button)
         self.message = await self.ctx.reply(embed=self.embeds[self.current_page], view=self, mention_author=False)
 
 class MyHelp(commands.HelpCommand):

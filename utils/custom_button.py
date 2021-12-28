@@ -25,13 +25,11 @@ class roleinfo_view(discord.ui.View):
         self.cooldown = commands.CooldownMapping.from_cooldown(1, 10, commands.BucketType.user)
 
     async def on_timeout(self):
-        try:
-            for item in self.children:
-                item.disabled = True
-                await self.message.edit(view=self)
-        except:
-            if self.message:
+        if self.message:
+            try:
                 await self.message.edit(view=None)
+            except:
+                pass
 
     async def on_error(self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction) -> None:
         embed_error = discord.Embed(color=0xffffff)
@@ -66,19 +64,17 @@ class roleinfo_view(discord.ui.View):
         p = SimplePages(entries=self.entries, per_page=10, ctx=self.ctx)
         p.embed.title = f"{self.role.name} : members list"
         p.embed.color = self.role.color
-        self.message = await p.start()
+        await p.start()
 
     @discord.ui.button(label='Quit', style=discord.ButtonStyle.red)
     async def stop_pages(self, button: discord.ui.Button, interaction: discord.Interaction):
-        await self.on_timeout()
-        # await interaction.response.defer()
-        # await interaction.delete_original_message()
-        # self.stop()
+        await interaction.response.defer()
+        await interaction.delete_original_message()
+        self.stop()
     
     async def start(self):
         if not self.entries:
-            if self.children[0].label == 'Member list':
-                self.children[0].disabled = True
+            self.member_list.disabled = True
         self.message = await self.ctx.reply(embed=self.embed, view=self , mention_author=False)
 
 class channel_info_view(discord.ui.View):

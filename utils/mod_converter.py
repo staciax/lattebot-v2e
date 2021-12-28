@@ -8,7 +8,13 @@ from discord.ext import commands , tasks
 from datetime import datetime, timedelta, timezone
 
 #check_message
-async def do_removal(self, ctx, limit, predicate, *, before=None, after=None):
+async def do_removal(ctx, limit, predicate, *, before=None, after=None):
+
+    @property
+    def total_remove():
+        return len(deleted)
+
+
     if limit > 2000:
         return await ctx.send(f'Too many messages to search given ({limit}/2000)')
 

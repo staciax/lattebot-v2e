@@ -6,6 +6,7 @@ from utils.formats import format_dt
 
 # Third party
 # Local
+from utils.checks import is_latte_guild
 
 class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
     """Only message command."""
@@ -23,16 +24,19 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
 
     @commands.command(name="pastel", help="pastel color")
     @commands.guild_only()
+    @is_latte_guild()
     async def pastel(self, ctx):
         await ctx.reply("https://colorhunt.co/palettes/pastel", mention_author=False)
 
     @commands.command(name="color", help="color hex")
     @commands.guild_only()
+    @is_latte_guild()
     async def color(self, ctx):
         await ctx.reply("https://www.color-hex.com/", mention_author=False)
     
     @commands.command(name='uptime', help="Gets the uptime of the bot")
     @commands.guild_only()
+    @is_latte_guild()
     async def uptime(self, ctx):
         uptime = datetime.utcnow() - self.bot.launch_time
         futuredate = datetime.now(timezone.utc) - timedelta(seconds=int(uptime.total_seconds())) 

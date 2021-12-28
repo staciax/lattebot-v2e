@@ -136,7 +136,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed = Embed(color=self.bot.white_color)
         if reason is None:
-            reason = "personal problems"
+            reason = "..."
         elif len(reason) > 100:
             raise UserInputErrors("**reason** is a maximum of 100 characters.")
         
@@ -170,6 +170,13 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             del self.bot.afk_user[member.id]
             embed.description = f"Welcome back {member.mention} , i've removed your **AFK** status."
             return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+        elif member.display_name.startswith('[AFK]'):
+            name_strip = member.display_name.strip('[AFK] ')
+            try:
+                return await member.edit(nick=name_strip)
+            except:
+                raise UserInputErrors("I can't clear your afk status")
+        raise UserInputErrors("You don't have afk status")
 
     @commands.command(help="your message to saybot")
     @commands.guild_only()
@@ -245,8 +252,10 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     
     @commands.command(name="random_number", help="takes smallest and largest numbers then does a random number between.", aliases=['rn'])
     @commands.guild_only()
-    async def random_number(self , ctx , lowest:Union[int,str] = commands.Option(description="Lowest number"), highest:Union[int,str] = commands.Option(description="Highest number")):
-        embed = Embed(title=f"Random Number: {random.randint(lowest,highest)} ",color=self.bot.white_color)
+    async def random_number(self , ctx , lowest:int = commands.Option(description="Lowest number"), highest:int = commands.Option(description="Highest number")):
+        if highest <= lowest:
+            raise UserInputErrors('Highest number must be greater than lowest number')
+        embed = Embed(title=f"Random Number: {random.randint(lowest,highest)}", color=self.bot.white_color)
         embed.add_field(name="Lowest Number:",value=f"{lowest}")
         embed.add_field(name="Highest Number:",value=f"{highest}")
         await ctx.send(embed=embed)
@@ -392,11 +401,11 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         msg = await ctx.send(embed=embed)
 
         if time > 600:
-            self.bot.reminding[str(ctx.author.id)] = {"message":message,"channel": channel.id,"url": msg.jump_url,"time": remind_timed}
+            self.bot.reminding[str(ctx.author.id)] = {"message":message,"channel": channel.id,"url": ctx.message.jump_url,"time": remind_timed}
             with open("latte_config/remind.json", "w") as fp:
                 json.dump(self.bot.reminding, fp, indent=4)
         else:
-            view = base_Button_URL(label="Go to original message", url=msg.jump_url)
+            view = base_Button_URL(label="Go to original message", url=ctx.message.jump_url)
             await discord.utils.sleep_until(remind_time)
             embed_response = discord.Embed(color=self.bot.white_color)
             embed_response.title = "Reminder"

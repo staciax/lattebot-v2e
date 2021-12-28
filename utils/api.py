@@ -99,7 +99,7 @@ class WaifuimView(discord.ui.View):
     
     def build_embed(self, name, color, image_url) -> discord.Embed:
         embed = Embed(color=int(color))
-        embed.set_author(name=name, url=f"https://waifu.im/preview/?image={(image_url.strip('https://cdn.waifu.im/'))}")
+        embed.set_author(name=name, url=f"https://waifu.im/preview/?image={(image_url.split('/'))[3]}")
         embed.set_image(url=image_url)
         embed.set_footer(text="Powered by waifu.im")
         return embed

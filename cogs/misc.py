@@ -66,7 +66,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     # @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True , embed_links=True)
     async def invite(self, ctx):
-        invite_url = f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=19058925630&scope=bot%20applications.commands"
+        invite_url = f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=1101273620486&scope=bot%20applications.commands"
         view = discord.ui.View()
         invite_button = discord.ui.Button(style=discord.ButtonStyle.gray, label="Invite me", url=invite_url) 
         view.add_item(item=invite_button)
@@ -127,21 +127,16 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         totalcommands = len(self.bot.commands)
         totalslash = f"\n{emoji_converter('bot_commands')} Slash : `{len([c for c in self.bot.commands if c.slash_command == True])}`"
 
-        latte_db = "\u200B"
         if ctx.guild.id == self.bot.latte_guild_id:
             latte_db = f"\n{emoji_converter('mongo')} Database : `MongoDB`"
 
-        fields = [
-            ("About Developer" , f"Owner: [{owner_bot}](https://discord.com/users/{owner_bot.id})" , False),
-            ("Stats " , f"{emoji_converter('cursor')} Line count : `{count_python('.'):,}`\n{emoji_converter('latte_icon')} Servers : `{serverCount}`\n{emoji_converter('member')} Users : `{memberCount}`\n{emoji_converter('bot_commands')} Commands : `{totalcommands}`" + totalslash if ctx.author == self.bot.renly else '\u200B' , False), #{platform.system()}
-            ("Bot Info" , f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`{latte_db}" , False),
-        ]
+        embed.add_field(name="About Developer", value=f"Owner: [{owner_bot}](https://discord.com/users/{owner_bot.id})", inline=False)
+        embed.add_field(name="Stats ", value=f"{emoji_converter('cursor')} Line count : `{count_python('.'):,}`\n{emoji_converter('latte_icon')} Servers : `{serverCount}`\n{emoji_converter('member')} Users : `{memberCount}`\n{emoji_converter('bot_commands')} Commands : `{totalcommands}`" + [totalslash if ctx.author == self.bot.renly else '\u200B'], inline=False)
+        embed.add_field(name="Bot Info",value=f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`{latte_db or '\u200B'}", inline=False)
         
-        for name , value , inline in fields:
-           embed.add_field(name=name , value=value , inline=inline)
-
-        # embed.add_field(name="Bot created" , value=f"{format_dt(self.bot.user.created_at)}" , inline=False)
-                
+        await ctx.reply(embed=embed, mention_author=False)
+        
+        # embed.add_field(name="Bot created" , value=f"{format_dt(self.bot.user.created_at)}" , inline=False)    
         #start_view_button
         # view = discord.ui.View()
         # style = discord.ButtonStyle.gray
@@ -149,7 +144,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         #Vote.gg = discord.ui.Button(style=style, label="Source code", url=self.bot.latte_source)
         # view.add_item(item=Source_code)
     
-        await ctx.reply(embed=embed, mention_author=False)
+
 
     @commands.command(help="Shows the latency of the bot")
     @commands.guild_only()

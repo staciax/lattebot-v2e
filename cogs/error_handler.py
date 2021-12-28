@@ -61,8 +61,8 @@ class Error(commands.Cog):
         elif isinstance(error, commands.NSFWChannelRequired):
             cm_error = f"This channel isn't NSFW"
         elif isinstance(error, commands.CheckFailure):
-            # cm_error = f"You can't use this command."
-            cm_error = f"I couldn't find that command."
+            cm_error = f"You can't use this command."
+            # cm_error = f"I couldn't find that command."
         elif isinstance(error, commands.DisabledCommand):
             cm_error = f"This command is restricted to slash commands." 
         # elif isinstance(error, commands.CommandError):
