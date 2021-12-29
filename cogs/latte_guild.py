@@ -229,7 +229,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         embed.description = f"{m_desktop}\n{m_mobile}\n{m_Web}"
         await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
-    @commands.command(help="Latte auto verify role")
+    @commands.command(name="giverole", help="Latte auto verify role")
     @commands.guild_only()
     @is_latte_guild()
     @mystic_role()
