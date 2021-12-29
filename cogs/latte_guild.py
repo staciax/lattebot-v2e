@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 # Local
 from utils.json_loader import latte_read
-from utils.checks import is_latte_guild
+from utils.checks import is_latte_guild, mystic_role
 from utils.emoji import status_converter
 from utils.errors import UserInputErrors
 from utils.latte_converter import latte_voice
@@ -232,6 +232,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.command(help="Latte auto verify role")
     @commands.guild_only()
     @is_latte_guild()
+    @mystic_role()
     async def autorole(self, ctx):
         sort_member = [g for g in sorted(ctx.guild.members, key=lambda g: g.joined_at, reverse=True)]
         member = sort_member[0]

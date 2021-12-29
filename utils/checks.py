@@ -77,6 +77,7 @@ def is_latte_guild():
 
 def is_my_friend():
     def predicate(ctx):
+        
         if ctx.author.id in [240350375201341442, 188653422864498688, 371230466319187969, 240137834349068290, 818849641784541234]:
             return True
         if ctx.author == ctx.bot.renly:
@@ -90,4 +91,12 @@ def bypass_for_owner(message):
         return None
     # Otherwise cooldown of 1 per 1 second
     return commands.Cooldown(1,60)
+
+def mystic_role():
+    def predicate(ctx):
+        role = ctx.bot.latte.get_role(842304286737956876)
+        if role in ctx.author.roles:
+            return True 
+        False
+    return commands.check(predicate)
 
