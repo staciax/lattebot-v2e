@@ -30,7 +30,7 @@ class PersistentView(discord.ui.View):
         self.bot = bot
         super().__init__(timeout=None)
 
-    @discord.ui.button(label='Do you like latte?', emoji='<:latte_:902674566655139881>', style=discord.ButtonStyle.primary, custom_id='lattebot_view_verifyv2x')
+    @discord.ui.button(label='Click for verify!', emoji='<:latte_:902674566655139881>', style=discord.ButtonStyle.primary, custom_id='lattebot_view_verifyv2x')
     async def latte_view_buttons(self, button: discord.ui.Button, interaction: discord.Interaction):
         latte_role = discord.utils.get(interaction.user.roles, id=842309176104976387)
         # bar_role = discord.utils.get(interaction.user.roles, id=854503426977038338)

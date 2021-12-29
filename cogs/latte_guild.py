@@ -229,7 +229,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         embed.description = f"{m_desktop}\n{m_mobile}\n{m_Web}"
         await ctx.send(embed=embed, ephemeral=True, delete_after=15)
 
-    @commands.command(name="giverole", help="Latte auto verify role")
+    @commands.command(name="giverole", help="Latte give verify role")
     @commands.guild_only()
     @is_latte_guild()
     @mystic_role()
@@ -246,7 +246,6 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
-
     
 def setup(bot):
     bot.add_cog(Latte(bot))
