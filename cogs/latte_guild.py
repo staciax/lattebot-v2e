@@ -93,11 +93,11 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                     stick = self.bot.get_sticker(878702176413810699)
                     await message.channel.send(stickers = [stick])
                 
-                if message.content.startswith(('เอาซันไลต์มาล้างตาดิ','เอาซันไลมา','ล้างตา','ซันไล')):
+                if message.content.startswith(('เอาซันไลต์มาล้างตาดิ','เอาซันไลมา','ล้างตา','ซันไล','sunline')):
                     stick = self.bot.get_sticker(872926576847777842)
                     await message.channel.send(stickers = [stick], delete_after=30)
                 
-                if message.content.startswith(('latte','ลาเต้','ลาตู้','ลาติเอ้','ลาตี้')):
+                if message.content.startswith(('latte','ลาเต้','ลาตู้','ลาติเอ้','ลาตี้','ลาติน่า','ลาติเอ้')):
                     stick = self.bot.get_sticker(random.choice([872921663803621406, 872927105799843871, 872931499324887070, 872933457418940466]))
                     await message.channel.send(content="เรียกเราหยอออ?", stickers = [stick], delete_after=30)
             

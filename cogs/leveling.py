@@ -11,20 +11,31 @@ from utils.checks import is_latte_guild
 from utils.errors import UserInputErrors
 
 # xp_channel
-chat_channel = 861883647070437386 , 840398821544296480 , 863438518981361686 , 859960606761549835 #chat,game,anime,kdbot
 
-# lvl_data
-level = ["level 3 ꮺ","level 5 ꮺ","level 10 ꮺ","level 20 ꮺ","level 25 ꮺ","level 30 ꮺ","level 40 ꮺ","level 45 ꮺ","level 50 ꮺ","Nebula ꮺ"]
-levelnum = [3,5,10,20,25,30,40,45,50,55]
-colorlvl = [0xeedad1,0xc39b7d,0xffbfd7,0xdbc6eb,0xcaf7e3,0xfdffbc,0xc1e7b8,0xc5ffff,0xec6fc1,0xb98fe4]
+colorlvl = {
+    3:0xeedad1,
+    5:0xc39b7d,
+    10:0xffbfd7,
+    15:0xc5ffff,
+    20:0xdbc6eb,
+    25:0xcaf7e3,
+    30:0xfdffbc,
+    40:0xc1e7b8,
+    45:0x99fdfd,
+    50:0xec6fc1,
+    55:0xb98fe4
+}
 
 class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Leveling system"""
 
     def __init__(self, bot):
         self.bot = bot
+        self.level = ["level 3 ꮺ","level 5 ꮺ","level 10 ꮺ","level 15 ꮺ","level 20 ꮺ","level 25 ꮺ","level 30 ꮺ","level 40 ꮺ","level 45 ꮺ","level 50 ꮺ","Nebula ꮺ"]
+        self.levelnum = [3,5,10,15,20,25,30,40,45,50,55]
+        self.chat_channel = 861883647070437386, 840398821544296480 , 863438518981361686 , 859960606761549835 #chat,game,anime,kdbot
         self.text_channel = 20
-        self.voice_channel = 5
+        self.voice_channel = 10
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -34,7 +45,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='lutoarakablush', id=903360992103268403, animated=False)
 
-    async def xp_update(self, member, guilds, channel=None, get_xp=None):
+    async def xp_update(self, member, guilds, get_xp, channel=None):
         if channel is None:
             member_guild = member.guild
             channel = member_guild.get_channel(861883647070437386)
@@ -52,33 +63,36 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             await member.add_roles(lvl_bar)
 
         xp = data["xp"]
-        data["xp"] += get_xp or self.text_channel
-        await self.bot.latte_level.update_by_custom(
-            {"id": member.id, "guild_id": guilds.id}, data
-        )
+        data["xp"] += get_xp
+        await self.bot.latte_level.update_by_custom({"id": member.id, "guild_id": guilds.id}, data)
         lvl = 0 
         while True:
             if xp < ((50*(lvl**2))+(50*lvl)):
                 break
             lvl += 1
         xp -= ((50*((lvl-1)**2))+(50*(lvl-1)))
-        if xp == 0:
-            emlvup = discord.Embed(description=f"{member.mention} you leveled up to **level {lvl}.**!", color=0xffffff)
+        try:
+            em_color = colorlvl[lvl]
+        except:
+            em_color = 0xffffff
+        if xp in range(get_xp):
+            emlvup = discord.Embed(description=f"{member.mention} you leveled up to **level {lvl}.**!", color=em_color)
             msg = await channel.send(embed=emlvup)
-            for i in range(len(level)):
-                if lvl == levelnum[i]:
-                    await member.add_roles(discord.utils.get(member.guild.roles, name=level[i]))
-                    embed = discord.Embed(description=f"{member.mention} you leveled up to **level {lvl}.**!\nyou have gotten role **{level[i]}**!!!",color=0xffffff)
-                    await msg.edit(embed=embed)
+            for i in range(len(self.level)):
+                if lvl == self.levelnum[i]:
+                    role = discord.utils.get(member.guild.roles, name=self.level[i])
+                    await member.add_roles(role)
+                    embed = discord.Embed(description=f"{member.mention} you leveled up to {role.mention}.!", color=em_color) #**!\nyou have gotten role **{self.level[i]}**!!!
+                    await msg.edit(embed=embed, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if not self.bot.tester or len(self.bot.tester) == 0:
             if message.author.bot:
                 return
-            if message.channel.id in chat_channel:
+            if message.channel.id in self.chat_channel:
                 try:
-                    await self.xp_update(message.author, message.guild, message.channel)
+                    await self.xp_update(message.author, message.guild, self.text_channel, message.channel)
                 except:
                     pass
             
@@ -157,7 +171,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             
             embedlv = discord.Embed(title=f"{member.name}'s level stats | {ctx.guild.name}",color=0x77dd77)
             embedlv.set_image(url="attachment://latte-level.png")
-            if ctx.channel.id in chat_channel:
+            if ctx.channel.id in self.chat_channel:
                 if ctx.clean_prefix != "/":
                     await ctx.message.delete()
                 return await ctx.reply(file=level_images(member, final_xp, lvl, rank, xp), embed=embedlv, ephemeral=True, delete_after=15, mention_author=False)
@@ -170,7 +184,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
         try:
             if member.guild == self.bot.latte:
                 if not before.channel and after.channel:
-                    await self.xp_update(member, member.guild, get_xp=self.voice_channel)
+                    await self.xp_update(member, member.guild, self.voice_channel)
         except:
             pass
 

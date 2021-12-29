@@ -57,8 +57,9 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         boost = check_boost(ctx)
         
         #get_embed_color
+        dominant_color = 0xffffff
         if ctx.guild.icon:
-            dominant_color = get_dominant_color(url=ctx.guild.icon.replace(format='png')) or 0xffffff
+            dominant_color = get_dominant_color(url=ctx.guild.icon.replace(format='png'))
 
         embed = discord.Embed(title=f"Server infomation - {ctx.guild.name}", color=dominant_color)
         fields = [("Server name",ctx.guild.name, True),

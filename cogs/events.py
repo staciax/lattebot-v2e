@@ -755,10 +755,8 @@ class Events(commands.Cog):
         embed.add_field(name='Amount of Channels:',value=f"{len(channels)}")
         embed.add_field(name='Amount of Roles:',value=f"{len(roles)}")
 
-        try:
+        if guild.icon:
             embed.set_thumbnail(url=guild.icon)    
-        except:
-            pass
 
         join_guild = self.bot.get_channel(self.bot.bot_join)
         await join_guild.send(embed=embed)
@@ -778,10 +776,8 @@ class Events(commands.Cog):
         except:
             pass
         
-        try:
+        if guild.icon:
             embed.set_thumbnail(url=guild.icon)    
-        except:
-            pass
 
         embed.add_field(name='Amount of Channels:',value=f"{len(channels)}")
         embed.add_field(name='Amount of Roles:',value=f"{len(roles)}")

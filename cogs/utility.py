@@ -158,24 +158,28 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             member = ctx.author
 
         embed = discord.Embed(color=self.bot.white_color)
+        embed.description = f"Welcome back {member.mention} , i've removed your **AFK** status."
         if member.id in self.bot.afk_user.keys() is not None:
             try:
                 if self.bot.afk_user[member.id]['name'] is not None:
                     await member.edit(nick=self.bot.afk_user[member.id]['name'])
                 else:
-                    await member.edit(nick=None)
+                    if member.display_name.startswith('[AFK]'):
+                        name_strip = member.display_name.strip('[AFK] ')
+                        await member.edit(nick=name_strip)
+                    else:
+                        await member.edit(nick=None)
             except:
                 pass
-
             del self.bot.afk_user[member.id]
-            embed.description = f"Welcome back {member.mention} , i've removed your **AFK** status."
             return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
         elif member.display_name.startswith('[AFK]'):
-            name_strip = member.display_name.strip('[AFK] ')
             try:
-                return await member.edit(nick=name_strip)
+                name_strip = member.display_name.strip('[AFK] ')
+                await member.edit(nick=name_strip)
             except:
                 raise UserInputErrors("I can't clear your afk status")
+            return await ctx.send(embed=embed, ephemeral=True, delete_after=15)
         raise UserInputErrors("You don't have afk status")
 
     @commands.command(help="your message to saybot")
