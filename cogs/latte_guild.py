@@ -228,6 +228,24 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         embed.set_author(name=member, icon_url=ctx.author.avatar or ctx.author.default_avatar)
         embed.description = f"{m_desktop}\n{m_mobile}\n{m_Web}"
         await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+
+    @commands.command(help="Latte auto verify role")
+    @commands.guild_only()
+    @is_latte_guild()
+    async def autorole(self, ctx):
+        sort_member = [g for g in sorted(ctx.guild.members, key=lambda g: g.joined_at, reverse=True)]
+        member = sort_member[0]
+        latte_roles = self.bot.latte.get_role(842309176104976387)
+        bar_role = self.bot.latte.get_role(854503426977038338)
+        if latte_roles not in member.roles:
+            await member.add_roles(latte_roles, bar_role)
+            chat_channel = self.bot.latte.get_channel(861883647070437386)
+            embed = discord.Embed(color=0xffffff)
+            embed.description = f'{member.mention} gets a role {latte_roles.mention}'
+            await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
+            return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
+        raise UserInputErrors("Member's already have a mute role.")
+
     
 def setup(bot):
     bot.add_cog(Latte(bot))

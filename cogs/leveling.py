@@ -34,8 +34,8 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
         self.level = ["level 3 ꮺ","level 5 ꮺ","level 10 ꮺ","level 15 ꮺ","level 20 ꮺ","level 25 ꮺ","level 30 ꮺ","level 40 ꮺ","level 45 ꮺ","level 50 ꮺ","Nebula ꮺ"]
         self.levelnum = [3,5,10,15,20,25,30,40,45,50,55]
         self.chat_channel = 861883647070437386, 840398821544296480 , 863438518981361686 , 859960606761549835 #chat,game,anime,kdbot
-        self.text_channel = 20
-        self.voice_channel = 10
+        self.text_xp = 20
+        self.voice_xp = 10
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -92,7 +92,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
                 return
             if message.channel.id in self.chat_channel:
                 try:
-                    await self.xp_update(message.author, message.guild, self.text_channel, message.channel)
+                    await self.xp_update(message.author, message.guild, self.text_xp, message.channel)
                 except:
                     pass
             
@@ -184,7 +184,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
         try:
             if member.guild == self.bot.latte:
                 if not before.channel and after.channel:
-                    await self.xp_update(member, member.guild, self.voice_channel)
+                    await self.xp_update(member, member.guild, self.voice_xp)
         except:
             pass
 
