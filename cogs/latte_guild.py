@@ -175,17 +175,67 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.command(help="Custom role color")
     @commands.guild_only()
     @is_latte_guild()
-    async def colors(self, ctx, color=commands.Option(description="Specify the color you want to change.")):
-        embed = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
-        embed.set_author(name=f'{ctx.guild.name} | Color Request', icon_url=ctx.guild.icon.url)
-        embed.description = f"**Color:** {color}"
-        embed.set_footer(text="Requested by", icon_url=ctx.author.avatar or ctx.author.default_avatar)
-        await self.bot.renly.send(embed=embed)
+    async def color(self, ctx, color=commands.Option(description="Specify the color you want to change. (Color such as #ffa01b, #e8476a, f1eee6, ffa01b)")):
+        member = ctx.author
+        guild = ctx.guild
+        if color.startswith('#'):
+            color = color.replace('#', '')
+        color_name = f'#{color}'
+            
+        try:
+            color_int = int(color, 16)
+        except:
+            raise UserInputErrors('Color is valid (Color such as #ffa01b, #e8476a, f1eee6, ffa01b)')
+        
+        request = await self.bot.session.get(f'https://api.color.pizza/v1/?values={color}')
+        api = await request.json()
+        if request.status == 200:
+            color_name = api.get('colors')[0].get('name')
+        final_name = f'⠀{color_name.lower()} ♡ ₊˚'
 
-        embed_send = discord.Embed(color=0xffffff, timestamp=ctx.message.created_at)
-        embed_send.description = 'I have sent your request to the moderator. <3'
-        await ctx.reply(embed=embed_send, mention_author=False)
+        data = await self.bot.custom_roles.find_by_custom({"id": member.id})            
+        if data is None:        
+            color_bar = guild.get_role(854506876674244608).position
+            role = await guild.create_role(name=final_name, color=color_int)
+            data = {
+                "id" : member.id,
+                "role_id": role.id
+            }
+            positions = {role: color_bar}
+            await guild.edit_role_positions(positions=positions)
+            await member.add_roles(role)
 
+            await self.bot.custom_roles.update_by_custom({"id": member.id}, data)
+            embed = discord.Embed(description=role.mention, color=color_int)
+            return await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+
+        role_id = int(data["role_id"])
+        role = guild.get_role(role_id)
+        await role.edit(name=final_name, color=color_int)
+        embed = discord.Embed(description=role.mention, color=color_int)
+        await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+    
+    @commands.command(help="remove custom role color")
+    @commands.guild_only()
+    @is_latte_guild()
+    async def color_remove(self, ctx):
+        member = ctx.author
+        guild = ctx.guild
+        
+        data = await self.bot.custom_roles.find_by_custom({"id": member.id})            
+        if data is None:        
+            raise UserInputErrors("You don't have custom color role")
+
+        role_id = int(data["role_id"])
+        role = guild.get_role(role_id)
+        embed = discord.Embed(description=f'**Successfully removed:** {role.mention}', color=role.color or 0xffffff)
+        data_deleted = await self.bot.custom_roles.delete_by_custom({"id": member.id})
+        if data_deleted and data_deleted.acknowledged:
+            await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+            await role.delete()
+        else:
+            raise UserInputErrors("I could not remove your custom color")
+        
     @commands.command(help="Move all members in your current channel")
     @commands.guild_only()
     @is_latte_guild()
@@ -247,5 +297,22 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
     
+    @commands.command(name="reactionrole")
+    @commands.guild_only()
+    @commands.is_owner()
+    async def reactionrole(self, ctx):
+        blank = '<:blank:926496177418043392>'
+        
+        embed1 = discord.Embed(color=0xffffff)
+        embed1.title=f'> {blank} <:bubblegumheartu:903339950353813595> <:blueberryheartu:903339950337032212> **C o l o r s** <a:bw_white_Hearts_White:859399024558080020>'
+        embed1.description = '<a:dp_arrowright:926495510372683796> Choose your favourite color!\n'
+        embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
+        
+        embed1.description += f'{blank} <emoji_color> <role>\n'
+
+        embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
+
+        await ctx.send(embed=embed1, allowed_mentions=discord.AllowedMentions.none())
+
 def setup(bot):
     bot.add_cog(Latte(bot))

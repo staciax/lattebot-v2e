@@ -38,8 +38,10 @@ class PersistentView(discord.ui.View):
             embed = discord.Embed(color=0xffffff)
             embed.description = "Let's check out . . .\n\n﹒<#861883647070437386> \n﹒<#840380566862823425>"
             role = self.bot.latte.get_role(842309176104976387)
-            role2 = self.bot.latte.get_role(854503426977038338)
-            await interaction.user.add_roles(role, role2)
+            lvl = self.bot.latte.get_role(854503041775566879)
+            spacial = self.bot.latte.get_role(926471814757113946)
+            # bar = self.bot.latte.get_role(854503426977038338)
+            await interaction.user.add_roles(role, lvl, spacial)
             await interaction.response.send_message(embed=embed, ephemeral=True)
             chat_channel = self.bot.latte.get_channel(861883647070437386)
             await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{interaction.user.mention}', allowed_mentions=discord.AllowedMentions.none())
@@ -177,6 +179,7 @@ if __name__ == "__main__":
     bot.latte_tags = Document(bot.latte_db, "tags")
     bot.latte_todo = Document(bot.latte_db, "todo")
     bot.latte_stars = Document(bot.latte_db, "stars")
+    bot.custom_roles = Document(bot.latte_db, "custom_roles")
 
     #ping
     bot.db_ping = bot.mongo["lattebot"]

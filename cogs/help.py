@@ -65,7 +65,7 @@ class HelpView(discord.ui.View):
             signature = f'{command.qualified_name}'
             if self.ctx.clean_prefix != '/':
                 signature += cmd_sig
-            embed.add_field(name=signature, value=command.short_doc or 'No help given...', inline=False)
+            embed.add_field(name='> %s' % signature, value=command.short_doc or 'No help given...', inline=False)
             embed.set_footer(text="<> = required argument | [] = optional argument")
             if len(embed.fields) == 5:
                 embeds.append(embed)

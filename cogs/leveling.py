@@ -58,9 +58,9 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
                 "guild_id": guilds.id
             }
             #add_role_xp_bar
-            guild = guilds
-            lvl_bar = discord.utils.get(guild.roles, id = 854503041775566879)#・ ──────꒰ ・ levels ・ ꒱────── ・
-            await member.add_roles(lvl_bar)
+            # guild = guilds
+            # lvl_bar = discord.utils.get(guild.roles, id = 854503041775566879)#・ ──────꒰ ・ levels ・ ꒱────── ・
+            # await member.add_roles(lvl_bar)
 
         xp = data["xp"]
         data["xp"] += get_xp
@@ -75,6 +75,10 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             em_color = colorlvl[lvl]
         except:
             em_color = 0xffffff
+        if lvl >= 3:
+            lvl_bar = discord.utils.get(member.roles, id=854503041775566879)
+            if not lvl_bar:
+                await member.add_roles(lvl_bar)
         if xp in range(get_xp):
             emlvup = discord.Embed(description=f"{member.mention} you leveled up to **level {lvl}.**!", color=em_color)
             msg = await channel.send(embed=emlvup)
