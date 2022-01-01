@@ -215,7 +215,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         embed = discord.Embed(description=role.mention, color=color_int)
         await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
     
-    @commands.command(help="remove custom role color")
+    @commands.command(aliases=['colorremove'], help="remove custom role color")
     @commands.guild_only()
     @is_latte_guild()
     async def color_remove(self, ctx):
