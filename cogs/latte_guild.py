@@ -185,7 +185,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         try:
             color_int = int(color, 16)
         except:
-            raise UserInputErrors('Color is valid (Color such as #ffa01b, #e8476a, f1eee6, ffa01b)')
+            raise UserInputErrors('**Invalid color.** (Color such as #ffa01b, #e8476a, f1eee6, ffa01b)')
         
         request = await self.bot.session.get(f'https://api.color.pizza/v1/?values={color}')
         api = await request.json()
@@ -193,27 +193,34 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             color_name = api.get('colors')[0].get('name')
         final_name = f'⠀{color_name.lower()} ♡ ₊˚'
 
-        data = await self.bot.custom_roles.find_by_custom({"id": member.id})            
-        if data is None:        
-            color_bar = guild.get_role(854506876674244608).position
-            role = await guild.create_role(name=final_name, color=color_int)
-            data = {
-                "id" : member.id,
-                "role_id": role.id
-            }
-            positions = {role: color_bar}
-            await guild.edit_role_positions(positions=positions)
-            await member.add_roles(role)
+        try:
+            data = await self.bot.custom_roles.find_by_custom({"id": member.id})            
+            if data is None:        
+                color_bar = guild.get_role(854506876674244608).position
+                role = await guild.create_role(name=final_name, color=color_int)
+                data = {
+                    "id" : member.id,
+                    "role_id": role.id
+                }
+                positions = {role: color_bar}
+                await guild.edit_role_positions(positions=positions)
+                await member.add_roles(role)
 
-            await self.bot.custom_roles.update_by_custom({"id": member.id}, data)
+                await self.bot.custom_roles.update_by_custom({"id": member.id}, data)
+                embed = discord.Embed(description=role.mention, color=color_int)
+                return await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+
+            role_id = int(data["role_id"])
+            role = guild.get_role(role_id)
+            await role.edit(name=final_name, color=color_int)
             embed = discord.Embed(description=role.mention, color=color_int)
-            return await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
-
-        role_id = int(data["role_id"])
-        role = guild.get_role(role_id)
-        await role.edit(name=final_name, color=color_int)
-        embed = discord.Embed(description=role.mention, color=color_int)
-        await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+            await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+        finally:
+            embed_log = discord.Embed(title='Custom color', color=color_int, timestamp=ctx.message.created_at)
+            embed_log.add_field(name='Role', value=role.mention,inline=False)
+            embed_log.add_field(name='Color', value=color_name, inline=False)
+            server_log = guild.get_channel(859789105507598346)
+            await server_log.send(embed=embed_log, allowed_mentions=discord.AllowedMentions.none())
     
     @commands.command(aliases=['colorremove'], help="remove custom role color")
     @commands.guild_only()
