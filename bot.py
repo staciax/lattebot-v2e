@@ -18,34 +18,17 @@ import aiohttp
 # Local
 from utils.json_loader import read_json
 from utils.mongo import Document
+from utils.errors import Blacklisted_user
+from utils.latte_converter import LatteVerifyView
 
 #json_loader
 data = read_json('bot_var')
 
+#env_loader
 dotenv_path = join(dirname(__file__), 'data/secrets/settings.env')
 load_dotenv(dotenv_path)
 
-class PersistentView(discord.ui.View):
-    def __init__(self, bot):
-        self.bot = bot
-        super().__init__(timeout=None)
-
-    @discord.ui.button(label='Click for verify!', emoji='<:latte_:902674566655139881>', style=discord.ButtonStyle.primary, custom_id='lattebot_view_verifyv2x')
-    async def latte_view_buttons(self, button: discord.ui.Button, interaction: discord.Interaction):
-        latte_role = discord.utils.get(interaction.user.roles, id=842309176104976387)
-        # bar_role = discord.utils.get(interaction.user.roles, id=854503426977038338)
-        if not latte_role:
-            embed = discord.Embed(color=0xffffff)
-            embed.description = "Let's check out . . .\n\n﹒<#861883647070437386> \n﹒<#840380566862823425>"
-            role = self.bot.latte.get_role(842309176104976387)
-            lvl = self.bot.latte.get_role(854503041775566879)
-            spacial = self.bot.latte.get_role(926471814757113946)
-            # bar = self.bot.latte.get_role(854503426977038338)
-            await interaction.user.add_roles(role, lvl, spacial)
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-            chat_channel = self.bot.latte.get_channel(861883647070437386)
-            await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{interaction.user.mention}', allowed_mentions=discord.AllowedMentions.none())
-
+#get_prefix
 async def get_prefix(bot, message):
     prefix = 're'
     if message.guild == bot.latte:
@@ -116,7 +99,7 @@ class LatteBot(commands.AutoShardedBot):
     async def on_ready(self):
         if not self.persistent_views_added:
             print('LatteVerify is ready')
-            self.add_view(PersistentView(self))
+            self.add_view(LatteVerifyView(self))
             self.persistent_views_added = True
         
         self.latte_invite_code = await self.latte.invites()
@@ -126,18 +109,21 @@ class LatteBot(commands.AutoShardedBot):
 
 bot = LatteBot(help_command = None, case_insensitive = True, owner_id=240059262297047041)
 
+#prepare_verify_view
 @bot.command()
 @commands.is_owner()
 async def prepare_verify(ctx: commands.Context):
     file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
-    await ctx.send(file=file, view=PersistentView(bot=bot) or None)
+    await ctx.send(file=file, view=LatteVerifyView(bot=bot) or None)
     await ctx.message.delete()
 
+#database
 async def create_db_pool():
     if not bot.tester or len(bot.tester) == 0:
         bot.pg_con = await asyncpg.create_pool(host=data['dbhost'], user=data['dbuser'], password=data['dbpassword'], database=data['database'], min_size=1, max_size=5)
         print("Connected to PostgreSQL")
 
+#blacklist_user
 async def run_once_when_ready():
     await bot.wait_until_ready()
     if not bot.tester or len(bot.tester) == 0:
@@ -145,9 +131,6 @@ async def run_once_when_ready():
         for value in banuser:
             bot.blacklist[value['user_id']] = (value['is_blacklisted'] or False)
         print("\nBlacklist database loaded")
-
-class Blacklisted_user(commands.CheckFailure):
-    pass
 
 @bot.check
 def blacklist(ctx):
@@ -166,27 +149,22 @@ def blacklist(ctx):
             raise Blacklisted_user
     return True
 
+#jishaku
 bot.load_extension('jishaku')
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
 os.environ["JISHAKU_HIDE"] = "True"
 
 if __name__ == "__main__":
+    #database
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(bot.mongo_url))
-
-    #main database
     bot.latte_db = bot.mongo["latteonly"]
+    bot.db_level = bot.mongo["discord"]
     bot.latte_tags = Document(bot.latte_db, "tags")
     bot.latte_todo = Document(bot.latte_db, "todo")
     bot.latte_stars = Document(bot.latte_db, "stars")
     bot.custom_roles = Document(bot.latte_db, "custom_roles")
-
-    #ping
-    bot.db_ping = bot.mongo["lattebot"]
-    bot.latte_ping = Document(bot.db_ping, "latency")
-
-    #leveling
-    bot.db_level = bot.mongo["discord"]
+    bot.latte_ping = Document(bot.latte_db, "latency")
     bot.latte_level = Document(bot.db_level, "levelling")
     
     for file in os.listdir("./cogs"):

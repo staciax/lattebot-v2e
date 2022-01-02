@@ -5,3 +5,6 @@ from discord.ext import commands
 class UserInputErrors(commands.UserInputError):
     def __init__(self, message: str, *arg: Any):
         super().__init__(message=message, *arg)
+
+class Blacklisted_user(commands.CheckFailure):
+    pass

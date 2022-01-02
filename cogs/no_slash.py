@@ -7,6 +7,7 @@ from utils.formats import format_dt
 # Third party
 # Local
 from utils.checks import is_latte_guild
+from utils.latte_converter import fancy_text
 
 class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
     """Only message command."""
@@ -42,7 +43,27 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
         futuredate = datetime.now(timezone.utc) - timedelta(seconds=int(uptime.total_seconds())) 
         embed = discord.Embed(description=f"🕘 I started {format_dt(futuredate, style='R')}", color=self.bot.white_color)
         await ctx.send(embed=embed)
-    
+
+    @commands.command(name='ftext')
+    @commands.guild_only()
+    @is_latte_guild()
+    async def ftext(self, ctx, *, text):
+        if len(text) == 0 or len(text) > 200:
+            return
+        
+        def split(word):
+            return list(word)
+
+        text_list = split(text)
+        output = ''
+        for x in text_list:
+            try:
+                output += fancy_text[x]
+            except:
+                pass
+
+        await ctx.send(output)
+
     # @commands.command(help="Happy new year 2022")
     # @commands.guild_only()
     # @is_latte_guild()

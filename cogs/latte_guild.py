@@ -175,28 +175,36 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @commands.command(help="Custom role color")
     @commands.guild_only()
     @is_latte_guild()
+    @commands.cooldown(2, 60, commands.BucketType.member)
     async def color(self, ctx, color=commands.Option(description="Specify the color you want to change. (Color such as #ffa01b, #e8476a, f1eee6, ffa01b)")):
         member = ctx.author
         guild = ctx.guild
         if color.startswith('#'):
             color = color.replace('#', '')
-        color_name = f'#{color}'
+        hex_name = f'#{color}'
             
         try:
             color_int = int(color, 16)
         except:
             raise UserInputErrors('**Invalid color.** (Color such as #ffa01b, #e8476a, f1eee6, ffa01b)')
         
+        #api https://github.com/meodai/color-names
         request = await self.bot.session.get(f'https://api.color.pizza/v1/?values={color}')
         api = await request.json()
         if request.status == 200:
             color_name = api.get('colors')[0].get('name')
         final_name = f'⠀{color_name.lower()} ♡ ₊˚'
 
+        embed = discord.Embed(color=color_int)
+        
         try:
+            #find_user_data
             data = await self.bot.custom_roles.find_by_custom({"id": member.id})            
-            if data is None:        
+            if data is None:
+                #role_position
                 color_bar = guild.get_role(854506876674244608).position
+                
+                #create_role
                 role = await guild.create_role(name=final_name, color=color_int)
                 data = {
                     "id" : member.id,
@@ -206,19 +214,26 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 await guild.edit_role_positions(positions=positions)
                 await member.add_roles(role)
 
+                #insert_to_database
                 await self.bot.custom_roles.update_by_custom({"id": member.id}, data)
-                embed = discord.Embed(description=role.mention, color=color_int)
+                
+                embed.description=f'{role.mention}\n*hex:* {hex_name}'
                 return await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
 
             role_id = int(data["role_id"])
             role = guild.get_role(role_id)
             await role.edit(name=final_name, color=color_int)
-            embed = discord.Embed(description=role.mention, color=color_int)
+            role_after = guild.get_role(role_id)
+            embed.description=f'{role_after.mention}\n*hex:* {hex_name}'
             await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+        except:
+            raise UserInputErrors("I couldn't create custom color, please try again")
         finally:
+            #send to server-log
             embed_log = discord.Embed(title='Custom color', color=color_int, timestamp=ctx.message.created_at)
+            embed_log.add_field(name='Member', value=member.display_name, inline=False)
             embed_log.add_field(name='Role', value=role.mention,inline=False)
-            embed_log.add_field(name='Color', value=color_name, inline=False)
+            embed_log.add_field(name='HEX',value=f'{hex_name}')
             server_log = guild.get_channel(859789105507598346)
             await server_log.send(embed=embed_log, allowed_mentions=discord.AllowedMentions.none())
     
@@ -233,41 +248,47 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         if data is None:        
             raise UserInputErrors("You don't have custom color role")
 
-        role_id = int(data["role_id"])
-        role = guild.get_role(role_id)
-        embed = discord.Embed(description=f'**Successfully removed:** {role.mention}', color=role.color or 0xffffff)
-        data_deleted = await self.bot.custom_roles.delete_by_custom({"id": member.id})
-        if data_deleted and data_deleted.acknowledged:
-            await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
-            await role.delete()
-        else:
-            raise UserInputErrors("I could not remove your custom color")
+        try:
+            role_id = int(data["role_id"])
+            role = guild.get_role(role_id)
+            if role:
+                embed = discord.Embed(description=f'**Successfully removed:** {role.mention} / {role.color}', color=role.color or 0xffffff)
+                data_deleted = await self.bot.custom_roles.delete_by_custom({"id": member.id})
+                if data_deleted and data_deleted.acknowledged:
+                    await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
+                    await role.delete()
+                    return
+                raise UserInputErrors("I couldn't remove your custom color, please try again")
+            raise UserInputErrors("I can't find your role.")
+        except:
+            raise UserInputErrors("I couldn't remove your custom color, please try again")
         
     @commands.command(help="Move all members in your current channel")
     @commands.guild_only()
     @is_latte_guild()
-    async def move(self, ctx, to_channel:Literal['Totsuki','general','game','music - 1','music - 2','listen only','movie','working','afk',"don't know",'underworld','moonlight','angel','death','temp']=commands.Option(description="Spectify channel")):        
+    async def move(self, ctx, to_channel:discord.VoiceChannel= commands.Option(description="Spectify channel")):        
+        
         try:
             now_channel = ctx.author.voice.channel
             in_channel = now_channel.members
         except:
             raise UserInputErrors('You must join a voice channel first.')
         
-        to_channels = ctx.guild.get_channel(latte_voice[to_channel])
-        if now_channel.id == to_channels.id:
-            raise UserInputErrors(f'You cannot move from {now_channel.mention} to {to_channels.mention}.')
+        # to_channels = ctx.guild.get_channel(latte_voice[to_channel])
+        if now_channel == to_channel:
+            raise UserInputErrors(f'You cannot move from {now_channel.mention} to {to_channel.mention}.')
 
         try:
             for x in in_channel:
-                await x.move_to(channel=to_channels)
+                await x.move_to(channel=to_channel)
         except discord.Forbidden:
             raise UserInputErrors("I don't have the permissions to move member")
         except discord.HTTPException as e:
-            raise UserInputErrors(f'Failed to move member - {e}')
-        except Exception as e:
             raise UserInputErrors(f'Failed to move member')
+        except Exception as e:
+            raise UserInputErrors(f'Failed to move member - {e}')
         
-        embed = Embed(description = f'You moved `{len(in_channel)}` members to {to_channels.mention}')
+        embed = Embed(description = f'You moved `{len(in_channel)}` members to {to_channel.mention}')
         await ctx.reply(embed=embed, mention_author=False)
     
     @commands.command(name="status", help="Shows status about the specified member.")
