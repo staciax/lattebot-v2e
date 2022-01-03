@@ -117,7 +117,7 @@ class Events(commands.Cog):
                 boost_channel = guild.get_channel(876737270051389470)
                 boost_name = f"ʙᴏᴏꜱᴛꜱ・{self.boost_}"
                 await boost_channel.edit(name=boost_name)
-        except RuntimeError:
+        except:
             pass
 
     @counted.before_loop
@@ -136,7 +136,7 @@ class Events(commands.Cog):
             for x in member_all:
                 if x.display_name.startswith('[AFK]'):
                     await x.edit(nick=None)
-        except RuntimeError:
+        except:
             pass
 
     @afk_check.before_loop
@@ -265,7 +265,9 @@ class Events(commands.Cog):
         self.bot.sniped[message.guild.id] = message, message.content , message.author , message.channel , message.created_at 
     
         if message.embeds:
-            self.bot.sniped_embed[message.guild.id] = message.embeds[0]
+            if message.author == self.bot:
+                return
+            self.bot.sniped_embed[message.guild.id] = message.embeds[0], message.content or None
 
         #latte_log_message
         self.message_log = self.bot.get_channel(self.json_read["message-log"])

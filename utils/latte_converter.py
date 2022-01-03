@@ -21,24 +21,6 @@ class LatteVerifyView(discord.ui.View):
             chat_channel = self.bot.latte.get_channel(861883647070437386)
             await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{interaction.user.mention}', allowed_mentions=discord.AllowedMentions.none())
 
-latte_voice = {
-    'Totsuki': 861371712153845781,
-    'general': 840381453779206166,
-    'game': 840406478615085056,
-    'music - 1': 840381486485340171,
-    'music - 2': 840384917635858444,
-    'listen only': 888526894738317323,
-    'movie': 859656177067098142,
-    'working': 890965104361889793,
-    'afk': 840387675008663592,
-    "don't know": 886966133176017017,
-    'underworld': 873679362082369546,
-    'moonlight': 875038018736644166,
-    'angel': 883027485455941712,
-    'death': 883059509810040884,
-    'temp': 879260241286549525,
-}
-
 fancy_text = {
     '0':'𝟶',
     '1':'𝟷',

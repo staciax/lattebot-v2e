@@ -208,8 +208,7 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.bot_has_permissions(send_messages=True, embed_links=True)
     async def snipe(self, ctx, type: Literal["message", "embed"] = commands.Option(description="choose type")):
 
-        embed = Embed()
-        embed.color = self.bot.white_color
+        embed = Embed(color=self.bot.white_color)
 
         if type == 'message':
             
@@ -236,11 +235,11 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
         
         if type == 'embed':
             try:
-                embed_snipe = self.bot.sniped_embed[ctx.guild.id]
+                embed_snipe, embed_content = self.bot.sniped_embed[ctx.guild.id]
             except:
                 raise UserInputErrors("Couldn't find a embed to snipe!")
 
-            await ctx.send(embed=embed_snipe)
+            await ctx.send(content=embed_content or None, embed=embed_snipe)
 
     @commands.command(help="Converter text to binary")
     @commands.guild_only()

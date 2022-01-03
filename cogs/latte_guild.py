@@ -13,7 +13,6 @@ from utils.json_loader import latte_read
 from utils.checks import is_latte_guild, mystic_role
 from utils.emoji import status_converter
 from utils.errors import UserInputErrors
-from utils.latte_converter import latte_voice
 from utils.useful import Embed
 
 class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
@@ -199,7 +198,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         
         try:
             #find_user_data
-            data = await self.bot.custom_roles.find_by_custom({"id": member.id})            
+            data = await self.bot.custom_roles.find_by_custom({"id": member.id})         
             if data is None:
                 #role_position
                 color_bar = guild.get_role(854506876674244608).position
@@ -217,23 +216,23 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                 #insert_to_database
                 await self.bot.custom_roles.update_by_custom({"id": member.id}, data)
                 
-                embed.description=f'{role.mention}\n*hex:* {hex_name}'
+                embed.description=f'{role.mention} | *{role.color}*'
                 return await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
 
             role_id = int(data["role_id"])
             role = guild.get_role(role_id)
             await role.edit(name=final_name, color=color_int)
-            role_after = guild.get_role(role_id)
-            embed.description=f'{role_after.mention}\n*hex:* {hex_name}'
+            role = guild.get_role(role_id)
+            embed.description=f'{role.mention} | *{role.color}*'
             await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
         except:
+            if data is not None:
+                await self.bot.custom_roles.delete_by_custom({"id": member.id})
             raise UserInputErrors("I couldn't create custom color, please try again")
         finally:
             #send to server-log
-            embed_log = discord.Embed(title='Custom color', color=color_int, timestamp=ctx.message.created_at)
-            embed_log.add_field(name='Member', value=member.display_name, inline=False)
-            embed_log.add_field(name='Role', value=role.mention,inline=False)
-            embed_log.add_field(name='HEX',value=f'{hex_name}')
+            embed_log = discord.Embed(title='Color change', color=role.color, timestamp=ctx.message.created_at)
+            embed_log.description = f'{member.mention} | {role.mention} | {role.color}'
             server_log = guild.get_channel(859789105507598346)
             await server_log.send(embed=embed_log, allowed_mentions=discord.AllowedMentions.none())
     
@@ -252,7 +251,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             role_id = int(data["role_id"])
             role = guild.get_role(role_id)
             if role:
-                embed = discord.Embed(description=f'**Successfully removed:** {role.mention} / {role.color}', color=role.color or 0xffffff)
+                embed = discord.Embed(description=f'**Successfully removed:** {role.mention} | *{role.color}*', color=role.color or 0xffffff)
                 data_deleted = await self.bot.custom_roles.delete_by_custom({"id": member.id})
                 if data_deleted and data_deleted.acknowledged:
                     await ctx.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none(), mention_author=False)
@@ -325,22 +324,24 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
     
-    @commands.command(name="reactionrole")
-    @commands.guild_only()
-    @commands.is_owner()
-    async def reactionrole(self, ctx):
-        blank = '<:blank:926496177418043392>'
+    # @commands.command(name="reactionrole")
+    # @commands.guild_only()
+    # @commands.is_owner()
+    # async def reactionrole(self, ctx):
+    #     blank = '<:blank:926496177418043392>'
         
-        embed1 = discord.Embed(color=0xffffff)
-        embed1.title=f'> {blank} <:bubblegumheartu:903339950353813595> <:blueberryheartu:903339950337032212> **C o l o r s** <a:bw_white_Hearts_White:859399024558080020>'
-        embed1.description = '<a:dp_arrowright:926495510372683796> Choose your favourite color!\n'
-        embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
+    #     embed1 = discord.Embed(color=0xffffff)
+    #     embed1.title=f'> {blank} <:bubblegumheartu:903339950353813595> <:blueberryheartu:903339950337032212> **C o l o r s** <a:bw_white_Hearts_White:859399024558080020>'
+    #     embed1.description = '<a:dp_arrowright:926495510372683796> Choose your favourite color!\n'
+    #     embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
         
-        embed1.description += f'{blank} <emoji_color> <role>\n'
+    #     embed1.description += f'{blank} <emoji_color> <role>\n'
 
-        embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
+    #     embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
 
-        await ctx.send(embed=embed1, allowed_mentions=discord.AllowedMentions.none())
+    #     await ctx.send(embed=embed1, allowed_mentions=discord.AllowedMentions.none())
+
+    
 
 def setup(bot):
     bot.add_cog(Latte(bot))
