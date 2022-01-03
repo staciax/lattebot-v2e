@@ -339,11 +339,10 @@ class Events(commands.Cog):
                             color=0xCCCCFF
                 )
 
-                try:
-                    embed.set_author(name=member, icon_url=member.avatar.url if member.avatar is not None else member.default_avatar)
-                    embed.set_thumbnail(url=member.avatar.url if member.avatar is not None else member.default_avatar)
-                except:
-                    pass
+                embed.set_author(name=member)
+                if member.avatar is not None:
+                    embed.set_author(name=member, icon_url=member.avatar.url)
+                    embed.set_thumbnail(url=member.avatar.url)
                 
                 if self.welcome_image is not None:
                     embed.set_image(url=self.welcome_image)
@@ -404,7 +403,8 @@ class Events(commands.Cog):
                         color=0xdbd7d2)
             # if member.avatar.url is not None:
             #     embed_log.set_thumbnail(url=member.avatar.url)
-            embed_log.set_thumbnail(url=member.avatar or member.default_avatar)
+            if member.avatar is not None:
+                embed_log.set_thumbnail(url=member.avatar or member.default_avatar)
             embed_log.set_footer(text="—・see you next time ♡")
             embed_log.timestamp = datetime.now(timezone.utc)
 
