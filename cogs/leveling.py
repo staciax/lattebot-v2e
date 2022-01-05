@@ -35,7 +35,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
         self.levelnum = [3,5,10,15,20,25,30,40,45,50,55]
         self.chat_channel = 861883647070437386, 840398821544296480 , 863438518981361686 , 859960606761549835 #chat,game,anime,kdbot
         self.text_xp = 20
-        self.voice_xp = 10
+        self.voice_xp = 20
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -79,7 +79,7 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             lvl_bar = discord.utils.get(member.roles, id=854503041775566879)
             if not lvl_bar:
                 await member.add_roles(lvl_bar)
-        if xp in range(get_xp):
+        if xp == 0:
             emlvup = discord.Embed(description=f"{member.mention} you leveled up to **level {lvl}.**!", color=em_color)
             msg = await channel.send(embed=emlvup)
             for i in range(len(self.level)):
