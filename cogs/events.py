@@ -713,36 +713,36 @@ class Events(commands.Cog):
         except Exception as Ex:
             print(f'on_voice_state_update - {Ex}')
         
-    # @commands.Cog.listener()
-    # async def on_presence_update(self, before, after):
-    #     # role = discord.utils.find(lambda r: r.name == 'ᴴ ᴱ ᴸ ᴬ・・ ♡', guild.roles)
+    @commands.Cog.listener()
+    async def on_presence_update(self, before, after):
+        # role = discord.utils.find(lambda r: r.name == 'ᴴ ᴱ ᴸ ᴬ・・ ♡', guild.roles)
 
-    #     #add_offline_role
-    #     if before.guild.id == self.bot.latte_guild_id:
-    #         try:
-    #             role = discord.utils.get(before.guild.roles, id = 886193080997384222)
-    #             if str(after.status) == "online" or "dnd" and "idle":
-    #                 await before.remove_roles(role)
-    #             if str(after.status) == "offline":
-    #                 await after.add_roles(role)
+        #add_offline_role
+        if before.guild.id == self.bot.latte_guild_id:
+            try:
+                # role = discord.utils.get(before.guild.roles, id = 886193080997384222)
+                # if str(after.status) == "online" or "dnd" and "idle":
+                #     await before.remove_roles(role)
+                # if str(after.status) == "offline":
+                #     await after.add_roles(role)
 
-    #             #server_log
-    #             self.status_log = self.bot.get_channel(self.json_read["status-log"])
+                #server_log
+                self.status_log = self.bot.get_channel(self.json_read["status-log"])
 
-    #             #status
-    #             if before.status != after.status:
-    #                 embed = discord.Embed(
-    #                     colour=after.colour,
-    #                     timestamp=datetime.now(timezone.utc)
-    #                 )
-    #                 if after.avatar is not None:
-    #                     embed.set_author(name=after, icon_url=after.avatar.url)
-    #                 else:
-    #                     embed.set_author(name=after)
-    #                 embed.set_footer(text=f"{str(after.status)}", icon_url=status_icon(after.status))
-    #                 await self.status_log.send(embed=embed)
-    #         except:
-    #             pass
+                #status
+                if before.status != after.status:
+                    embed = discord.Embed(
+                        colour=after.colour,
+                        timestamp=datetime.now(timezone.utc)
+                    )
+                    if after.avatar is not None:
+                        embed.set_author(name=after, icon_url=after.avatar.url)
+                    else:
+                        embed.set_author(name=after)
+                    embed.set_footer(text=f"{str(after.status)}", icon_url=status_icon(after.status))
+                    await self.status_log.send(embed=embed)
+            except:
+                pass
     
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
