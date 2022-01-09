@@ -11,11 +11,11 @@ def generate_image(skin):
         name, icon, price = skin
 
         # background
-        background = Image.open('assets/images/background.png')
+        background = Image.open('data/assets/background.png')
         draw = ImageDraw.Draw(background)
 
         # font
-        font = "assets/font/LEMONMILK-RegularItalic.otf"
+        font = "data/fonts/LEMONMILK-RegularItalic.otf"
         font_small = ImageFont.FreeTypeFont(font, 30)
         font_medium = ImageFont.FreeTypeFont(font, 35)
         color_text = '#ffffff'
