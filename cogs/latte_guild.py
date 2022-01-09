@@ -325,7 +325,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
     
-    @commands.command(name="giverole", help="Latte give verify role")
+    @commands.command(help="Shows my daily store")
     @commands.guild_only()
     @is_latte_guild()
     async def store(self, ctx, username = commands.Option(description="Input username"), password = commands.Option(description="Input password")):
