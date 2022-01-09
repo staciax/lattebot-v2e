@@ -54,7 +54,7 @@ class ValorantAPI:
         return skin, icon, price
 
     def build_embed(self) -> discord.Embed:
-        user = self.interaction.user
+        user = self.ctx.author
         embed = discord.Embed(title=f'Valorant Store', color=0xfe676e, timestamp=discord.utils.utcnow()) #0x2F3136
         embed.set_image(url='attachment://store-offers.png')        
         embed.set_footer(text=f'Requested by {user.display_name}')
