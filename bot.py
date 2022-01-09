@@ -127,7 +127,7 @@ async def prepare_verify(ctx: commands.Context):
 @commands.is_owner()
 async def prepare_support_verify(ctx: commands.Context):
     file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
-    await ctx.send(file=file, view=LatteVerifyView(bot=bot) or None)
+    await ctx.send(file=file, view=LatteSupportVerifyView(bot=bot) or None)
     await ctx.message.delete()
 
 #database
