@@ -8,7 +8,7 @@ from typing import Any
 
 # Local
 from .auth import Auth
-from .valorant_api import generate_image
+from .vlr_pillow import generate_image
 from .errors import UserInputErrors
 
 # disable urllib3 warnings that might arise from making requests to 127.0.0.1
