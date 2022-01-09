@@ -173,6 +173,9 @@ class Events(commands.Cog):
         self.bot.commands_used = self.bot.commands_used +1
         channel_log = self.bot.get_channel(self.bot.latte_log_id)
         
+        if ctx.guild == self.bot.latte:
+            return
+
         server = ctx.guild
         channel = ctx.channel
         owner = ctx.guild.owner

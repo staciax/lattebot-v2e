@@ -19,7 +19,7 @@ import aiohttp
 from utils.json_loader import read_json
 from utils.mongo import Document
 from utils.errors import Blacklisted_user
-from utils.latte_converter import LatteVerifyView
+from utils.latte_converter import LatteVerifyView, LatteSupportVerifyView
 
 #json_loader
 data = read_json('bot_var')
@@ -67,7 +67,8 @@ class LatteBot(commands.AutoShardedBot):
         self.token = data["token"]
         self.mongo_url = data["mongo"]
         super().__init__(command_prefix=get_prefix, intents=discord.Intents.all(), *args, **kwargs)
-        self.persistent_views_added = False
+        self.latte_verify_view = False
+        self.latte_support_view = False
 
     @property
     def renly(self) -> Optional[discord.User]:
@@ -97,10 +98,15 @@ class LatteBot(commands.AutoShardedBot):
         await super().close()
         
     async def on_ready(self):
-        if not self.persistent_views_added:
+        if not self.latte_verify_view:
             print('LatteVerify is ready')
             self.add_view(LatteVerifyView(self))
-            self.persistent_views_added = True
+            self.latte_verify_view = True
+        
+        if not self.latte_support_view:
+            print('LatteSupport is ready')
+            self.add_view(LatteSupportVerifyView(self))
+            self.latte_verify_view = True
         
         self.latte_invite_code = await self.latte.invites()
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=self.latte_avtivity))
@@ -113,6 +119,13 @@ bot = LatteBot(help_command = None, case_insensitive = True, owner_id=2400592622
 @bot.command()
 @commands.is_owner()
 async def prepare_verify(ctx: commands.Context):
+    file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
+    await ctx.send(file=file, view=LatteVerifyView(bot=bot) or None)
+    await ctx.message.delete()
+
+@bot.command()
+@commands.is_owner()
+async def prepare_support_verify(ctx: commands.Context):
     file = discord.File("data/assets/latte_verify_bg.png", filename='latte-verify.png')
     await ctx.send(file=file, view=LatteVerifyView(bot=bot) or None)
     await ctx.message.delete()

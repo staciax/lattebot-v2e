@@ -14,6 +14,7 @@ from utils.checks import is_latte_guild, mystic_role
 from utils.emoji import status_converter
 from utils.errors import UserInputErrors
 from utils.useful import Embed
+from utils.valorant_api import ValorantAPI
 
 class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Commands only latte server"""
@@ -324,6 +325,13 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
     
+    @commands.command(name="giverole", help="Latte give verify role")
+    @commands.guild_only()
+    @is_latte_guild()
+    async def store(self, ctx, username = commands.Option(description="Input username"), password = commands.Option(description="Input password")):
+        api = ValorantAPI(ctx, username, password, region='ap')
+        await api.start()
+
     # @commands.command(name="reactionrole")
     # @commands.guild_only()
     # @commands.is_owner()

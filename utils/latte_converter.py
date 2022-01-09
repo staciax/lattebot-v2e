@@ -21,6 +21,22 @@ class LatteVerifyView(discord.ui.View):
             chat_channel = self.bot.latte.get_channel(861883647070437386)
             await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{interaction.user.mention}', allowed_mentions=discord.AllowedMentions.none())
 
+class LatteSupportVerifyView(discord.ui.View):
+    def __init__(self, bot):
+        self.bot = bot
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label='Click for verify!', emoji='<:latte_:902674566655139881>', style=discord.ButtonStyle.primary, custom_id='lattebot_support_view_verifyv2x')
+    async def latte_support_view_buttons(self, button: discord.ui.Button, interaction: discord.Interaction):
+        member_role = discord.utils.get(interaction.user.roles, id=892907635467235399)
+        if not member_role:
+            guild = self.bot.get_guild(887274968012955679)
+            role = guild.get_role(892907635467235399)
+            embed = discord.Embed(color=0xffffff)
+            embed.description = "Let's check out . . .\n\n﹒<#929815225434267749> \n﹒<#929815696081301544>"
+            await interaction.user.add_roles(role)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            
 fancy_text = {
     '0':'𝟶',
     '1':'𝟷',

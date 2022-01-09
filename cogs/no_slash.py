@@ -8,7 +8,6 @@ from utils.formats import format_dt
 # Local
 from utils.checks import is_latte_guild
 from utils.latte_converter import fancy_text
-from utils.vlr_api import ValorantAPI
 
 class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
     """Only message command."""
@@ -65,12 +64,6 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
 
         if text_list:
             await ctx.send(output)
-
-    @commands.command()
-    @commands.guild_only()
-    async def market(self, ctx, username, password):
-        api = ValorantAPI(ctx, username, password)
-        await api.start()
 
     # @commands.command(help="Happy new year 2022")
     # @commands.guild_only()

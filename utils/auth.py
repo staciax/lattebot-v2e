@@ -1,14 +1,15 @@
 # Standard 
-import requests
 import re
 
-#Auth by https://github.com/colinhartigan/valclient.py
-class Auth:
+# Third
+import requests
 
-    def __init__(self, auth):
-        self.username = auth['username']
-        self.password = auth['password']
-        self.country = auth['country']
+# reference by https://github.com/iancdev
+
+class Auth:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
 
     def authenticate(self):
         try:
@@ -20,17 +21,13 @@ class Auth:
                 'response_type': 'token id_token',
             }
             r = session.post('https://auth.riotgames.com/api/v1/authorization', json=data)
-            # print(r.text)
 
             data = {
                 'type': 'auth',
                 'username': self.username,
                 'password': self.password,
-                'country': self.country
             }
             r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data)
-            if r.json()['type'] != 'response':
-                raise RuntimeError('Your username or password may be incorrect!')
             pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
             data = pattern.findall(r.json()['response']['parameters']['uri'])[0] 
             access_token = data[0]
@@ -43,12 +40,12 @@ class Auth:
             entitlements_token = r.json()['entitlements_token']
             # print('Entitlements Token: ' + entitlements_token)
 
-            r = session.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
+            r = session.post('https://auth.riotgames.com/userinfo', headers=headers, json={})            
             user_id = r.json()['sub']
             # print('User ID: ' + user_id)
             headers['X-Riot-Entitlements-JWT'] = entitlements_token
             session.close()
-            return user_id, headers, {}
-        except:
-            RuntimeError('An unknown error occurred, please try again!')
 
+            return user_id, headers
+        except:
+            raise RuntimeError('Your username or password may be incorrect!')
