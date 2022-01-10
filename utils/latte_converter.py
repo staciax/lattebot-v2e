@@ -33,7 +33,7 @@ class LatteSupportVerifyView(discord.ui.View):
             guild = self.bot.get_guild(887274968012955679)
             role = guild.get_role(892907635467235399)
             embed = discord.Embed(color=0xffffff)
-            embed.description = "Let's check out . . .\n\n﹒<#929815225434267749> \n﹒<#929815696081301544>"
+            embed.description = "Let's check out . . .\n\n﹒<#929815225434267749> \n﹒<#892906578334851103>"
             await interaction.user.add_roles(role)
             await interaction.response.send_message(embed=embed, ephemeral=True)
             
