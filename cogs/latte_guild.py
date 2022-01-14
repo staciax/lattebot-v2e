@@ -303,9 +303,9 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         m_Web = f"{status_converter(str(member.web_status))} Web"
         #embed
         embed = discord.Embed(color=member.colour)
-        embed.set_author(name=member, icon_url=ctx.author.avatar or ctx.author.default_avatar)
+        embed.set_author(name=member, icon_url=member.avatar or member.default_avatar)
         embed.description = f"{m_desktop}\n{m_mobile}\n{m_Web}"
-        await ctx.send(embed=embed, ephemeral=True, delete_after=15)
+        await ctx.send(embed=embed, ephemeral=True, delete_after=20)
 
     @commands.command(name="giverole", help="Latte give verify role")
     @commands.guild_only()

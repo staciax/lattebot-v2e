@@ -361,14 +361,15 @@ class Events(commands.Cog):
                 try:
                     invites_before_join = self.bot.latte_invite_code
                     invites_after_join = await member.guild.invites()
-                    for invite in invites_before_join:
-                        if invite.uses < find_invite_by_code(invites_after_join, invite.code).uses:
-                            if invite.code == 'jhK46N6QWU':
-                                latte_roles = discord.utils.get(member.guild.roles, id = 842309176104976387) #name="Latte・・ ♡")
-                                bar_role = discord.utils.get(member.guild.roles, id = 854503426977038338) #name="・ ───────꒰ ・ ♡ ・ ꒱─────── ・")
-                                await member.add_roles(latte_roles, bar_role)
-                                chat_channel = self.bot.latte.get_channel(861883647070437386)
-                                await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
+                    if invites_before_join:
+                        for invite in invites_before_join:
+                            if invite.uses < find_invite_by_code(invites_after_join, invite.code).uses:
+                                if invite.code == 'jhK46N6QWU':
+                                    latte_roles = discord.utils.get(member.guild.roles, id = 842309176104976387) #name="Latte・・ ♡")
+                                    bar_role = discord.utils.get(member.guild.roles, id = 854503426977038338) #name="・ ───────꒰ ・ ♡ ・ ꒱─────── ・")
+                                    await member.add_roles(latte_roles, bar_role)
+                                    chat_channel = self.bot.latte.get_channel(861883647070437386)
+                                    await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
             
                 except (discord.Forbidden, discord.HTTPException):
                     pass
