@@ -2,10 +2,10 @@
 import discord
 import asyncio
 import random
-from discord.ext import commands
+from discord.ext import commands, tasks
 from typing import Literal
 from re import search
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 # Third
 
 # Local
@@ -28,6 +28,10 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         self.deathx = [883025077610876958, 883059509810040884]
         self.angelx = [873696566165250099, 883027485455941712]
         self.tempx = [879260123665682482, 879260241286549525]
+        self.valorant_loop.start()
+    
+    def cog_unload(self):
+        self.valorant_loop.cancel()
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -40,6 +44,21 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @property
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='latte_icon_new', id=907030425011109888, animated=False)
+
+    @tasks.loop(time=time(hour=0, minute=0, second=30))
+    async def valorant_loop(self):
+            try:
+                guild = self.bot.latte
+                self.channel = guild.get_channel(844462710526836756)
+                with open("data/accounts.txt", encoding='utf-8') as file:
+                    for x in file.readlines():
+                        account = x.rstrip("\n").split(";")
+                        api = ValorantAPI(channel=self.channel, username=account[0], password=account[1], region='ap')
+                        await api.for_loop_send()
+            except ValueError:
+                pass
+            except:
+                pass
 
     @commands.Cog.listener()
     async def on_message(self, message):

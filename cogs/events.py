@@ -423,6 +423,9 @@ class Events(commands.Cog):
                 return
             
             if member.guild.id == self.bot.latte_guild_id:
+
+                self.bot.latte_invite_code = await self.bot.latte.invites()
+                
                 embed = discord.Embed(color=self.bot.white_color)
                 embed.title = "Member joined"
                 embed.add_field(name=f"Name", value=f"{member.name}", inline=False)
@@ -458,6 +461,8 @@ class Events(commands.Cog):
                 return
                 
             if invite.guild.id == self.bot.latte_guild_id:
+
+                self.bot.latte_invite_code = await self.bot.latte.invites()
 
                 expiresAt = "Never" if not invite.expires_at else format_dt(invite.expires_at)
                 max_use_count = "Unlimited" if invite.max_uses == 0 else invite.max_uses

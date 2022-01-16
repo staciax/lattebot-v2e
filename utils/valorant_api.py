@@ -94,17 +94,17 @@ class ValorantAPI:
         # userinfo = r.json()
         # print(userinfo['name'], userinfo['tag'])
     
-    # async def for_loop_send(self):        
-    #     # authenticate
-    #     self.user_id, self.headers = Auth(self.username, self.password).authenticate()   
+    async def for_loop_send(self):        
+        # authenticate
+        self.user_id, self.headers = Auth(self.username, self.password).authenticate()   
 
-    #     # generate image
-    #     file = generate_image(self.my_daily_offter())
+        # generate image
+        file = generate_image(self.my_daily_offter())
 
-    #     # build embed 
-    #     embed = discord.Embed(title="Valorant Store",color=0xfe676e, timestamp=discord.utils.utcnow())
-    #     embed.set_image(url='attachment://store-offers.png')
-    #     embed.set_footer(text=f"ID : {self.username}")
+        # build embed 
+        embed = discord.Embed(title="Valorant Store",color=0xfe676e, timestamp=discord.utils.utcnow())
+        embed.set_image(url='attachment://store-offers.png')
+        embed.set_footer(text=f"ID : {self.username}")
 
-    #     # loop send
-    #     await self.channel.send(embed=embed, file=file)
+        # loop send
+        await self.channel.send(embed=embed, file=file)
