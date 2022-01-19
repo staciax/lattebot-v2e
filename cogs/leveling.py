@@ -185,6 +185,8 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
+        if member.bot:
+            return
         try:
             if member.guild == self.bot.latte:
                 if not before.channel and after.channel:
