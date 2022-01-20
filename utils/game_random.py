@@ -4,8 +4,8 @@ import random
 from discord.ext import commands
 from typing import List
 
-ALL_AGENT = ['Jett','Phoenix','Raze','Reyna','Yoru', 'Astra','Brimston','Omen','Viper', 'Breach','KAY/O','Skye','Sova','Chamber','Cypher','Killjoy','Sage']
-DUELIST = ['Jett','Phoenix','Raze','Reyna','Yoru']
+ALL_AGENT = ['Jett','Phoenix','Raze','Reyna','Yoru','Neon','Astra','Brimston','Omen','Viper', 'Breach','KAY/O','Skye','Sova','Chamber','Cypher','Killjoy','Sage']
+DUELIST = ['Jett','Phoenix','Raze','Reyna','Yoru','Neon']
 CONTROLLER = ['Astra','Brimston','Omen','Viper']
 INITIATOR = ['Breach','KAY/O','Skye','Sova']
 SENTINEL = ['Chamber','Cypher','Killjoy','Sage']
@@ -24,6 +24,7 @@ AGENT_TYPES = {
     'Raze': 'Duelist',
     'Reyna': 'Duelist',
     'Yoru': 'Duelist',
+    'Neon': 'Duelist',
     'Astra': 'Controller',
     'Brimston': 'Controller',
     'Omen': 'Controller',
@@ -77,6 +78,7 @@ AGENT_ICON = {
   'Cypher': 'https://static.wikia.nocookie.net/valorant/images/8/88/Cypher_icon.png',
   'Killjoy': 'https://static.wikia.nocookie.net/valorant/images/1/15/Killjoy_icon.png',
   'Sage': 'https://static.wikia.nocookie.net/valorant/images/7/74/Sage_icon.png',
+  'Neon': 'https://static.wikia.nocookie.net/valorant/images/d/d0/Neon_icon.png'
 }
 
 WEAPON_ICON = {
@@ -113,7 +115,7 @@ MAP_ICON = {
 ICON = 'https://cdn.discordapp.com/attachments/417245049315655690/902173852401025074/valorant.jpg'
 
 AGENT_LIST = {
-    'Duelist': 'Jett, Phoenix, Raze, Reyna, Yoru',
+    'Duelist': 'Jett, Phoenix, Raze, Reyna, Yoru, Neon',
     'Controller': 'Astra, Brimston, Omen, Viper',
     'Initiator': 'Breach, KAY/O, Skye, Sova',
     'Sentinel': 'Chamber, Cypher, Killjoy, Sage',
