@@ -351,23 +351,6 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         api = ValorantAPI(ctx, username, password, region='ap')
         await api.start()
 
-    # @commands.command(name="reactionrole")
-    # @commands.guild_only()
-    # @commands.is_owner()
-    # async def reactionrole(self, ctx):
-    #     blank = '<:blank:926496177418043392>'
-        
-    #     embed1 = discord.Embed(color=0xffffff)
-    #     embed1.title=f'> {blank} <:bubblegumheartu:903339950353813595> <:blueberryheartu:903339950337032212> **C o l o r s** <a:bw_white_Hearts_White:859399024558080020>'
-    #     embed1.description = '<a:dp_arrowright:926495510372683796> Choose your favourite color!\n'
-    #     embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
-        
-    #     embed1.description += f'{blank} <emoji_color> <role>\n'
-
-    #     embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
-
-    #     await ctx.send(embed=embed1, allowed_mentions=discord.AllowedMentions.none())
-
     
 
 def setup(bot):

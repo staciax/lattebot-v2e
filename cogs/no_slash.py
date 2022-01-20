@@ -64,6 +64,37 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
 
         if text_list:
             await ctx.send(output)
+    
+    # @commands.command(name="reactionrole")
+    # @commands.guild_only()
+    # @commands.is_owner()
+    # async def reactionrole(self, ctx):
+    #     await ctx.message.delete()
+    #     await ctx.send('https://i.imgur.com/ZmjnNaS.png')
+    #     await ctx.send("˚｡ *╭ <a:ab_purplesparklingstar:859370464711278612>  **__ let's reaction__** <a:ab_purplesparklingstar:859370464711278612>   ʕつ ͡◔ ᴥ ͡◔ʔつ\n<:aa_dash:859370894177992704>  react on emotes to assign roles.\n<:aa_dash:859370894283505664>  react again to remove roles.\n  ୨୧ －－－－－－－－－ ꒷꒦")
+
+    #     emoji_role = ['860075723501994004;933777267149119611','860069154291843082;933777267249803384','860069184084115476;933777267325300856','860069205772337172;933777267442733076','860069252526506004;933777267245580348','926512578732105768;933777267228807259','860069771679891457;933777267379798056','860069691271020564;933777267342073886','926512582083362856;933777267505627136','860069256904572928;933777266989748255','926741228010229820;933777267279163443','926741417366269952;933777267396575342','926512582553120769;933777267488854066']
+
+    #     blank = '<:blank:926496177418043392>'
+    #     embed1 = discord.Embed(color=0xffffff)
+    #     embed1.title=f' {blank} <:bubblegumheartu:903339950353813595> <:blueberryheartu:903339950337032212> **C o l o r s** <a:dp_heart2:926492924831756319>'
+    #     embed1.description = '<a:dp_arrowright:926495510372683796> Choose your favourite color!\n'
+    #     embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
+        
+    #     for x in emoji_role:
+    #         emorole = x.split(";")
+    #         embed1.description += f'{blank} {self.bot.get_emoji(int(emorole[1]))} <@&{emorole[0]}>\n'
+
+    #     embed1.description += f'{blank} ﹒﹒﹒﹒ <:chocolateheartu:903339950223806526> ﹒﹒﹒﹒\n'
+    #     # embed1.set_image(url='https://i.imgur.com/hrD5f9N.png')
+
+    #     msg = await ctx.send(embed=embed1, allowed_mentions=discord.AllowedMentions.none())
+    #     print(msg.id)
+
+    #     for x in emoji_role:
+    #         emoji = x.split(";")
+    #         get_emoji = self.bot.get_emoji(int(emoji[1]))
+    #         await msg.add_reaction(get_emoji)
 
     # @commands.command(help="Happy new year 2022")
     # @commands.guild_only()

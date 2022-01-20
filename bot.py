@@ -38,7 +38,7 @@ async def get_prefix(bot, message):
 class LatteBot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
         self.bot_version = '0.0.1s'
-        self.last_update = [2022, 1, 14]
+        self.last_update = [2022, 1, 21]
         self.launch_time = datetime.utcnow()
         self.latte_avtivity = 'mirror ♡ ₊˚'
         self.tester = ''

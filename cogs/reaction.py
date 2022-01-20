@@ -10,7 +10,7 @@ class Reaction(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.latte_verify = 861849112386469908
-        self.latte_color = 861212646057443338
+        self.latte_color = 933799136795447296
         self.matcha_verify = 873042881189920809
         self.matcha_color = 878847610616700928
 
@@ -31,23 +31,33 @@ class Reaction(commands.Cog):
         
         #latte_color
         if self.latte_color == payload.message_id:
-
-            if emoji == '861130565804621835':
+            
+            if emoji == '933777267149119611':
                 role = discord.utils.get(guild.roles, id = 860075723501994004)
-            if emoji == '861128977828806686':
+            if emoji == '933777267249803384':
                 role = discord.utils.get(guild.roles, id = 860069154291843082)
-            if emoji == '861128979418447942':
+            if emoji == '933777267325300856':
                 role = discord.utils.get(guild.roles, id = 860069184084115476)
-            if emoji == '861128977410293761':
+            if emoji == '933777267442733076':
                 role = discord.utils.get(guild.roles, id = 860069205772337172)
-            if emoji == '861128978902024192':
+            if emoji == '933777267245580348':
                 role = discord.utils.get(guild.roles, id = 860069252526506004)
-            if emoji == '861128979309133844':
+            if emoji == '933777267228807259':
+                role = discord.utils.get(guild.roles, id = 926512578732105768)
+            if emoji == '933777267379798056':
                 role = discord.utils.get(guild.roles, id = 860069771679891457)
-            if emoji == '861128977603231765':
+            if emoji == '933777267342073886':
                 role = discord.utils.get(guild.roles, id = 860069691271020564)
-            if emoji == '861128979313328128':
+            if emoji == '933777267505627136':
+                role = discord.utils.get(guild.roles, id = 926512582083362856)
+            if emoji == '933777266989748255':
                 role = discord.utils.get(guild.roles, id = 860069256904572928)
+            if emoji == '933777267279163443':
+                role = discord.utils.get(guild.roles, id = 926741228010229820)
+            if emoji == '933777267396575342':
+                role = discord.utils.get(guild.roles, id = 926741417366269952)
+            if emoji == '933777267488854066':
+                role = discord.utils.get(guild.roles, id = 926512582553120769)
 
             # color_main = discord.utils.get(guild.roles, id = 854506876674244608) #name="・ ──────꒰ ・ colors ・ ꒱────── ・")
 
@@ -110,24 +120,34 @@ class Reaction(commands.Cog):
         #latte_color
         if self.latte_color == payload.message_id:
 
-            if emoji == '861130565804621835':
+            if emoji == '933777267149119611':
                 role = discord.utils.get(guild.roles, id = 860075723501994004)
-            if emoji == '861128977828806686':
+            if emoji == '933777267249803384':
                 role = discord.utils.get(guild.roles, id = 860069154291843082)
-            if emoji == '861128979418447942':
+            if emoji == '933777267325300856':
                 role = discord.utils.get(guild.roles, id = 860069184084115476)
-            if emoji == '861128977410293761':
+            if emoji == '933777267442733076':
                 role = discord.utils.get(guild.roles, id = 860069205772337172)
-            if emoji == '861128978902024192':
+            if emoji == '933777267245580348':
                 role = discord.utils.get(guild.roles, id = 860069252526506004)
-            if emoji == '861128979309133844':
+            if emoji == '933777267228807259':
+                role = discord.utils.get(guild.roles, id = 926512578732105768)
+            if emoji == '933777267379798056':
                 role = discord.utils.get(guild.roles, id = 860069771679891457)
-            if emoji == '861128977603231765':
+            if emoji == '933777267342073886':
                 role = discord.utils.get(guild.roles, id = 860069691271020564)
-            if emoji == '861128979313328128':
+            if emoji == '933777267505627136':
+                role = discord.utils.get(guild.roles, id = 926512582083362856)
+            if emoji == '933777266989748255':
                 role = discord.utils.get(guild.roles, id = 860069256904572928)
+            if emoji == '933777267279163443':
+                role = discord.utils.get(guild.roles, id = 926741228010229820)
+            if emoji == '933777267396575342':
+                role = discord.utils.get(guild.roles, id = 926741417366269952)
+            if emoji == '933777267488854066':
+                role = discord.utils.get(guild.roles, id = 926512582553120769)
 
-        #            role_lvl = discord.utils.get(guild.roles, id = 854506876674244608) #name="・ ──────꒰ ・ colors ・ ꒱────── ・")
+            #role_lvl = discord.utils.get(guild.roles, id = 854506876674244608) #name="・ ──────꒰ ・ colors ・ ꒱────── ・")
 
             if member is not None:
                 await member.remove_roles(role)# , role_lvl)
