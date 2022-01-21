@@ -344,14 +344,13 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
     
-    @commands.command(help="Shows my daily store")
+    @commands.command(help="Shows my daily store", slash_command=True, slash_command_guilds=[840379510704046151, 887274968012955679])
     @commands.guild_only()
     @is_latte_guild()
     async def store(self, ctx, username = commands.Option(description="Input username"), password = commands.Option(description="Input password")):
-        api = ValorantAPI(ctx, username, password, region='ap')
+        api = ValorantAPI(ctx, username, password, region='ap', bot=self.bot)
         await api.start()
 
-    
 
 def setup(bot):
     bot.add_cog(Latte(bot))

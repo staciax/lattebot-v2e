@@ -15,12 +15,13 @@ from .errors import UserInputErrors
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class ValorantAPI:
-    def __init__(self, ctx=None, username=None, password=None, region=None, channel=None):
+    def __init__(self, ctx=None, username=None, password=None, region=None, channel=None, bot=None):
         self.ctx = ctx
         self.username = username
         self.password = password
         self.region = region
         self.channel:discord.TextChannel = channel
+        self.bot = bot
         self.session = requests.session()
         
     def fetch(self, endpoint="/") -> dict:
@@ -68,17 +69,19 @@ class ValorantAPI:
             # defers the interaction response.
             if ctx.interaction is not None:
                 await ctx.interaction.response.defer(ephemeral=True)
+            message = await ctx.reply('\u200B', mention_author=False)
 
             # authenticate
-            self.user_id, self.headers = Auth(self.username, self.password).authenticate()   
+            auth = Auth(self.username, self.password)
+            self.user_id, self.headers = await auth.authenticate(message, self.bot, ctx)
 
             # generate image
+            await ctx.trigger_typing()
             file = generate_image(self.my_daily_offter())
 
             # build embed 
             embed = self.build_embed()
             
-            await ctx.reply('\u200B', mention_author=False)
             await ctx.channel.send(embed=embed, file=file)
 
         except RuntimeError as e:
