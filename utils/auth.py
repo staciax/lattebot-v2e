@@ -46,13 +46,13 @@ class Auth:
                     respond_message = await bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel, timeout=60)
                 except asyncio.TimeoutError:
                     auth_error = '2 factor authentication is Timeout.'
-                await message.edit('\u200B')
-                await respond_message.delete()
                 data = {
                     "type": "multifactor",
                     "code": respond_message.content,
                     "rememberDevice": False
                 }
+                await message.edit('\u200B')
+                await respond_message.delete()
                 r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data)
             
             pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
