@@ -81,8 +81,8 @@ class ValorantAPI:
 
             # build embed 
             embed = self.build_embed()
-            if ctx.channel.id == 861883647070437386:
-                return await ctx.channel.send(embed=embed, file=file, delete_after=300)
+            # if ctx.channel.id == 861883647070437386:
+            #     return await ctx.channel.send(embed=embed, file=file, delete_after=300)
             await ctx.channel.send(embed=embed, file=file)
 
         except RuntimeError as e:

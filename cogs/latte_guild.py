@@ -56,9 +56,14 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
                     api = ValorantAPI(channel=self.channel, username=account[0], password=account[1], region='ap')
                     await api.for_loop_send()
         except ValueError:
+            print('vlr ValueError error')
+        except Exception as e:
+            print(e)
             pass
-        except:
-            pass
+    
+    @valorant_loop.before_loop
+    async def before_daily_send(self):
+        await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
     async def on_message(self, message):
