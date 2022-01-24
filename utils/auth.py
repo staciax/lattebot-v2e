@@ -12,7 +12,7 @@ class Auth:
         self.username = username
         self.password = password
 
-    async def authenticate(self, message, bot, ctx):
+    async def authenticate(self, message=None, bot=None, ctx=None):
         
         auth_error = 'An unknown error occurred, sorry'  
         
@@ -38,22 +38,23 @@ class Auth:
             if r.json()['type'] == 'auth':
                 auth_error = 'Your username or password may be incorrect!'
             elif r.json()['type'] == 'multifactor':
-                # 2fa error
-                auth_error = '2FA verify code may be incorrect!'
-                await message.edit('**Enter the 2FA verify code**')
+                if message is not None and bot is not None and ctx is not None:
+                    # 2fa error
+                    auth_error = '2FA verify code may be incorrect!'
+                    await message.edit('**Enter the 2FA verify code**')
 
-                try:
-                    respond_message = await bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel, timeout=60)
-                except asyncio.TimeoutError:
-                    auth_error = '2 factor authentication is Timeout.'
-                data = {
-                    "type": "multifactor",
-                    "code": respond_message.content,
-                    "rememberDevice": False
-                }
-                await message.edit('\u200B')
-                await respond_message.delete()
-                r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data)
+                    try:
+                        respond_message = await bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel, timeout=60)
+                    except asyncio.TimeoutError:
+                        auth_error = '2 factor authentication is Timeout.'
+                    data = {
+                        "type": "multifactor",
+                        "code": respond_message.content,
+                        "rememberDevice": False
+                    }
+                    await message.edit('\u200B')
+                    await respond_message.delete()
+                    r = session.put('https://auth.riotgames.com/api/v1/authorization', json=data)
             
             pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
             data = pattern.findall(r.json()['response']['parameters']['uri'])[0] 
