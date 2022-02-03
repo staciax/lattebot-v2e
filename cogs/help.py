@@ -496,6 +496,10 @@ class Help(commands.Cog, command_attrs = dict(slash_command=True)):
 
     def cog_unload(self):
         self.bot.help_command = self._original_help_command
+
+    @property
+    def display_emoji(self) -> discord.PartialEmoji:
+        return discord.PartialEmoji(name='latte_icon_new', id=907030425011109888, animated=False)
      
 def setup(bot):
     bot.add_cog(Help(bot))

@@ -41,19 +41,8 @@ class LatteBot(commands.AutoShardedBot):
         self.last_update = [2022, 1, 21]
         self.launch_time = datetime.utcnow()
         self.latte_avtivity = 'mirror ♡ ₊˚'
-        self.tester = ''
-        self.github = 'https://github.com/staciax'
-        self.defaul_prefix = 're'
-        self.blacklist = {}
-        self.afk_user = {}
-        self.sniped = {}
-        self.sniped_embed = {}
-        self.sleeping = {}
-        self.reminding = {}
-        self.channel_sleep = {}
-        self.current_streamers = list()
-        self.no_prefix = False
-        self.latte_invite_code = {}
+
+        # Bot based stuff
         self.latte_guild_id = 840379510704046151
         self.latte_sup_guild_id = 887274968012955679
         self.latte_log_id = 909301335743143946
@@ -66,7 +55,27 @@ class LatteBot(commands.AutoShardedBot):
         self.error_color = 0xFF7878
         self.token = data["token"]
         self.mongo_url = data["mongo"]
+
+        # Cache stuff
+        self.blacklist = {}
+        self.afk_user = {}
+        self.sniped = {}
+        self.sniped_embed = {}
+        self.sleeping = {}
+        self.reminding = {}
+        self.channel_sleep = {}
+        self.current_streamers = list()
+        self.latte_invite_code = {}
+        self.no_prefix = False
+
+        # Extra stuff
+        self.tester = ''
+        self.github = 'https://github.com/staciax'
+        self.defaul_prefix = 're'
+
         super().__init__(command_prefix=get_prefix, *args, **kwargs)
+        
+        # Bot view
         self.latte_verify_view = False
         self.latte_support_view = False
 

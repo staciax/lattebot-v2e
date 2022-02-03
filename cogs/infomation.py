@@ -445,9 +445,10 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             duration = f"Duration: {deltaconv((ctx.message.created_at - spotify.start).total_seconds())} / {deltaconv(spotify.duration.total_seconds())}"
             embed = discord.Embed()
             embed.title = f"{member.name} is listening to {spotify.title}"
-            embed.description = f"Title: [{spotify.title}]({spotify.track_url})\n{duration}\nArtists: {', '.join(spotify.artists)}\nTrack ID: `{spotify.track_id}`"
+            embed.description = f"Title: [{spotify.title}]({spotify.track_url})\n{duration}\nArtists: {', '.join(spotify.artists)}"
             embed.color = spotify.color
             embed.set_image(url=spotify.album_cover_url)
+            embed.set_footer(text=f'Track ID: {spotify.track_id}')
             speac = '\u2001'*6
             view = discord.ui.View()
             view.add_item(discord.ui.Button(emoji=f"{emoji_converter('spotify')}",label=f"Listen on spoify{speac}",url=spotify.track_url))
