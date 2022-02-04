@@ -591,7 +591,7 @@ class ValorantView(discord.ui.View):
         embed.set_thumbnail(url=ICON)
         return embed
             
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         if interaction.user and interaction.user == self.ctx.author:
             return True
         await interaction.response.defer()

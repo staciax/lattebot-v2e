@@ -94,7 +94,7 @@ class TagName(commands.clean_content):
 
         return converted if not self.lower else lower
 
-class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
+class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151, 937967814889848853])):
     """Commands to fetch something by a tag name"""
     def __init__(self, bot):
         self.bot = bot
