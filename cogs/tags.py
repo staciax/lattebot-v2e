@@ -29,7 +29,7 @@ class Cancel_button(discord.ui.View):
             self.add_item(self.content_button)
         self.add_item(self.cancel_button_)
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
             return True
         await interaction.response.send_message('This menus cannot be controlled by you, sorry!', ephemeral=True)

@@ -40,7 +40,7 @@ class roleinfo_view(discord.ui.View):
             embed_error.description='An unknown error occurred, sorry'
             await interaction.response.send_message(embed=embed_error, ephemeral=True)
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author
@@ -116,7 +116,7 @@ class channel_info_view(discord.ui.View):
             embed_error.description='An unknown error occurred, sorry'
             await interaction.response.send_message(embed=embed_error, ephemeral=True)
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author
@@ -253,7 +253,7 @@ class content_button(discord.ui.View):
         if self.content is not None:
             self.add_item(self.content_button)
     
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author
@@ -296,7 +296,7 @@ class AvatarView(discord.ui.View):
         self.embeds: List[discord.Embed] = []
         self.clear_items()
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author

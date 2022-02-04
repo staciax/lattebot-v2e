@@ -104,7 +104,7 @@ class BaseNewButton(discord.ui.View):
         except IndexError:
             pass
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author
@@ -214,7 +214,7 @@ class Confirm(discord.ui.View):
         self.value = None
         self.ctx = ctx
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
             return True
         await interaction.response.send_message('This menus cannot be controlled by you, sorry!', ephemeral=True)

@@ -175,7 +175,7 @@ class HelpView(discord.ui.View):
         self.previous.style = styles[page == 0]
         self.go_to_first_page.style = styles[page == 0]
         
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author

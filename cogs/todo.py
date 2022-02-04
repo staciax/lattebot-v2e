@@ -33,7 +33,7 @@ class todolist_button(discord.ui.View):
         if self.entries is not None:
             self.add_item(self.todolist_button)
     
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author

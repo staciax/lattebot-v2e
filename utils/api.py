@@ -91,7 +91,7 @@ class WaifuimView(discord.ui.View):
             except:
                 pass
     
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
             return True
         await interaction.response.send_message('This interaction cannot be controlled by you, sorry!', ephemeral=True)
@@ -311,7 +311,7 @@ class WaifupiscView(discord.ui.View):
             except:
                 pass
         
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
             return True
         await interaction.response.send_message('This interaction cannot be controlled by you, sorry!', ephemeral=True)
@@ -427,7 +427,7 @@ class WaifupiscView_nsfw(discord.ui.View):
             except:
                 pass
     
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):
             return True
         await interaction.response.send_message('This interaction cannot be controlled by you, sorry!', ephemeral=True)
