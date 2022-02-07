@@ -127,17 +127,16 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @commands.command(help="Set your afk")
     @commands.guild_only()
-    @commands.bot_has_permissions(send_messages=True , embed_links=True)
-    async def afk(self, ctx, *, reason=commands.Option(default=None, description="Reason (default = personal problems)")):
+    @commands.bot_has_permissions(send_messages=True, embed_links=True)
+    async def afk(self, ctx, *, reason=commands.Option(default='...', description="Reason (default = personal problems)")):
         member = ctx.author
 
         if member.id in self.bot.afk_user.keys():
             raise UserInputErrors(f"**You already have afk status**\n*reason:* {self.bot.afk_user[member.id]['reason']}")
 
         embed = Embed(color=self.bot.white_color)
-        if reason is None:
-            reason = "..."
-        elif len(reason) > 100:
+
+        if len(reason) > 100:
             raise UserInputErrors("**reason** is a maximum of 100 characters.")
         
         self.bot.afk_user[member.id] = {"reason": reason, "name": member.display_name}

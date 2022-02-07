@@ -270,6 +270,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
             'python': 'https://docs.python.org/3',
             'python-jp': 'https://docs.python.org/ja/3',
             'master': 'https://discordpy.readthedocs.io/en/master',
+            'pyc':'https://docs.pycord.dev/en/master/'
         }
 
         if obj is None:
@@ -317,6 +318,11 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     async def rtfm_edpy(self, ctx, *, search: str = commands.Option(description='Item to search for')):
         await self.do_rtfm(ctx, 'edpy', search)
+    
+    @rtfm.command(name='pyc', help='Search the Enhanced-dpy docs')
+    @commands.guild_only()
+    async def rtfm_edpy(self, ctx, *, search: str = commands.Option(description='Item to search for')):
+        await self.do_rtfm(ctx, 'pyc', search)
     
     @rtfm.command(name='python', aliases=['py'], help='Search the Python docs')
     @commands.guild_only()
