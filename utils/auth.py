@@ -69,6 +69,8 @@ class Auth:
             headers = {
                 'Authorization': f'Bearer {access_token}',
             }
+
+            print(headers)
             r = session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
             entitlements_token = r.json()['entitlements_token']
             # print('Entitlements Token: ' + entitlements_token)
