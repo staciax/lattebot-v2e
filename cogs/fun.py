@@ -56,11 +56,11 @@ class Fun(commands.Cog, command_attrs=dict(slash_command=True)):
         view = APEX_RANDOM(ctx)
         await view.start()
 
-    @commands.command(name="valorant", aliases=["vlr", "valo"], help="valorant random agent, weapon")
-    @commands.guild_only()
-    async def valorant(self, ctx):
-        view = ValorantView(ctx)
-        await view.start()
+    # @commands.command(name="valorant", aliases=["vlr", "valo"], help="valorant random agent, weapon")
+    # @commands.guild_only()
+    # async def valorant(self, ctx):
+    #     view = ValorantView(ctx)
+    #     await view.start()
 
     @commands.command(aliases=['lattesay','botsay'], help="Message something you give latte to say.")
     @commands.guild_only()

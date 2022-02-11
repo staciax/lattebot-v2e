@@ -46,7 +46,7 @@ class LatteBot(commands.AutoShardedBot):
         # Bot based stuff
         self.latte_guild_id = 840379510704046151
         self.latte_sup_guild_id = 887274968012955679
-        self.latte_log_id = 909301335743143946
+        self.latte_log_id = 941514797571256360
         self.latte_starbot_id = 909485607359758337
         self.latte_invite_url = os.getenv('LATTE_URL', None)
         self.latte_supprt_url = os.getenv('SUPPORT_URL', None)

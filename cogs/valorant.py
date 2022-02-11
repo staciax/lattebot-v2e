@@ -17,7 +17,7 @@ from utils_valorant.json_loader import data_read, data_save
 from utils_valorant.view import Notify, Notify_list
 
 class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
-    """VALORANT Commands"""
+    """By default, the bot doesn't store your username/password, it only uses them to get the cookies that can be used to generate access tokens needed to get your shop."""
     def __init__(self, bot):
         self.bot = bot
         self.notifys_skin.start()
