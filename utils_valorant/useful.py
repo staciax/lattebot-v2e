@@ -83,11 +83,11 @@ def get_tier_emoji(skin_uuid, bot):
     data = data_read('skins')
     uuid = data['skins'][skin_uuid]['tier']
     tier_uuid = {
-        '0cebb8be-46d7-c12a-d306-e9907bfc5a25': discord.utils.get(bot.emojis, name='DeluxeTier'),
-        'e046854e-406c-37f4-6607-19a9ba8426fc': discord.utils.get(bot.emojis, name='ExclusiveTier'),
-        '60bca009-4182-7998-dee7-b8a2558dc369': discord.utils.get(bot.emojis, name='PremiumTier'),
-        '12683d76-48d7-84a3-4e09-6985794f0445': discord.utils.get(bot.emojis, name='SelectTier'),
-        '411e4a55-4e59-7757-41f0-86a53f101bb5': discord.utils.get(bot.emojis, name='UltraTier'),
+        '0cebb8be-46d7-c12a-d306-e9907bfc5a25': discord.utils.get(bot.emojis, name='v_DeluxeTier'),
+        'e046854e-406c-37f4-6607-19a9ba8426fc': discord.utils.get(bot.emojis, name='v_ExclusiveTier'),
+        '60bca009-4182-7998-dee7-b8a2558dc369': discord.utils.get(bot.emojis, name='v_PremiumTier'),
+        '12683d76-48d7-84a3-4e09-6985794f0445': discord.utils.get(bot.emojis, name='v_SelectTier'),
+        '411e4a55-4e59-7757-41f0-86a53f101bb5': discord.utils.get(bot.emojis, name='v_UltraTier'),
     }
     return tier_uuid[uuid]
 
@@ -307,7 +307,7 @@ async def setup_emoji(ctx):
     
     for emoji in Emoji_list:
         name = emoji + 'Tier'
-        emote = discord.utils.get(ctx.bot.emojis, name=name) or discord.utils.get(ctx.guild.emojis, name=name)
+        emote = discord.utils.get(ctx.bot.emojis, name='v_' + name) or discord.utils.get(ctx.guild.emojis, name='v_' + name)
         if emote is None:
             Emoji_none.append(emoji)
 
@@ -315,14 +315,14 @@ async def setup_emoji(ctx):
         for x in data['tiers']:
             if data['tiers'][x]['name'] in Emoji_none:
                 image = url_to_image(data['tiers'][x]['icon'])
-                await guild.create_custom_emoji(image=image, name=data['tiers'][x]['name'] + 'Tier')
+                await guild.create_custom_emoji(image=image, name='v_' + data['tiers'][x]['name'] + 'Tier')
 
-        radianite_emoji = discord.utils.get(ctx.bot.emojis, name='RadianitePoint') or discord.utils.get(ctx.guild.emojis, name='RadianitePoint')
+        radianite_emoji = discord.utils.get(ctx.bot.emojis, name='v_RadianitePoint') or discord.utils.get(ctx.guild.emojis, name='v_RadianitePoint')
         if radianite_emoji is None:
             radianite = url_to_image('https://media.valorant-api.com/currencies/e59aa87c-4cbf-517a-5983-6e81511be9b7/displayicon.png')
             await guild.create_custom_emoji(image=radianite, name='RadianitePoint')
         
-        vlr_point_emoji = discord.utils.get(ctx.bot.emojis, name='ValorantPoint') or discord.utils.get(ctx.guild.emojis, name='ValorantPoint')
+        vlr_point_emoji = discord.utils.get(ctx.bot.emojis, name='v_ValorantPoint') or discord.utils.get(ctx.guild.emojis, name='v_ValorantPoint')
         if vlr_point_emoji is None:
             vlrpoint = url_to_image('https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png')
             await guild.create_custom_emoji(image=vlrpoint, name='ValorantPoint')
