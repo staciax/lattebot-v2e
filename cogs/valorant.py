@@ -16,7 +16,7 @@ from utils_valorant.useful import *
 from utils_valorant.json_loader import data_read, data_save
 from utils_valorant.view import Notify, Notify_list
 
-class Valorant(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
+class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
     """VALORANT Commands"""
     def __init__(self, bot):
         self.bot = bot
