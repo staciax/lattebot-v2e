@@ -14,7 +14,7 @@ from utils.checks import is_latte_guild, mystic_role
 from utils.emoji import status_converter
 from utils.errors import UserInputErrors
 from utils.useful import Embed
-from utils.valorant_api import ValorantAPI
+# from utils.valorant_api import ValorantAPI
 
 class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Commands only latte server"""
@@ -28,10 +28,6 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         self.deathx = [883025077610876958, 883059509810040884]
         self.angelx = [873696566165250099, 883027485455941712]
         self.tempx = [879260123665682482, 879260241286549525]
-        self.valorant_loop.start()
-    
-    def cog_unload(self):
-        self.valorant_loop.cancel()
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -44,26 +40,6 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     @property
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='latte_icon_new', id=907030425011109888, animated=False)
-
-    @tasks.loop(time=time(hour=0, minute=0, second=30))
-    async def valorant_loop(self):
-        try:
-            guild = self.bot.latte
-            self.channel = guild.get_channel(844462710526836756)
-            with open("data/accounts.txt", encoding='utf-8') as file:
-                for x in file.readlines():
-                    account = x.rstrip("\n").split(";")
-                    api = ValorantAPI(channel=self.channel, username=account[0], password=account[1], region='ap')
-                    await api.for_loop_send()
-        except ValueError:
-            print('vlr ValueError error')
-        except Exception as e:
-            print(e)
-            pass
-    
-    @valorant_loop.before_loop
-    async def before_daily_send(self):
-        await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -348,14 +324,6 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
-    
-    @commands.command(help="Shows my daily store", slash_command=True, slash_command_guilds=[840379510704046151, 887274968012955679])
-    @commands.guild_only()
-    @is_latte_guild()
-    async def store(self, ctx, username = commands.Option(description="Input username"), password = commands.Option(description="Input password")):
-        api = ValorantAPI(ctx, username, password, region='ap', bot=self.bot)
-        await api.start()
-
 
 def setup(bot):
     bot.add_cog(Latte(bot))

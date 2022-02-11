@@ -211,7 +211,7 @@ class Events(commands.Cog):
             member = message.guild.get_member(user_id)
             if member.mentioned_in(message):
                 embed = discord.Embed(description=f'**{member.display_name}** is afk for: {self.bot.afk_user[user_id]["reason"]}' , color=self.bot.white_color)
-                await message.channel.send(embed=embed , delete_after=15)
+                await message.channel.send(embed=embed, delete_after=15)
                     
         # #google_translator
         # if message.channel.id == self.translatex:

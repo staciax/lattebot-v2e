@@ -3,7 +3,7 @@ import discord
 import os
 import datetime
 import asyncio
-from discord.ext import commands
+from discord.ext import commands, tasks
 from os import environ
 from os.path import join, dirname
 from typing import Union, List, Optional
@@ -20,6 +20,7 @@ from utils.json_loader import read_json
 from utils.mongo import Document
 from utils.errors import Blacklisted_user
 from utils.latte_converter import LatteVerifyView, LatteSupportVerifyView
+from utils_valorant.useful import *
 
 #json_loader
 data = read_json('bot_var')
@@ -37,10 +38,10 @@ async def get_prefix(bot, message):
 
 class LatteBot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
-        self.bot_version = '0.0.1s'
-        self.last_update = [2022, 1, 21]
+        self.bot_version = '1.0.0a'
+        self.last_update = [2022, 2, 11]
         self.launch_time = datetime.utcnow()
-        self.latte_avtivity = 'mirror ♡ ₊˚'
+        self.latte_avtivity = 'nyanpasu ♡ ₊˚'
 
         # Bot based stuff
         self.latte_guild_id = 840379510704046151
@@ -69,12 +70,12 @@ class LatteBot(commands.AutoShardedBot):
         self.no_prefix = False
 
         # Extra stuff
-        self.tester = ''
+        self.tester = '.'
         self.github = 'https://github.com/staciax'
         self.defaul_prefix = 're'
+        self.format_version = 1
 
         super().__init__(command_prefix=get_prefix, *args, **kwargs)
-        
         # Bot view
         self.latte_verify_view = False
         self.latte_support_view = False
@@ -107,6 +108,9 @@ class LatteBot(commands.AutoShardedBot):
         await super().close()
         
     async def on_ready(self):
+        if not get_version.is_running():
+            get_version.start()
+
         if not self.latte_verify_view:
             print('LatteVerify is ready')
             self.add_view(LatteVerifyView(self))
@@ -139,6 +143,24 @@ bot = LatteBot(intents = discord.Intents(
     emojis=True,  # emoji update
     bans=True  # member ban/unban
 ), help_command = None, case_insensitive = True, owner_id=240059262297047041)
+
+@tasks.loop(minutes=30)
+async def get_version():
+    bot.game_version = get_valorant_version()
+
+    # data_store
+    data = data_read('skins')
+    data['formats'] = bot.format_version
+    data['gameversion'] = bot.game_version
+    data_save('skins', data)
+    
+    try:
+        if data['skins']["version"] != bot.game_version: fetch_skin()
+        if data['tiers']["version"] != bot.game_version: fetch_tier()
+    except KeyError:
+        fetch_skin()
+        pre_fetch_price()
+        fetch_tier()
 
 #prepare_verify_view
 @bot.command()

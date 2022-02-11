@@ -111,13 +111,14 @@ class HelpView(discord.ui.View):
         tags = get_cog('Tags')
         todo = get_cog('Todo')
         utility = get_cog('Utility')
+        valorant = get_cog('Valorant')
 
         if ctx.guild.id == ctx.bot.latte_guild_id:
             embed.add_field(name=f'\u200B', value=f'{anime}{latte}{mod}{utility}', inline=True)
-            embed.add_field(name=f'\u200B', value=f'{fun}{leveling}{misc}', inline=True)
+            embed.add_field(name=f'\u200B', value=f'{fun}{leveling}{misc}{valorant}', inline=True)
             embed.add_field(name=f'\u200B', value=f'{infomation}{tags}{todo}' , inline=True)
         else:
-            embed.add_field(name=f'\u200B', value=f'{anime}{misc}', inline=True)
+            embed.add_field(name=f'\u200B', value=f'{anime}{misc}{valorant}', inline=True)
             embed.add_field(name=f'\u200B', value=f'{fun}{mod}', inline=True)
             embed.add_field(name=f'\u200B', value=f'{infomation}{utility}', inline=True)
         embed.set_image(url=(latte_read('latte_events'))['help_thumbnail'])

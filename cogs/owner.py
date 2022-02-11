@@ -209,7 +209,7 @@ class Owner(commands.Cog):
     @commands.command(help="logout bot")
     @commands.guild_only()
     @commands.is_owner()
-    async def logout(self, ctx):
+    async def logout_bot(self, ctx):
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name=f"{self.bot.user.name} Logout",icon_url=self.bot.user.avatar.url)
         embed.description = f"are you sure?"
