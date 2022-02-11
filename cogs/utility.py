@@ -470,8 +470,12 @@ class Utility(commands.Cog, command_attrs = dict(slash_command=True)):
             
             #chat_send
             if ctx.guild == self.bot.latte:
-                chat_channel = ctx.guild.get_channel(861883647070437386)            
-                await chat_channel.send(embed=embed_edit)
+                chat_channel = ctx.guild.get_channel(861883647070437386)  
+
+                embed_chat = discord.Embed(color=ctx.author.colour)
+                embed_chat.description = f"{emoji_converter('sleeping')} SLEEP : {channel.mention} | {format_dt(futuredate, style='f')}({format_dt(futuredate, style='R')})"
+
+                await chat_channel.send(embed=embed_chat)
 
             if timewait > 600:
                 self.bot.channel_sleep[str(channel.id)] = {"time": futuredate_, "guild_id": ctx.guild.id}
