@@ -165,15 +165,18 @@ class channel_info_view(discord.ui.View):
 
 
 class base_Button_URL(discord.ui.View):
-    def __init__(self, label:str, url):
+    def __init__(self, label:str, url, emoji=None):
         super().__init__()
         self.label = label
         self.url = url
+        self.emoji = emoji
         self.clear_items()
         self.fill_items()
     
     def fill_items(self):
-        if self.label and self.url:
+        if self.label and self.url and self.emoji is not None:
+            self.add_item(discord.ui.Button(label=self.label, url=self.url, emoji=self.emoji))
+        elif self.label and self.url:
             self.add_item(discord.ui.Button(label=self.label, url=self.url))
 
 class Button_URL(discord.ui.View):
