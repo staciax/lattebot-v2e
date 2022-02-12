@@ -137,7 +137,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.add_field(name="Stats ", value=f"{emoji_converter('cursor')} Line count : `{count_python('.'):,}`\n{emoji_converter('latte_icon')} Servers : `{serverCount}`\n{emoji_converter('member')} Users : `{memberCount}`\n{emoji_converter('bot_commands')} Commands : `{totalcommands}`{totalslash}", inline=False)
         embed.add_field(name="Bot Info", value=f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`{latte_db}", inline=False)
         
-        view = base_Button_URL(label=owner_bot, url=f'https://discord.com/users/{owner_bot.id}')
+        view = base_Button_URL(label=f'{owner_bot}', url=f'https://discord.com/users/{owner_bot.id}')
         await ctx.reply(embed=embed, view=view, mention_author=False)
         
         # embed.add_field(name="Bot created" , value=f"{format_dt(self.bot.user.created_at)}" , inline=False)    
