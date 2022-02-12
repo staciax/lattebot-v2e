@@ -285,7 +285,7 @@ class Owner(commands.Cog):
     async def load(
             self,
             ctx,
-            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','no_slash','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")
+            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','no_slash','nsfw','owner','reaction','stars','tags','testing','todo','utility','valorant'] = commands.Option(description="extension")
         ):
         embed = discord.Embed()
         try:
@@ -311,7 +311,7 @@ class Owner(commands.Cog):
     async def unload(
             self,
             ctx,
-            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','no_slash','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")
+            extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','no_slash','nsfw','owner','reaction','stars','tags','testing','todo','utility','valorant'] = commands.Option(description="extension")
         ):
         embed = discord.Embed()
         try:
@@ -330,7 +330,7 @@ class Owner(commands.Cog):
     @commands.command(help="Reloaded cog")
     @commands.guild_only()
     @commands.is_owner()
-    async def reload(self, ctx, extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','no_slash','nsfw','owner','reaction','stars','tags','testing','todo','utility'] = commands.Option(description="extension")):
+    async def reload(self, ctx, extension: Literal['anime','error_handler','events','fun','help','infomation','latte_guild','leveling','misc','moderator','no_slash','nsfw','owner','reaction','stars','tags','testing','todo','utility','valorant'] = commands.Option(description="extension")):
         embed = discord.Embed()
         try:
             self.bot.reload_extension(f'cogs.{extension}')

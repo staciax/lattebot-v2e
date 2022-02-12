@@ -16,6 +16,19 @@ from utils_valorant.useful import *
 from utils_valorant.json_loader import data_read, data_save
 from utils_valorant.view import Notify, Notify_list
 
+class share_button(discord.ui.Button):
+    def __init__(self, embeds, channel: discord.channel):
+        self.embeds = embeds
+        self.channel = channel
+        super().__init__(
+            label="Share to friends",
+            style=discord.enums.ButtonStyle.primary
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        self.view.stop()
+        await self.channel.send(embeds=[self.embeds])
+
 class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
     """the bot doesn't store your username/password, it only uses them to get the cookies"""
     def __init__(self, bot):
@@ -148,7 +161,9 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         embed3 = await embed_design_giorgio(ctx, skin3['uuid'], skin3['name'], skin3['price'], skin3['icon'])
         embed4 = await embed_design_giorgio(ctx, skin4['uuid'], skin4['name'], skin4['price'], skin4['icon'])
 
-        await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4])
+        view = discord.ui.View()
+        view.add_item(share_button([embed, embed1, embed2, embed3, embed4], ctx.channel))
+        await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4], view=view)
 
     @commands.command(help="Log in with your Riot acoount")
     @is_latte_guild()
