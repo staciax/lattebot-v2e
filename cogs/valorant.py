@@ -22,12 +22,15 @@ class share_button(discord.ui.Button):
         self.channel = channel
         super().__init__(
             label="Share to friends",
-            style=discord.enums.ButtonStyle.primary
+            style=discord.ButtonStyle.primary
         )
 
     async def callback(self, interaction: discord.Interaction):
         self.view.stop()
-        await self.channel.send(embeds=[self.embeds])
+
+        embeds = [embed for embed in list(self.embeds)]
+
+        await self.channel.send(embeds=embeds)
 
 class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
     """the bot doesn't store your username/password, it only uses them to get the cookies"""
