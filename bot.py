@@ -90,6 +90,11 @@ class LatteBot(commands.AutoShardedBot):
         """Returns discord.Guild of the owner guild"""
         return self.get_guild(self.latte_guild_id)
     
+    @property
+    def latte_support(self) -> Optional[discord.Guild]:
+        """Returns discord.Guild of the owner guild"""
+        return self.get_guild(self.latte_sup_guild_id)
+    
     #thank_stella_bot
     def get_command_signature(self, ctx, command_name: Union[commands.Command, str]) -> str:
         if isinstance(command_name, str):

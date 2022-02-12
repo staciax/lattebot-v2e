@@ -97,6 +97,7 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
 
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name=f"{self.bot.user.name} Support server", icon_url=self.bot.user.avatar.url, url=self.bot.latte_supprt_url)
+        embed.set_image(url=self.bot.latte_support.icon)
         await ctx.reply(embed=embed, view=view, mention_author=False)
 
     @commands.command(help="Shows the bot's prefixes")
@@ -138,17 +139,19 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.add_field(name="Bot Info", value=f"{emoji_converter('latte_icon')} {self.bot.user.name} : `{self.bot.bot_version}`\n{emoji_converter('python')} Python : `{platform.python_version()}`\n{emoji_converter('dpy')} Discord.py : `{discord.__version__}`{latte_db}", inline=False)
         
         staciax_ = self.bot.get_emoji(941961591610556457)
-        view = base_Button_URL(label=f'{owner_bot}', url=f'https://discord.com/users/{owner_bot.id}', emoji=staciax_)
-        await ctx.reply(embed=embed, view=view, mention_author=False)
+        latte_support = self.bot.get_emoji(941971854728511529)
+
+        #start_view
+        view = discord.ui.View()
         
-        # embed.add_field(name="Bot created" , value=f"{format_dt(self.bot.user.created_at)}" , inline=False)    
-        #start_view_button
-        # view = discord.ui.View()
-        # style = discord.ButtonStyle.gray
-        #Source_code = discord.ui.Button(emoji=f"{utils.emoji_converter('github')}",style=style, label="Source code", url=self.bot.latte_source)
-        #Vote.gg = discord.ui.Button(style=style, label="Source code", url=self.bot.latte_source)
-        # view.add_item(item=Source_code)
-    
+        item = discord.ui.Button(label=f"{owner_bot.name}", url=f'https://discord.com/users/{owner_bot.id}', emoji=staciax_, row=0)
+        view.add_item(item=item)
+        
+        item2 = discord.ui.Button(label="ꜱᴇʀᴠᴇʀ", url=self.bot.latte_supprt_url, emoji=latte_support, row=0)
+        view.add_item(item=item2)
+
+        await ctx.reply(embed=embed, view=view, mention_author=False)
+            
     @commands.command(help="Shows the latency of the bot")
     @commands.guild_only()
     async def ping(self, ctx):
