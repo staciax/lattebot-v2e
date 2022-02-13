@@ -52,6 +52,7 @@ class Events(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
+        self.latte_invite_code = await self.latte.invites()
         print(f"{self.__class__.__name__}")
 
     @property
@@ -359,7 +360,7 @@ class Events(commands.Cog):
                     embed.set_footer(text=footer_text)
 
                 try:
-                    invites_before_join = self.bot.latte_invite_code
+                    invites_before_join = self.latte_invite_code
                     invites_after_join = await member.guild.invites()
                     if invites_before_join:
                         for invite in invites_before_join:
@@ -371,7 +372,8 @@ class Events(commands.Cog):
                                     chat_channel = self.bot.latte.get_channel(861883647070437386)
                                     await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
             
-                except (discord.Forbidden, discord.HTTPException):
+                except Exception as es:
+                    print(es)
                     pass
 
                 if member.bot:
@@ -424,7 +426,7 @@ class Events(commands.Cog):
             
             if member.guild.id == self.bot.latte_guild_id:
 
-                self.bot.latte_invite_code = await self.bot.latte.invites()
+                self.latte_invite_code = await self.bot.latte.invites()
                 
                 embed = discord.Embed(color=self.bot.white_color)
                 embed.title = "Member joined"
@@ -462,7 +464,7 @@ class Events(commands.Cog):
                 
             if invite.guild.id == self.bot.latte_guild_id:
 
-                self.bot.latte_invite_code = await self.bot.latte.invites()
+                self.latte_invite_code = await self.bot.latte.invites()
 
                 expiresAt = "Never" if not invite.expires_at else format_dt(invite.expires_at)
                 max_use_count = "Unlimited" if invite.max_uses == 0 else invite.max_uses

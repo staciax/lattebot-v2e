@@ -26,11 +26,10 @@ class share_button(discord.ui.Button):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        self.view.stop()
-
         embeds = [embed for embed in list(self.embeds)]
-
         await self.channel.send(embeds=embeds)
+        if self.view.message:
+            await self.view.message.edit(view=None)
 
 class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
     """the bot doesn't store your username/password, it only uses them to get the cookies"""
@@ -132,6 +131,8 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer(ephemeral=is_private)
         
+        view = discord.ui.View()
+
         if username and password:
             puuid, headers, region, ign = Auth(username, password).temp_auth()
             skin_list = VALORANT_API().temp_store(puuid, headers, region)
@@ -140,6 +141,7 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
             raise commands.CommandError("An unknown error occurred, sorry")
         else:
             data = Auth(user_id=ctx.author.id).get_users()
+            
             try:
                 skin_data = data_read('skins')
                 if skin_data['prices']["version"] != self.bot.game_version:
@@ -164,9 +166,10 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         embed3 = await embed_design_giorgio(ctx, skin3['uuid'], skin3['name'], skin3['price'], skin3['icon'])
         embed4 = await embed_design_giorgio(ctx, skin4['uuid'], skin4['name'], skin4['price'], skin4['icon'])
 
-        view = discord.ui.View()
-        view.add_item(share_button([embed, embed1, embed2, embed3, embed4], ctx.channel))
-        await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4], view=view)
+        if is_private is True:
+            view.add_item(share_button([embed, embed1, embed2, embed3, embed4], ctx.channel))
+
+        view.message = await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4], view=view)
 
     @commands.command(help="Log in with your Riot acoount")
     @is_latte_guild()
