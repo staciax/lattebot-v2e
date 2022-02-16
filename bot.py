@@ -50,8 +50,8 @@ class LatteBot(commands.AutoShardedBot):
         self.latte_starbot_id = 909485607359758337
         self.latte_invite_url = os.getenv('LATTE_URL', None)
         self.latte_supprt_url = os.getenv('SUPPORT_URL', None)
-        self.bot_join = 893695417320087573
-        self.bot_leave = 893695447309369345
+        self.bot_join = 943379664280387646
+        self.bot_leave = 943379695033016380
         self.white_color = 0xffffff
         self.error_color = 0xFF7878
         self.token = data["token"]

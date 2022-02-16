@@ -158,7 +158,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
             return await ctx.send(tag['content'])
         await ctx.send(f"**`{tag['tag']}`**\n{content}")
             
-    @commands.command(aliases=['tagcreate','tagc'], help="Creates a new tag owned by you.")
+    @commands.command(aliases=['tagcreate','tagc','tagadd'], help="Creates a new tag owned by you.")
     @commands.guild_only()
     @is_latte_guild()
     async def tag_create(self, ctx, *, name: TagName(lower=True) = commands.Option(description="Input name")):

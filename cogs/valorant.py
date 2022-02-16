@@ -122,7 +122,7 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         print('Checking new store skins for notifys...')
     
     @commands.command(help="Shows my daily store")
-    @is_latte_guild()
+    # @is_latte_guild()
     async def store(self, ctx, username = commands.Option(None, description="Input username"), password = commands.Option(None, description="Input password")):
         is_private = False
         if username is not None or password is not None:
@@ -172,7 +172,6 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         view.message = await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4], view=view)
 
     @commands.command(help="Log in with your Riot acoount")
-    @is_latte_guild()
     async def login(self, ctx, username = commands.Option(description="Input username (temp login)"), password = commands.Option(description="Input password (temp login)")):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer(ephemeral=True)
@@ -192,7 +191,6 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
             raise commands.UserInputError('Your username or password may be incorrect!')
 
     @commands.command(name="2fa", help="Enter your 2FA Code")
-    @is_latte_guild()
     async def twofa(self, ctx, code:str = commands.Option(description="Input 2FA Code")):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer(ephemeral=True)
@@ -218,7 +216,6 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         raise commands.UserInputError('Invalid 2FA code!')
 
     @commands.command(name="logout", help="Logout and delete your accounts")
-    @is_latte_guild()
     async def logout(self, ctx):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer(ephemeral=True)
@@ -284,7 +281,6 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         raise commands.UserInputError("Not found skin")
 
     @commands.command(help="Shows all your skin notify")
-    @is_latte_guild()
     async def notifys(self, ctx):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer(ephemeral=True)
@@ -302,7 +298,6 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         await view.start()
     
     @commands.command(help="Shows your valorant point in your accounts")
-    @is_latte_guild()
     async def point(self, ctx):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer()
