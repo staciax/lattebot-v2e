@@ -70,7 +70,7 @@ class LatteBot(commands.AutoShardedBot):
         self.no_prefix = False
 
         # Extra stuff
-        self.tester = '.'
+        self.tester = ''
         self.github = 'https://github.com/staciax'
         self.defaul_prefix = 're'
         self.format_version = 1
