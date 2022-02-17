@@ -140,7 +140,7 @@ bot = LatteBot(intents = discord.Intents(
     dm_reactions=True,  # reaction add/remove/clear
     guild_typing=True,  # on typing
     dm_messages=True,  # message create/update/delete
-    presences=False,  # member/user update for games/activities
+    presences=True,  # member/user update for games/activities
     dm_typing=True,  # on typing
     webhooks=True,  # webhook update
     members=True,  # member join/remove/update
