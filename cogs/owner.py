@@ -156,17 +156,17 @@ class Owner(commands.Cog):
         query = "SELECT * FROM public.blacklist;"
         blacklist = await self.bot.pg_con.fetch(query)
         
-        if blacklist is None or len(blacklist) == 0:
-            raise UserInputErrors("Not found blacklisted users.")
+        if blacklist or len(blacklist) != 0:
+            for data in blacklist:
+                user = self.bot.get_user(data["user_id"])
+                # reason = data["reason"]
+                blacklist_users.append(f"{user} | `{user.id}`")
 
-        for data in blacklist:
-            user = self.bot.get_user(data["user_id"])
-            # reason = data["reason"]
-            blacklist_users.append(f"{user.name} | `{user.id}`")
+            p = NewSimpage(ctx=ctx, entries=blacklist_users, per_page=10)
+            p.embed.color = self.bot.white_color
+            return await p.start()
 
-        p = NewSimpage(ctx=ctx, entries=blacklist_users, per_page=10)
-        p.embed.color = self.bot.white_color
-        await p.start()
+        raise UserInputErrors("Not found blacklisted users.")
 
     @commands.command(name="view_config", aliases=['configview'], help="view config files")
     @commands.guild_only()
