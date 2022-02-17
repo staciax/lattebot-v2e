@@ -285,7 +285,7 @@ class MyHelp(commands.HelpCommand):
 
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
         if command.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
-            raise UserInputErrors(f'No command called "{command.name}" found.')
+            raise UserInputErrors(f'Command not found')
 
         command_cd = []
         try:
@@ -354,7 +354,7 @@ class MyHelp(commands.HelpCommand):
 
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
         if group.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
-            raise UserInputErrors(f'No command called "{group.name}" found.')
+            raise UserInputErrors(f'Command not found')
 
         command_signatures = [self.get_minimal_command_signature(c) for c in entries]
         if command_signatures:
@@ -371,7 +371,7 @@ class MyHelp(commands.HelpCommand):
             try:
                 await group.can_run(self.context)
             except Exception as Ex:
-                # print(f"Group help error - {Ex}")
+                print(f"Group help error - {Ex}")
                 can_run.append('\n**Can be used?:** No')
 
             command_checks = ''.join(command_cd)
