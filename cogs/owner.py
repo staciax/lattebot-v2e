@@ -158,7 +158,8 @@ class Owner(commands.Cog):
         
         if blacklist or len(blacklist) != 0:
             for data in blacklist:
-                user = self.bot.get_user(data["user_id"])
+                user_id = data["user_id"]
+                user = self.bot.get_user(user_id) or await self.bot.fetch_user(user_id)
                 # reason = data["reason"]
                 blacklist_users.append(f"{user} | `{user.id}`")
 
