@@ -126,7 +126,7 @@ class LatteBot(commands.AutoShardedBot):
             self.add_view(LatteSupportVerifyView(self))
             self.latte_verify_view = True
         
-        # self.latte_invite_code = await self.latte.invites()
+        self.latte_invite_code = await self.latte.invites()
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=self.latte_avtivity))
         print(f"\nName : {self.user}\nActivity : {self.latte_avtivity}\nServers : {len(self.guilds)}\nUsers : {len(set(self.get_all_members()))}")
         print("\nCog loaded\n---------\n")

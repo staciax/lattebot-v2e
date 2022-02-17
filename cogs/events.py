@@ -52,7 +52,7 @@ class Events(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        self.latte_invite_code = await self.latte.invites()
+        # self.latte_invite_code = await self.latte.invites()
         print(f"{self.__class__.__name__}")
 
     @property
