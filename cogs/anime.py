@@ -22,45 +22,25 @@ class Anime(commands.Cog, command_attrs = dict(slash_command=True)):
     def display_emoji(self) -> discord.PartialEmoji:
         return discord.PartialEmoji(name='nekostare', id=903339723806875648, animated=False)
     
-    @commands.command(name="waifuim", help="Display waifu im sfw.", aliases=["wfim"])
-    @commands.guild_only()
-    async def waifu_im_sfw(self, ctx, tags: Literal["waifu", "maid"] = commands.Option(description="choose tags")):        
-        if tags == "waifu":
-            waifu_url = "https://api.waifu.im/sfw/waifu"
-        elif tags == "maid":
-            waifu_url = "https://api.waifu.im/sfw/maid"
+    # @commands.command(name="waifuim", help="Display waifu im sfw.", aliases=["wfim"])
+    # @commands.guild_only()
+    # async def waifu_im_sfw(self, ctx, tags: Literal["waifu", "maid"] = commands.Option(description="choose tags")):        
+    #     if tags == "waifu":
+    #         waifu_url = "https://api.waifu.im/sfw/waifu"
+    #     elif tags == "maid":
+    #         waifu_url = "https://api.waifu.im/sfw/maid"
           
-        view = WaifuimView(ctx=ctx, url=waifu_url)
-        await view.api_start()
+    #     view = WaifuimView(ctx=ctx, url=waifu_url)
+    #     await view.api_start()
     
     @commands.command(name="waifuim_nsfw", help="Display waifu im nsfw.", aliases=['waifuimnsfw','wfnsfw'])
     @commands.guild_only()
     @commands.is_nsfw()
     async def waifu_im_nsfw(self, ctx, tags: Literal["ass","ecchi","ero","hentai","maid","milf","oppai","oral","paizuri","selfies","uniform"] = commands.Option(description="choose tags")):
-        if tags == "ass":
-            waifu_url = "https://api.waifu.im/nsfw/ass"
-        elif tags == "ecchi":
-            waifu_url = "https://api.waifu.im/nsfw/ecchi"
-        elif tags == "ero":
-            waifu_url = "https://api.waifu.im/nsfw/ero"
-        elif tags == "hentai":
-            waifu_url = "https://api.waifu.im/nsfw/hentai"
-        elif tags == "maid":
-            waifu_url = "https://api.waifu.im/nsfw/maid"
-        elif tags == "milf":
-            waifu_url = "https://api.waifu.im/nsfw/milf"
-        elif tags == "oral":
-            waifu_url = "https://api.waifu.im/nsfw/oral"
-        elif tags == "oral":
-            waifu_url = "https://api.waifu.im/nsfw/oral"
-        elif tags == "paizuri":
-            waifu_url = "https://api.waifu.im/nsfw/paizuri"
-        elif tags == "selfies":
-            waifu_url = "https://api.waifu.im/nsfw/selfies"
-        elif tags == "uniform":
-            waifu_url = "https://api.waifu.im/nsfw/uniform"
 
-        view = WaifuimView(ctx=ctx, url=waifu_url)
+        fianl_url = 'https://api.waifu.im/random/?selected_tags={}'.format(tags)
+
+        view = WaifuimView(ctx=ctx, url=fianl_url)
         await view.api_start()
             
     @commands.command(name="waifupisc", help="Display waifu pisc.", aliases=["wfp"])
