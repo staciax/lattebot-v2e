@@ -258,8 +258,7 @@ class Events(commands.Cog):
                 pass
 
     @commands.Cog.listener()
-    async def on_message_delete(self, message):
-            
+    async def on_message_delete(self, message):                   
         # if message.author.bot:
         #     return
 
@@ -509,7 +508,7 @@ class Events(commands.Cog):
                 embed.add_field(name="**Before**", value=f"```{before.name}```", inline=False)
                 embed.add_field(name="**After**", value=f"```{after.name}```", inline=False)
 
-                if after.avatar.url is not None:
+                if after.avatar is not None:
                     embed.set_thumbnail(url=after.avatar.url)
                     embed.set_footer(text=after, icon_url=after.avatar.url)
                 else:
@@ -526,15 +525,15 @@ class Events(commands.Cog):
                 embed.add_field(name="**Before**", value=f"```#{before.discriminator}```", inline=False)
                 embed.add_field(name="**After**", value=f"```#{after.discriminator}```", inline=False)
                 
-                if after.avatar.url is not None:
-                    embed.set_footer(text=after, icon_url=after.avatar.url)
+                if after.avatar is not None:
+                    embed.set_footer(text=after, icon_url=after.avatar)
                 else:
                     embed.set_footer(text=after)
             
                 await self.server_log.send(embed=embed)
 
             #avatar_log
-            if before.avatar.url != after.avatar.url:
+            if before.avatar != after.avatar:
                 embed = discord.Embed(title="Avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
                 try:
                     embed.set_thumbnail(url=before.avatar.url)
