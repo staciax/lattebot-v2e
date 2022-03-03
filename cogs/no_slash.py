@@ -47,14 +47,14 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
     @commands.command(name='ftext')
     @commands.guild_only()
     @is_latte_guild()
-    async def ftext(self, ctx, *, text):
+    async def ftext(self, ctx, *, text:str):
         if len(text) == 0 or len(text) > 200:
             return
         
         def split(word):
             return list(word)
 
-        text_list = split(text)
+        text_list = split(text.lower())
         output = ''
         for x in text_list:
             try:
