@@ -100,3 +100,10 @@ def mystic_role():
         False
     return commands.check(predicate)
 
+def onlyfans():
+    def predicate(ctx):
+        role = ctx.bot.latte.get_role(863434675133087746)
+        if role in ctx.author.roles:
+            return True 
+        False
+    return commands.check(predicate)
