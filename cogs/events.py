@@ -4,6 +4,7 @@ import random
 import datetime
 import io
 import asyncio
+import contextlib
 from discord import Embed
 from discord.ext import commands , tasks
 from datetime import datetime, timezone , timedelta
@@ -582,7 +583,7 @@ class Events(commands.Cog):
                 member_role = ' '.join(reversed([r.mention for r in after.roles if r.name != '@everyone']))
                 
                 values = "**NEW**" if new_role else "**REMOVE**"
-                color_embed = 0x52D452 if new_role else 0xFF6961
+                color_embed = discord.Colour.green() if new_role else discord.Colour.red()
 
                 embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc))
                 embed.set_author(name=f"{after.display_name} | Roles update")
@@ -618,7 +619,18 @@ class Events(commands.Cog):
                 return
 
             if member.guild.id == self.bot.latte_guild_id:
-                
+                                
+                if str(member.id) in self.bot.auto_kick_user.keys():
+                    try:
+                        cooldown = self.bot.auto_kick_user[str(member.id)]['time']
+                        current = datetime.timestamp(datetime.utcnow())
+                        if cooldown > current:
+                            await member.move_to(channel=None)
+                        elif cooldown < current:
+                            del self.bot.auto_kick_user[str(member.id)]
+                    except Exception as e:
+                        print(e)
+                                
                 embed = discord.Embed(timestamp=datetime.now(timezone.utc))
                 if member.avatar is not None:
                     embed.set_footer(text=member , icon_url=member.display_avatar.url)
@@ -641,36 +653,19 @@ class Events(commands.Cog):
                         embed.description = f"**SWITCHED CHANNELS** : `{before.channel.name}` to `{after.channel.name}`"
                         embed.color=0xfcfc64
                         await self.voice_log.send(embed=embed)
-                    
-                    else:
-                        if member.voice.self_stream:
 
-                            embed.description = f"**STREAMING in** : `{before.channel.name}`"
-                            embed.colour=0x8A2BE2
-                            self.bot.current_streamers.append(member.id)
-                            await self.voice_log.send(embed=embed)
-
-                        # elif member.voice.mute:
-                        #     embed.description = f"**SERVER MUTED** in `{after.channel.name}`"
-                        #     embed.colour=0xFF3D33
-                        #     await self.voice_log.send(embed=embed)
-
-                        # elif member.voice.deaf:
-                        #     embed.description = f"**SERVER DEAFEN** in `{after.channel.name}`"
-                        #     embed.colour=0xFF3D33
-                        #     await self.voice_log.send(embed=embed)
-
-                        else:
-                            # if member.voice.deaf:
-                            #     pass
-                                # print("unmuted")
-                            for streamer in self.bot.current_streamers:
-                                if member.id == streamer:
-                                    if not member.voice.self_stream:
-                                            # print("user stopped streaming")
-                                        self.bot.current_streamers.remove(member.id)
-                                    break
+                # stream_log           
+                if before.self_stream != after.self_stream:
+                    if after.self_stream:
+                        embed.description = f"**STREAMING in `{before.channel.name}`**"
+                        embed.colour=0x8A2BE2
+                        await self.voice_log.send(embed=embed)
+                    if before.self_stream:
+                        embed.description = f"**LEAVE STREAMING"
+                        embed.colour=0x8A2BE2
+                        await self.voice_log.send(embed=embed)
                 
+                # deaf_log      
                 if before.deaf != after.deaf:
                     if after.deaf:
                         embed.description = f"**MEMBER DEAF**"
@@ -690,31 +685,25 @@ class Events(commands.Cog):
                         embed.description = f"**MEMBER UNMUTED**"
                         embed.colour=0x77dd77
                         await self.voice_log.send(embed=embed)
-        
-                #privete_temp_channel
+
                 if after.channel is not None:
-                    if after.channel.id == self.underworldx[0]:
-                        underworld_vc = member.guild.get_channel(self.underworldx[1])
-                        return await member.move_to(underworld_vc)
-                        
-                    if after.channel.id == self.moonlightx[0]:
-                        moonlight_vc = member.guild.get_channel(self.moonlightx[1])
-                        return await member.move_to(moonlight_vc)
-                    
-                    if after.channel.id == self.angelx[0]:
-                        angel_vc = member.guild.get_channel(self.angelx[1])
-                        return await member.move_to(angel_vc)
-                    
-                    if after.channel.id == self.deathx[0]:            
-                        death_vc = member.guild.get_channel(self.deathx[1])
-                        return await member.move_to(death_vc)
-                    
+                    temp_channel = {
+                        '873677543453126676': 873679362082369546,
+                        '875037193196945409': 875038018736644166,
+                        '873696566165250099': 883027485455941712,
+                        '883025077610876958': 883059509810040884
+                    }
+                    with contextlib.suppress(Exception):
+                        channel_move = temp_channel[str(after.channel.id)]
+                        channel_voice =  member.guild.get_channel(channel_move)
+                        return await member.move_to(channel_voice)
+
                     if after.channel.id == self.secret_channel:
                         if member.id in self.secret_users:
                             return
                         else:
                             await member.move_to(channel=None)
-
+                   
         except TypeError: #if no records found for that guild
             pass
 

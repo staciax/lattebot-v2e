@@ -340,7 +340,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         time:TimeConverter = commands.Option(description="specify duration")
     ):  
 
-        future_time = datetime.now() + timedelta(seconds=int(time))
+        future_time = datetime.utcnow() + timedelta(seconds=int(time))
         to_timestamp = datetime.timestamp(future_time)
         
         cooldown = humanize.naturaldelta(timedelta(seconds=int(time)))
@@ -349,6 +349,11 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
         self.bot.auto_kick_user[str(member.id)] = {
             'time': to_timestamp
         }
+
+        try:
+            await member.move_to(channel=None)
+        except Exception as e:
+            print(e)
 
         embed = discord.Embed(color=0xffffff)
         embed.description = f"{member.mention} | **Duration:** `{cooldown}`"
