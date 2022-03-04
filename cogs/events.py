@@ -609,7 +609,7 @@ class Events(commands.Cog):
                 await self.server_log.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_voice_state_update(self, member, before, after):
+    async def on_voice_state_update(self, member:discord.Member, before, after):
         self.voice_log = self.bot.get_channel(self.json_read["voice-log"])
 
         try:
@@ -621,6 +621,11 @@ class Events(commands.Cog):
             if member.guild.id == self.bot.latte_guild_id:
                                 
                 if str(member.id) in self.bot.auto_kick_user.keys():
+                
+                    onlyfans_role = self.bot.latte.get_role(863434675133087746)
+                    if onlyfans_role in member.roles:
+                        return
+
                     try:
                         cooldown = self.bot.auto_kick_user[str(member.id)]['time']
                         current = datetime.timestamp(datetime.utcnow())

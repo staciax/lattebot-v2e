@@ -11,7 +11,7 @@ import humanize
 
 # Local
 from utils.json_loader import latte_read
-from utils.checks import is_latte_guild, mystic_role
+from utils.checks import is_latte_guild, mystic_role, onlyfans
 from utils.emoji import status_converter
 from utils.errors import UserInputErrors
 from utils.useful import Embed
@@ -332,7 +332,7 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
 
     @commands.command(aliases=['ak'])
     @is_latte_guild()
-    @mystic_role()
+    @onlyfans()
     async def autokick(
         self,
         ctx:commands.Context,
@@ -361,13 +361,12 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
     
     @commands.command(aliases=['akc'])
     @is_latte_guild()
-    @mystic_role()
+    @onlyfans()
     async def autokick_clear(
         self,
         ctx:commands.Context,
         member: discord.Member = commands.Option(description="Mention member")
     ):  
-    
         if str(member.id) in self.bot.auto_kick_user.keys():
             del self.bot.auto_kick_user[str(member.id)]
             embed = discord.Embed(color=0xffffff)
