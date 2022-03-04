@@ -5,8 +5,9 @@ import random
 from discord.ext import commands, tasks
 from typing import Literal
 from re import search
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, timezone
 # Third
+import humanize
 
 # Local
 from utils.json_loader import latte_read
@@ -14,12 +15,16 @@ from utils.checks import is_latte_guild, mystic_role
 from utils.emoji import status_converter
 from utils.errors import UserInputErrors
 from utils.useful import Embed
+from utils.formats import format_dt
+from utils.converter import TimeConverter
+
+from bot import LatteBot
 # from utils.valorant_api import ValorantAPI
 
 class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command_guilds=[840379510704046151])):
     """Commands only latte server"""
     def __init__(self, bot):
-        self.bot = bot
+        self.bot:LatteBot = bot
         self.json_read = latte_read("latte_events")
         self.url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
         self.latte_bot = [861874852050894868, 840381588704591912, 844462710526836756]
@@ -324,6 +329,47 @@ class Latte(commands.Cog, command_attrs = dict(slash_command=True, slash_command
             await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
             return await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
         raise UserInputErrors("Member's already have a mute role.")
+
+    @commands.command(aliases=['ak'])
+    @is_latte_guild()
+    @mystic_role()
+    async def autokick(
+        self,
+        ctx:commands.Context,
+        member: discord.Member = commands.Option(description="Mention member"),
+        time:TimeConverter = commands.Option(description="specify duration")
+    ):  
+
+        future_time = datetime.now() + timedelta(seconds=int(time))
+        to_timestamp = datetime.timestamp(future_time)
+        
+        cooldown = humanize.naturaldelta(timedelta(seconds=int(time)))
+        bkk_time = datetime.now(timezone.utc) + timedelta(seconds=int(time))
+
+        self.bot.auto_kick_user[str(member.id)] = {
+            'time': to_timestamp
+        }
+
+        embed = discord.Embed(color=0xffffff)
+        embed.description = f"{member.mention} | **Duration:** `{cooldown}`"
+        await ctx.send(embed=embed, ephemeral=True)
+    
+    @commands.command(aliases=['akc'])
+    @is_latte_guild()
+    @mystic_role()
+    async def autokick_clear(
+        self,
+        ctx:commands.Context,
+        member: discord.Member = commands.Option(description="Mention member")
+    ):  
+    
+        if str(member.id) in self.bot.auto_kick_user.keys():
+            del self.bot.auto_kick_user[str(member.id)]
+            embed = discord.Embed(color=0xffffff)
+            embed.description = f"REMOVE {member}"
+            return await ctx.send(embed=embed, ephemeral=True)
+        raise commands.UserInputError(f'Not found {member.mention}')
+        
 
 def setup(bot):
     bot.add_cog(Latte(bot))

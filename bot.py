@@ -42,6 +42,7 @@ class LatteBot(commands.AutoShardedBot):
         self.last_update = [2022, 2, 11]
         self.launch_time = datetime.utcnow()
         self.latte_avtivity = 'nyanpasu ♡ ₊˚'
+        # self.allowed_mentions = discord.AllowedMentions.none()
 
         # Bot based stuff
         self.latte_guild_id = 840379510704046151
@@ -68,6 +69,10 @@ class LatteBot(commands.AutoShardedBot):
         self.current_streamers = list()
         self.latte_invite_code = {}
         self.no_prefix = False
+
+        # events stuff
+        self.auto_kick_user = {}
+        self.auto_kick = False
 
         # Extra stuff
         self.tester = ''
@@ -214,6 +219,14 @@ def blacklist(ctx):
             raise Blacklisted_user
     return True
 
+# @bot.check
+# def user_blacklisted(ctx: CustomContext):
+#     if not bot.blacklist.get(ctx.author.id, None) or ctx.author.id == bot.owner_id:
+#         return True
+#     if ctx.command.root_parent and ctx.command.root_parent.name == 'pit':
+#         return True
+#     raise errors.UserBlacklisted
+
 #jishaku
 bot.load_extension('jishaku')
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
@@ -225,12 +238,16 @@ if __name__ == "__main__":
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(bot.mongo_url))
     bot.latte_db = bot.mongo["latteonly"]
     bot.db_level = bot.mongo["discord"]
+    
     bot.latte_tags = Document(bot.latte_db, "tags")
     bot.latte_todo = Document(bot.latte_db, "todo")
     bot.latte_stars = Document(bot.latte_db, "stars")
     bot.custom_roles = Document(bot.latte_db, "custom_roles")
     bot.latte_ping = Document(bot.latte_db, "latency")
+    # bot.genshin_db = Document(bot.latte_db, "genshin")
     bot.latte_level = Document(bot.db_level, "levelling")
+    
+    # bot.notifys = Document(bot.latte_db, "notifys")
     
     for file in os.listdir("./cogs"):
         if file.endswith(".py") and not file.startswith("_"):
