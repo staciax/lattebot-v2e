@@ -1,11 +1,7 @@
 # Standard
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from utils.checks import is_snipe_guild
-
-# Third
-
-# Local
 
 class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
     def __init__(self, bot):
@@ -27,6 +23,8 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
         channel = self.bot.get_channel(950654058379771985)
 
         if message.guild.id == 950089766488125471:
+            # if message.channel.id == 950092028023279696:
+            #     return
 
             im = None
             embed = discord.Embed(color=0xffffff, timestamp=discord.utils.utcnow())
@@ -97,7 +95,7 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
                     embed.colour=0x8A2BE2
                     await channel.send(embed=embed)
     
-    @commands.command()
+    @commands.command(aliases=['wru'])
     @is_snipe_guild()
     async def whareru(self, ctx):
         members = []
@@ -108,7 +106,7 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
                 if member.voice is not None:
                     channels.append(member.voice.channel.name)
                     for i in member.voice.channel.members:
-                        members.append(i.name)
+                        members.append(i.mention)
             except:
                 pass
                 
@@ -119,7 +117,7 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
             embed = discord.Embed(color=0xffffff)
             embed.description = f'**channel: **{channel_txt}\n**member: **{members_txt}'
 
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
 
 def setup(bot):
     bot.add_cog(SNIPE(bot))
