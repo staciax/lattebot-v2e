@@ -110,3 +110,10 @@ def onlyfans():
 
 def is_snipe_guild():
     return is_in_guilds(949987281505255454)
+
+def is_badguy():
+    def predicate(ctx):
+        if ctx.author.id in [240350375201341442, 240059262297047041, 188653422864498688]:
+            return True 
+        False
+    return commands.check(predicate)

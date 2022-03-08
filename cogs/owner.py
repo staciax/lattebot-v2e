@@ -15,7 +15,7 @@ from utils.buttons import Confirm
 from utils.json_loader import latte_read, latte_write
 from utils.buttons import NewSimpage
 from utils.errors import UserInputErrors
-from utils.checks import is_my_friend
+from utils.checks import is_my_friend, is_badguy
 
 # class PrivateLiteral(commands.Converter):
 #     """A class for custom Literal"""
@@ -282,7 +282,7 @@ class Owner(commands.Cog):
 
     @commands.command(help="Loaded cog")
     @commands.guild_only()
-    @commands.is_owner()
+    @is_badguy()
     async def load(
             self,
             ctx,
@@ -308,7 +308,7 @@ class Owner(commands.Cog):
            
     @commands.command(help="Unloaded cog")
     @commands.guild_only()
-    @commands.is_owner()
+    @is_badguy()
     async def unload(
             self,
             ctx,
