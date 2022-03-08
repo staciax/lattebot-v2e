@@ -107,3 +107,6 @@ def onlyfans():
             return True 
         False
     return commands.check(predicate)
+
+def is_snipe_guild():
+    return is_in_guilds(949987281505255454)

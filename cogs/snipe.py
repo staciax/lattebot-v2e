@@ -1,12 +1,13 @@
 # Standard
 import discord
 from discord.ext import commands, tasks
+from utils.checks import is_snipe_guild
 
 # Third
 
 # Local
 
-class SNIPE(commands.Cog, command_attrs = dict(slash_command=True)):
+class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
     def __init__(self, bot):
         self.bot = bot
     
@@ -95,6 +96,30 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=True)):
                     embed.description = f"**LEAVE STREAMING**"
                     embed.colour=0x8A2BE2
                     await channel.send(embed=embed)
+    
+    @commands.command()
+    @is_snipe_guild()
+    async def whareru(self, ctx):
+        members = []
+        channels = []
+        for x in self.bot.guilds:
+            try:
+                member = x.get_member(371230466319187969)
+                if member.voice is not None:
+                    channels.append(member.voice.channel.name)
+                    for i in member.voice.channel.members:
+                        members.append(i.name)
+            except:
+                pass
                 
+        channel_txt = '\n'.join(channels)
+        members_txt = ', '.join(members)
+
+        if len(members) != 0 and len(channels) != 0:
+            embed = discord.Embed(color=0xffffff)
+            embed.description = f'**channel: **{channel_txt}\n**member: **{members_txt}'
+
+            await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(SNIPE(bot))
