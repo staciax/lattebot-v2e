@@ -186,6 +186,7 @@ class Events(commands.Cog):
                 
         embed = discord.Embed(color=self.bot.white_color, timestamp=discord.utils.utcnow())
         
+
         embed.description = f"[**{ctx.command}**](https://discord.gg/hE8x7S2fR5 '{message.content}') - has been used\n"
         embed.add_field(name="Server:",value=f"Name: {server} | `{server.id}`\nOwner: {owner} | `{owner.id}`", inline=False)
         embed.add_field(name="User:",value=f"Name: {author} | `{author.id}`", inline=False)
@@ -666,7 +667,7 @@ class Events(commands.Cog):
                         embed.colour=0x8A2BE2
                         await self.voice_log.send(embed=embed)
                     if before.self_stream:
-                        embed.description = f"**LEAVE STREAMING"
+                        embed.description = f"**LEAVE STREAMING**"
                         embed.colour=0x8A2BE2
                         await self.voice_log.send(embed=embed)
                 
