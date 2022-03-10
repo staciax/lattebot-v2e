@@ -88,8 +88,8 @@ class WaifuimView(discord.ui.View):
         if self.message:
             try:
                 await self.message.edit(view=self)
-            except:
-                pass
+            except Exception as e:
+                print(e)
     
     async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
         if interaction.user in (self.ctx.author, self.ctx.bot.renly):

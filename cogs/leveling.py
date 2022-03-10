@@ -195,8 +195,8 @@ class Leveling(commands.Cog, command_attrs = dict(slash_command=True, slash_comm
             if member.guild == self.bot.latte:
                 if not before.channel and after.channel:
                     await self.xp_update(member, member.guild, self.voice_xp)
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     # @commands.command(description="Crete xp role")
     # @commands.guild_only()
