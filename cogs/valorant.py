@@ -161,10 +161,10 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         skin3 = skin_list['skin3']
         skin4 = skin_list['skin4']
 
-        embed1 = await embed_design_giorgio(ctx, skin1['uuid'], skin1['name'], skin1['price'], skin1['icon'])
-        embed2 = await embed_design_giorgio(ctx, skin2['uuid'], skin2['name'], skin2['price'], skin2['icon'])
-        embed3 = await embed_design_giorgio(ctx, skin3['uuid'], skin3['name'], skin3['price'], skin3['icon'])
-        embed4 = await embed_design_giorgio(ctx, skin4['uuid'], skin4['name'], skin4['price'], skin4['icon'])
+        embed1 = embed_design_giorgio(skin1['uuid'], skin1['name'], skin1['price'], skin1['icon'])
+        embed2 = embed_design_giorgio(skin2['uuid'], skin2['name'], skin2['price'], skin2['icon'])
+        embed3 = embed_design_giorgio(skin3['uuid'], skin3['name'], skin3['price'], skin3['icon'])
+        embed4 = embed_design_giorgio(skin4['uuid'], skin4['name'], skin4['price'], skin4['icon'])
 
         if is_private is True:
             view.add_item(share_button([embed, embed1, embed2, embed3, embed4], ctx.channel))
@@ -272,6 +272,7 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
             uuid = skin_source['uuid']
 
             embed = discord.Embed(description=f'Successfully set an notify for the {emoji} **{name}**', color=0xfd4554)
+            embed.set_footer(text='NOTE : this is preview command')
             embed.set_thumbnail(url=icon)
             
             view = Notify(ctx.author.id, uuid, name)
@@ -341,7 +342,7 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         
         async def night_embed(uuid, name, price, dpice):
             embed = discord.Embed(color=0x0F1923)
-            embed.description = f"{get_emoji_tier_bot(self.bot, uuid)} **{name}**\n{get_emoji_point_bot(self.bot, 'vp')} {dpice} ~~{price}~~"
+            embed.description = f"{get_emoji_tier_by_uuid(uuid)} **{name}**\n{get_emoji_point_bot(self.bot, 'vp')} {dpice} ~~{price}~~"
             embed.set_thumbnail(url=get_skin_icon(uuid))
             return embed
         

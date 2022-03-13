@@ -16,6 +16,19 @@ from utils_valorant.json_loader import data_read, data_save
 
 # USEFUL
 
+tiers = {
+    '0cebb8be-46d7-c12a-d306-e9907bfc5a25': {'name':'Deluxe', 'emoji':'<:Deluxe:950372823048814632>', 'color': 0x009587},
+    'e046854e-406c-37f4-6607-19a9ba8426fc': {'name':'Exclusive', 'emoji':'<:Exclusive:950372911036915762>', 'color': 0xf1b82d},
+    '60bca009-4182-7998-dee7-b8a2558dc369': {'name':'Premium', 'emoji':'<:Premium:950376774620049489>', 'color': 0xd1548d},
+    '12683d76-48d7-84a3-4e09-6985794f0445': {'name':'Select', 'emoji':'<:Select:950376833982021662>', 'color': 0x5a9fe2},
+    '411e4a55-4e59-7757-41f0-86a53f101bb5': {'name':'Ultra', 'emoji':'<:Ultra:950376896745586719>', 'color': 0xefeb65}
+}
+
+points = {
+    'vp':'<:ValorantPoint:950365917613817856>',
+    'rad':'<:RadianitePoint:950365909636235324>'
+}
+
 def _decode_token(token:str) -> dict: # decode_token by ok_#4443
     data = base64.b64decode(token.split(".")[1] + "==").decode()
     return json.loads(data)
@@ -289,13 +302,20 @@ def get_emoji_point_bot(bot, point):
         emoji = discord.utils.get(bot.emojis, name='v_' + name)
     return emoji
 
-def get_emoji_tier_bot(bot, skin_uuid):
+# def get_emoji_tier_bot(bot, skin_uuid):
+#     data = data_read('skins')
+#     uuid = data['skins'][skin_uuid]['tier']
+#     name = data['tiers'][uuid]['name']
+#     emoji = discord.utils.get(bot.emojis, name='v_' + name + 'Tier')
+#     return emoji
+    
+def get_emoji_tier_by_uuid(skin_uuid) -> discord.Emoji:
     data = data_read('skins')
     uuid = data['skins'][skin_uuid]['tier']
-    name = data['tiers'][uuid]['name']
-    emoji = discord.utils.get(bot.emojis, name='v_' + name + 'Tier')
+    uuid = data['tiers'][uuid]['uuid']
+    emoji = tiers[uuid]['emoji']
     return emoji
-    
+
 async def setup_emoji(ctx):
     data:dict = data_read('skins')
     data['tiers'].pop('version')
@@ -343,15 +363,15 @@ def pillow_embed(name, user, duration) -> discord.Embed:
         embed.set_footer(text=f'Requested by {user.display_name}', icon_url=user.display_avatar)
     return embed
 
-async def embed_design_giorgio(ctx, uuid, name, price, icon) -> discord.Embed:
+def embed_design_giorgio(uuid, name, price, icon) -> discord.Embed:
     embed = discord.Embed(color=0x0F1923)
-    embed.description = f"{await get_emoji_tier(ctx, uuid)} **{name}**\n{await get_emoji_point(ctx, 'vp')} {price}"
+    embed.description = f"{get_emoji_tier_by_uuid(uuid)} **{name}**\n{points['vp']} {price}"
     embed.set_thumbnail(url=icon)
     return embed
 
-def embed_giorgio_notify(bot, uuid, name, price, icon) -> discord.Embed:
+def embed_giorgio_notify(uuid, name, price, icon) -> discord.Embed:
     embed = discord.Embed(color=0x0F1923)
-    embed.description = f"{get_emoji_tier_bot(bot, uuid)} **{name}**\n{get_emoji_point_bot(bot, 'vp')} {price}"
+    embed.description = f"{get_emoji_tier_by_uuid(uuid)} **{name}**\n{points['vp']} {price}"
     embed.set_thumbnail(url=icon)
     return embed
 
