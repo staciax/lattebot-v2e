@@ -609,115 +609,115 @@ class Events(commands.Cog):
         
     #             await self.server_log.send(embed=embed)
 
-    # @commands.Cog.listener()
-    # async def on_voice_state_update(self, member:discord.Member, before, after):
-    #     self.voice_log = self.bot.get_channel(self.json_read["voice-log"])
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member:discord.Member, before, after):
+        self.voice_log = self.bot.get_channel(self.json_read["voice-log"])
 
-    #     try:
+        try:
 
-    #         if self.voice_log is None:
-    #             print("on_voice_state_update error")
-    #             return
+            if self.voice_log is None:
+                print("on_voice_state_update error")
+                return
 
-    #         if member.guild.id == self.bot.latte_guild_id:
+            if member.guild.id == self.bot.latte_guild_id:
                                 
-    #             if str(member.id) in self.bot.auto_kick_user.keys():
+                if str(member.id) in self.bot.auto_kick_user.keys():
                 
-    #                 onlyfans_role = self.bot.latte.get_role(863434675133087746)
-    #                 if onlyfans_role in member.roles:
-    #                     return
+                    onlyfans_role = self.bot.latte.get_role(863434675133087746)
+                    if onlyfans_role in member.roles:
+                        return
 
-    #                 try:
-    #                     cooldown = self.bot.auto_kick_user[str(member.id)]['time']
-    #                     current = datetime.timestamp(datetime.utcnow())
-    #                     if cooldown > current:
-    #                         await member.move_to(channel=None)
-    #                     elif cooldown < current:
-    #                         del self.bot.auto_kick_user[str(member.id)]
-    #                 except Exception as e:
-    #                     print(e)
+                    try:
+                        cooldown = self.bot.auto_kick_user[str(member.id)]['time']
+                        current = datetime.timestamp(datetime.utcnow())
+                        if cooldown > current:
+                            await member.move_to(channel=None)
+                        elif cooldown < current:
+                            del self.bot.auto_kick_user[str(member.id)]
+                    except Exception as e:
+                        print(e)
                                 
-    #             embed = discord.Embed(timestamp=datetime.now(timezone.utc))
-    #             if member.avatar is not None:
-    #                 embed.set_footer(text=member , icon_url=member.display_avatar.url)
-    #             else:
-    #                 embed.set_footer(text=member)
+                embed = discord.Embed(timestamp=datetime.now(timezone.utc))
+                if member.avatar is not None:
+                    embed.set_footer(text=member , icon_url=member.display_avatar.url)
+                else:
+                    embed.set_footer(text=member)
 
-    #             #voice_log
-    #             if not before.channel and after.channel:
-    #                 embed.description = f"**JOIN CHANNEL** : `{after.channel.name}`"
-    #                 embed.color=0x77dd77            
-    #                 await self.voice_log.send(embed=embed)
+                #voice_log
+                if not before.channel and after.channel:
+                    embed.description = f"**JOIN CHANNEL** : `{after.channel.name}`"
+                    embed.color=0x77dd77            
+                    await self.voice_log.send(embed=embed)
             
-    #             if before.channel and not after.channel:
-    #                 embed.description = f"**LEFT CHANNEL** : `{before.channel.name}`"
-    #                 embed.color=0xd34e4e
-    #                 await self.voice_log.send(embed=embed)
+                if before.channel and not after.channel:
+                    embed.description = f"**LEFT CHANNEL** : `{before.channel.name}`"
+                    embed.color=0xd34e4e
+                    await self.voice_log.send(embed=embed)
             
-    #             if before.channel and after.channel: #and before.channel != after.channel
-    #                 if before.channel.id != after.channel.id:
-    #                     embed.description = f"**SWITCHED CHANNELS** : `{before.channel.name}` to `{after.channel.name}`"
-    #                     embed.color=0xfcfc64
-    #                     await self.voice_log.send(embed=embed)
+                if before.channel and after.channel: #and before.channel != after.channel
+                    if before.channel.id != after.channel.id:
+                        embed.description = f"**SWITCHED CHANNELS** : `{before.channel.name}` to `{after.channel.name}`"
+                        embed.color=0xfcfc64
+                        await self.voice_log.send(embed=embed)
 
-    #             # stream_log           
-    #             if before.self_stream != after.self_stream:
-    #                 if after.self_stream:
-    #                     embed.description = f"**STREAMING in `{before.channel.name}`**"
-    #                     embed.colour=0x8A2BE2
-    #                     await self.voice_log.send(embed=embed)
-    #                 if before.self_stream:
-    #                     embed.description = f"**LEAVE STREAMING**"
-    #                     embed.colour=0x8A2BE2
-    #                     await self.voice_log.send(embed=embed)
+                # stream_log           
+                if before.self_stream != after.self_stream:
+                    if after.self_stream:
+                        embed.description = f"**STREAMING in `{before.channel.name}`**"
+                        embed.colour=0x8A2BE2
+                        await self.voice_log.send(embed=embed)
+                    if before.self_stream:
+                        embed.description = f"**LEAVE STREAMING**"
+                        embed.colour=0x8A2BE2
+                        await self.voice_log.send(embed=embed)
                 
-    #             # deaf_log      
-    #             if before.deaf != after.deaf:
-    #                 if after.deaf:
-    #                     embed.description = f"**MEMBER DEAF**"
-    #                     embed.colour=0xFF7878
-    #                     await self.voice_log.send(embed=embed)
-    #                 if before.deaf:
-    #                     embed.description = f"**MEMBER UNDEAF**"
-    #                     embed.colour=0x77dd77
-    #                     await self.voice_log.send(embed=embed)
+                # deaf_log      
+                if before.deaf != after.deaf:
+                    if after.deaf:
+                        embed.description = f"**MEMBER DEAF**"
+                        embed.colour=0xFF7878
+                        await self.voice_log.send(embed=embed)
+                    if before.deaf:
+                        embed.description = f"**MEMBER UNDEAF**"
+                        embed.colour=0x77dd77
+                        await self.voice_log.send(embed=embed)
 
-    #             if before.mute != after.mute:
-    #                 if after.mute:
-    #                     embed.description = f"**MEMBER MUTED**"
-    #                     embed.colour=0xFF7878
-    #                     await self.voice_log.send(embed=embed)
-    #                 if before.mute:
-    #                     embed.description = f"**MEMBER UNMUTED**"
-    #                     embed.colour=0x77dd77
-    #                     await self.voice_log.send(embed=embed)
+                if before.mute != after.mute:
+                    if after.mute:
+                        embed.description = f"**MEMBER MUTED**"
+                        embed.colour=0xFF7878
+                        await self.voice_log.send(embed=embed)
+                    if before.mute:
+                        embed.description = f"**MEMBER UNMUTED**"
+                        embed.colour=0x77dd77
+                        await self.voice_log.send(embed=embed)
 
-    #             if after.channel is not None:
-    #                 temp_channel = {
-    #                     '873677543453126676': 873679362082369546,
-    #                     '875037193196945409': 875038018736644166,
-    #                     '873696566165250099': 883027485455941712,
-    #                     '883025077610876958': 883059509810040884
-    #                 }
-    #                 with contextlib.suppress(Exception):
-    #                     channel_move = temp_channel[str(after.channel.id)]
-    #                     channel_voice =  member.guild.get_channel(channel_move)
-    #                     return await member.move_to(channel_voice)
+                if after.channel is not None:
+                    temp_channel = {
+                        '873677543453126676': 873679362082369546,
+                        '875037193196945409': 875038018736644166,
+                        '873696566165250099': 883027485455941712,
+                        '883025077610876958': 883059509810040884
+                    }
+                    with contextlib.suppress(Exception):
+                        channel_move = temp_channel[str(after.channel.id)]
+                        channel_voice =  member.guild.get_channel(channel_move)
+                        return await member.move_to(channel_voice)
 
-    #                 if after.channel.id == self.secret_channel:
-    #                     if member.id in self.secret_users:
-    #                         return
-    #                     else:
-    #                         await member.move_to(channel=None)
+                    if after.channel.id == self.secret_channel:
+                        if member.id in self.secret_users:
+                            return
+                        else:
+                            await member.move_to(channel=None)
                    
-    #     except TypeError: #if no records found for that guild
-    #         pass
+        except TypeError: #if no records found for that guild
+            pass
 
-    #     except KeyError: # records exist but not set up a logging channel
-    #         pass
+        except KeyError: # records exist but not set up a logging channel
+            pass
             
-    #     except Exception as Ex:
-    #         print(f'on_voice_state_update - {Ex}')
+        except Exception as Ex:
+            print(f'on_voice_state_update - {Ex}')
         
     # @commands.Cog.listener()
     # async def on_presence_update(self, before, after):
