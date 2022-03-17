@@ -246,9 +246,9 @@ class MyHelp(commands.HelpCommand):
         ctx = self.context
         bot = self.context.bot
         if ctx.guild.id == ctx.bot.latte_guild_id:
-            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Testing', 'No_slash']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Testing', 'No_slash','SNIPE']
         else:
-            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
+            ignored_cogs = ['Error', 'Events', 'Help', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Reference', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash','SNIPE']
         self.ignored_cog = ignored_cogs
         mapping = {cog: cog.get_commands() for cog in
                    sorted(bot.cogs.values(), key=lambda c: c.qualified_name, reverse=False) if
@@ -283,7 +283,7 @@ class MyHelp(commands.HelpCommand):
         aliases = command.aliases
         description = command.help
 
-        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
+        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash','SNIPE']
         if command.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
             raise UserInputErrors(f'Command not found')
 
@@ -317,7 +317,7 @@ class MyHelp(commands.HelpCommand):
         
     async def send_cog_help(self, cog):
         ctx = self.context
-        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
+        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash', 'SNIPE']
         if cog.qualified_name in ignored_cogs and ctx.author != ctx.bot.renly:
             raise UserInputErrors(f'Command not found')
         
@@ -352,7 +352,7 @@ class MyHelp(commands.HelpCommand):
         # prefix = self.context.clean_prefix
         entries = group.commands
 
-        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash']
+        ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash', 'SNIPE']
         if group.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
             raise UserInputErrors(f'Command not found')
 

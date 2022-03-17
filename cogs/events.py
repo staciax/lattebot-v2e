@@ -327,96 +327,96 @@ class Events(commands.Cog):
         except KeyError: 
             pass
       
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        self.welcome = self.bot.get_channel(self.json_read["welcome_channel"])
-        self.welcome_image = self.json_read["welcome_image"]
-        self.welcome_footer = self.json_read["welcome_footer"]
+    # @commands.Cog.listener()
+    # async def on_member_join(self, member):
+    #     self.welcome = self.bot.get_channel(self.json_read["welcome_channel"])
+    #     self.welcome_image = self.json_read["welcome_image"]
+    #     self.welcome_footer = self.json_read["welcome_footer"]
         
-        try:
-            if self.welcome is None:
-                print("on_member_join error")
-                return
+    #     try:
+    #         if self.welcome is None:
+    #             print("on_member_join error")
+    #             return
 
-            if member.guild.id == self.bot.latte_guild_id:
-                embed=discord.Embed(
-                            description=f"**Welcome to ₊˚ {member.guild.name}**\n\n₊˚don’t forget to check out . . .\n﹒<#861883647070437386> \n﹒<#840380566862823425>", 
-                            timestamp=datetime.now(timezone.utc),
-                            color=0xCCCCFF
-                )
+    #         if member.guild.id == self.bot.latte_guild_id:
+    #             embed=discord.Embed(
+    #                         description=f"**Welcome to ₊˚ {member.guild.name}**\n\n₊˚don’t forget to check out . . .\n﹒<#861883647070437386> \n﹒<#840380566862823425>", 
+    #                         timestamp=datetime.now(timezone.utc),
+    #                         color=0xCCCCFF
+    #             )
 
-                embed.set_author(name=member)
-                if member.avatar is not None:
-                    embed.set_author(name=member, icon_url=member.avatar.url)
-                    embed.set_thumbnail(url=member.avatar.url)
+    #             embed.set_author(name=member)
+    #             if member.avatar is not None:
+    #                 embed.set_author(name=member, icon_url=member.avatar.url)
+    #                 embed.set_thumbnail(url=member.avatar.url)
                 
-                if self.welcome_image is not None:
-                    embed.set_image(url=self.welcome_image)
+    #             if self.welcome_image is not None:
+    #                 embed.set_image(url=self.welcome_image)
 
-                # embed.set_thumbnail(url=member.guild.icon.url)
+    #             # embed.set_thumbnail(url=member.guild.icon.url)
                 
-                footer_text = f"You're our {member.guild.member_count} members ෆ"
-                if self.welcome_footer is not None:
-                    embed.set_footer(text=footer_text, icon_url=self.welcome_footer)
-                else:
-                    embed.set_footer(text=footer_text)
+    #             footer_text = f"You're our {member.guild.member_count} members ෆ"
+    #             if self.welcome_footer is not None:
+    #                 embed.set_footer(text=footer_text, icon_url=self.welcome_footer)
+    #             else:
+    #                 embed.set_footer(text=footer_text)
 
-                try:
-                    invites_before_join = self.latte_invite_code
-                    invites_after_join = await member.guild.invites()
-                    if invites_before_join:
-                        for invite in invites_before_join:
-                            if invite.uses < find_invite_by_code(invites_after_join, invite.code).uses:
-                                if invite.code == 'jhK46N6QWU':
-                                    latte_roles = discord.utils.get(member.guild.roles, id = 842309176104976387) #name="Latte・・ ♡")
-                                    bar_role = discord.utils.get(member.guild.roles, id = 854503426977038338) #name="・ ───────꒰ ・ ♡ ・ ꒱─────── ・")
-                                    await member.add_roles(latte_roles, bar_role)
-                                    chat_channel = self.bot.latte.get_channel(861883647070437386)
-                                    await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
+    #             try:
+    #                 invites_before_join = self.latte_invite_code
+    #                 invites_after_join = await member.guild.invites()
+    #                 if invites_before_join:
+    #                     for invite in invites_before_join:
+    #                         if invite.uses < find_invite_by_code(invites_after_join, invite.code).uses:
+    #                             if invite.code == 'jhK46N6QWU':
+    #                                 latte_roles = discord.utils.get(member.guild.roles, id = 842309176104976387) #name="Latte・・ ♡")
+    #                                 bar_role = discord.utils.get(member.guild.roles, id = 854503426977038338) #name="・ ───────꒰ ・ ♡ ・ ꒱─────── ・")
+    #                                 await member.add_roles(latte_roles, bar_role)
+    #                                 chat_channel = self.bot.latte.get_channel(861883647070437386)
+    #                                 await chat_channel.send(f'୨୧・━━⋄✩ ₊ ˚・\nwelcome to our latte . .\n⸝⸝・{member.mention}', allowed_mentions=discord.AllowedMentions.none())
             
-                except Exception as es:
-                    print(es)
-                    pass
+    #             except Exception as es:
+    #                 print(es)
+    #                 pass
 
-                if member.bot:
-                    role = discord.utils.get(member.guild.roles, id=840677855460458496)
-                    if role:
-                        await member.add_roles(role)
-                await self.welcome.send(embed=embed)
+    #             if member.bot:
+    #                 role = discord.utils.get(member.guild.roles, id=840677855460458496)
+    #                 if role:
+    #                     await member.add_roles(role)
+    #             await self.welcome.send(embed=embed)
         
-        except TypeError: 
-            pass
+    #     except TypeError: 
+    #         pass
         
-        except KeyError: 
-            pass
+    #     except KeyError: 
+    #         pass
             
-        except Exception as ex:
-            print(ex)
+    #     except Exception as ex:
+    #         print(ex)
 
-    @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        self.welcome = self.bot.get_channel(self.json_read["welcome_channel"])
-        self.leave = self.bot.get_channel(self.json_read["leave_channel"])
+    # @commands.Cog.listener()
+    # async def on_member_remove(self, member):
+    #     self.welcome = self.bot.get_channel(self.json_read["welcome_channel"])
+    #     self.leave = self.bot.get_channel(self.json_read["leave_channel"])
 
-        if member.guild.id == self.bot.latte_guild_id:
+    #     if member.guild.id == self.bot.latte_guild_id:
         
-            embed = discord.Embed()
-            embed.color = 0xDEBA9D
-            embed.description = f"**{member.name}** see you next time ♡"
+    #         embed = discord.Embed()
+    #         embed.color = 0xDEBA9D
+    #         embed.description = f"**{member.name}** see you next time ♡"
 
-            await self.welcome.send(embed=embed)
+    #         await self.welcome.send(embed=embed)
             
-            embed_log = discord.Embed(
-                        description=f"**Leave Server\n`{member}`**",
-                        color=0xdbd7d2)
-            # if member.avatar.url is not None:
-            #     embed_log.set_thumbnail(url=member.avatar.url)
-            if member.avatar is not None:
-                embed_log.set_thumbnail(url=member.avatar or member.default_avatar)
-            embed_log.set_footer(text="—・see you next time ♡")
-            embed_log.timestamp = datetime.now(timezone.utc)
+    #         embed_log = discord.Embed(
+    #                     description=f"**Leave Server\n`{member}`**",
+    #                     color=0xdbd7d2)
+    #         # if member.avatar.url is not None:
+    #         #     embed_log.set_thumbnail(url=member.avatar.url)
+    #         if member.avatar is not None:
+    #             embed_log.set_thumbnail(url=member.avatar or member.default_avatar)
+    #         embed_log.set_footer(text="—・see you next time ♡")
+    #         embed_log.timestamp = datetime.now(timezone.utc)
 
-            await self.leave.send(embed = embed_log)
+    #         await self.leave.send(embed = embed_log)
     
     @commands.Cog.listener()
     async def on_invite_update(self, member, invite):
@@ -492,263 +492,263 @@ class Events(commands.Cog):
         except Exception as Ex:
             print(f'on_invite_create - {Ex}')
     
-    @commands.Cog.listener()
-    async def on_user_update(self, before, after):
-        #load_json
-            self.server_log = self.bot.get_channel(self.json_read["server-log"])
+    # @commands.Cog.listener()
+    # async def on_user_update(self, before, after):
+    #     #load_json
+    #         self.server_log = self.bot.get_channel(self.json_read["server-log"])
 
-            if self.server_log is None:
-                print("on_user_update error")
-                return
+    #         if self.server_log is None:
+    #             print("on_user_update error")
+    #             return
             
-            if self.bot.latte not in before.mutual_guilds:
-                return
+    #         if self.bot.latte not in before.mutual_guilds:
+    #             return
 
-            #username_log
-            if before.name != after.name:
-                embed = discord.Embed(title="Username change",colour=after.colour, timestamp=datetime.now(timezone.utc))  
-                embed.add_field(name="**Before**", value=f"```{before.name}```", inline=False)
-                embed.add_field(name="**After**", value=f"```{after.name}```", inline=False)
+    #         #username_log
+    #         if before.name != after.name:
+    #             embed = discord.Embed(title="Username change",colour=after.colour, timestamp=datetime.now(timezone.utc))  
+    #             embed.add_field(name="**Before**", value=f"```{before.name}```", inline=False)
+    #             embed.add_field(name="**After**", value=f"```{after.name}```", inline=False)
 
-                if after.avatar is not None:
-                    embed.set_thumbnail(url=after.avatar.url)
-                    embed.set_footer(text=after, icon_url=after.avatar.url)
-                else:
-                    embed.set_footer(text=after)
+    #             if after.avatar is not None:
+    #                 embed.set_thumbnail(url=after.avatar.url)
+    #                 embed.set_footer(text=after, icon_url=after.avatar.url)
+    #             else:
+    #                 embed.set_footer(text=after)
             
-                await self.server_log.send(embed=embed)
+    #             await self.server_log.send(embed=embed)
 
-            #discriminator_log
-            if before.discriminator != after.discriminator:
-                embed = discord.Embed(title="Discriminator change",
-                                    colour=0xffffff, #after.colour
-                                    timestamp=datetime.now(timezone.utc))
+    #         #discriminator_log
+    #         if before.discriminator != after.discriminator:
+    #             embed = discord.Embed(title="Discriminator change",
+    #                                 colour=0xffffff, #after.colour
+    #                                 timestamp=datetime.now(timezone.utc))
 
-                embed.add_field(name="**Before**", value=f"```#{before.discriminator}```", inline=False)
-                embed.add_field(name="**After**", value=f"```#{after.discriminator}```", inline=False)
+    #             embed.add_field(name="**Before**", value=f"```#{before.discriminator}```", inline=False)
+    #             embed.add_field(name="**After**", value=f"```#{after.discriminator}```", inline=False)
                 
-                if after.avatar is not None:
-                    embed.set_footer(text=after, icon_url=after.avatar)
-                else:
-                    embed.set_footer(text=after)
+    #             if after.avatar is not None:
+    #                 embed.set_footer(text=after, icon_url=after.avatar)
+    #             else:
+    #                 embed.set_footer(text=after)
             
-                await self.server_log.send(embed=embed)
+    #             await self.server_log.send(embed=embed)
 
-            #avatar_log
-            if before.avatar != after.avatar:
-                embed = discord.Embed(title="Avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
-                try:
-                    embed.set_thumbnail(url=before.avatar.url)
-                    embed.description = "New image is below, old to the right."
-                except:
-                    pass
-                embed.set_image(url=after.avatar.url)
-                embed.set_footer(text=after, icon_url=after.avatar.url)
+    #         #avatar_log
+    #         if before.avatar != after.avatar:
+    #             embed = discord.Embed(title="Avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
+    #             try:
+    #                 embed.set_thumbnail(url=before.avatar.url)
+    #                 embed.description = "New image is below, old to the right."
+    #             except:
+    #                 pass
+    #             embed.set_image(url=after.avatar.url)
+    #             embed.set_footer(text=after, icon_url=after.avatar.url)
 
-                await self.server_log.send(embed=embed)
+    #             await self.server_log.send(embed=embed)
     
-    @commands.Cog.listener()
-    async def on_member_update(self, before, after):
+    # @commands.Cog.listener()
+    # async def on_member_update(self, before, after):
         
-        if before.guild.id == self.bot.latte_guild_id:
-            #load_json
-            self.server_log = self.bot.get_channel(self.json_read["server-log"])
-            self.roles_log = self.bot.get_channel(self.json_read["role-log"])
+    #     if before.guild.id == self.bot.latte_guild_id:
+    #         #load_json
+    #         self.server_log = self.bot.get_channel(self.json_read["server-log"])
+    #         self.roles_log = self.bot.get_channel(self.json_read["role-log"])
 
-            if self.server_log is None and self.roles_log is None:
-                print("on_member_update error")
-                return
+    #         if self.server_log is None and self.roles_log is None:
+    #             print("on_member_update error")
+    #             return
 
-            #nickname_log
-            if before.display_name != after.display_name:
-                embed = discord.Embed(title="Nickname change",
-                                    colour=0xFFDF00, #colour=after.colour,
-						            timestamp=datetime.now(timezone.utc))                               
+    #         #nickname_log
+    #         if before.display_name != after.display_name:
+    #             embed = discord.Embed(title="Nickname change",
+    #                                 colour=0xFFDF00, #colour=after.colour,
+	# 					            timestamp=datetime.now(timezone.utc))                               
                 
-                embed.add_field(name="**Before**", value=f"```{before.display_name}```", inline=False)
-                embed.add_field(name="**After**", value=f"```{after.display_name}```", inline=False)
+    #             embed.add_field(name="**Before**", value=f"```{before.display_name}```", inline=False)
+    #             embed.add_field(name="**After**", value=f"```{after.display_name}```", inline=False)
 
-                if after.avatar is not None:    
-                    embed.set_thumbnail(url=after.avatar.url)
-                # embed.set_footer(text="", icon_url=after.avatar.url)
+    #             if after.avatar is not None:    
+    #                 embed.set_thumbnail(url=after.avatar.url)
+    #             # embed.set_footer(text="", icon_url=after.avatar.url)
 
-                await self.server_log.send(embed=embed)
+    #             await self.server_log.send(embed=embed)
 
-            #role_log
-            elif before.roles != after.roles:
-                new_role = [x.mention for x in after.roles if x not in before.roles]
-                old_role = [x.mention for x in before.roles if x not in after.roles]
-                update_role = new_role[0] if new_role else old_role[0]
-                if update_role == '<@&886193080997384222>':
-                    return
-                member_role = ' '.join(reversed([r.mention for r in after.roles if r.name != '@everyone']))
+    #         #role_log
+    #         elif before.roles != after.roles:
+    #             new_role = [x.mention for x in after.roles if x not in before.roles]
+    #             old_role = [x.mention for x in before.roles if x not in after.roles]
+    #             update_role = new_role[0] if new_role else old_role[0]
+    #             if update_role == '<@&886193080997384222>':
+    #                 return
+    #             member_role = ' '.join(reversed([r.mention for r in after.roles if r.name != '@everyone']))
                 
-                values = "**NEW**" if new_role else "**REMOVE**"
-                color_embed = discord.Colour.green() if new_role else discord.Colour.red()
+    #             values = "**NEW**" if new_role else "**REMOVE**"
+    #             color_embed = discord.Colour.green() if new_role else discord.Colour.red()
 
-                embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc))
-                embed.set_author(name=f"{after.display_name} | Roles update")
-                if after.avatar is not None:
-                    embed.set_author(name=f"{after.display_name} | Roles update", icon_url=after.avatar.url)
+    #             embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc))
+    #             embed.set_author(name=f"{after.display_name} | Roles update")
+    #             if after.avatar is not None:
+    #                 embed.set_author(name=f"{after.display_name} | Roles update", icon_url=after.avatar.url)
                 
-                if update_role and member_role:
-                    embed.add_field(name="**ROLE**", value=member_role or '\u200B', inline=False)
-                    embed.add_field(name=values, value=update_role, inline=False)
-                    await self.roles_log.send(embed=embed)
+    #             if update_role and member_role:
+    #                 embed.add_field(name="**ROLE**", value=member_role or '\u200B', inline=False)
+    #                 embed.add_field(name=values, value=update_role, inline=False)
+    #                 await self.roles_log.send(embed=embed)
 
-            elif before.display_avatar != after.display_avatar:
-                embed = discord.Embed(title="Server avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
-                embed.description = "New image is below, old to the right."
+    #         elif before.display_avatar != after.display_avatar:
+    #             embed = discord.Embed(title="Server avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
+    #             embed.description = "New image is below, old to the right."
                 
-                if before.display_avatar is not None:
-                    embed.set_thumbnail(url=before.display_avatar.url)
+    #             if before.display_avatar is not None:
+    #                 embed.set_thumbnail(url=before.display_avatar.url)
                 
-                if after.display_avatar is not None:
-                    embed.set_image(url=after.display_avatar.url)
-                    embed.set_footer(text=after, icon_url=after.display_avatar.url)
+    #             if after.display_avatar is not None:
+    #                 embed.set_image(url=after.display_avatar.url)
+    #                 embed.set_footer(text=after, icon_url=after.display_avatar.url)
         
-                await self.server_log.send(embed=embed)
+    #             await self.server_log.send(embed=embed)
 
-    @commands.Cog.listener()
-    async def on_voice_state_update(self, member:discord.Member, before, after):
-        self.voice_log = self.bot.get_channel(self.json_read["voice-log"])
+    # @commands.Cog.listener()
+    # async def on_voice_state_update(self, member:discord.Member, before, after):
+    #     self.voice_log = self.bot.get_channel(self.json_read["voice-log"])
 
-        try:
+    #     try:
 
-            if self.voice_log is None:
-                print("on_voice_state_update error")
-                return
+    #         if self.voice_log is None:
+    #             print("on_voice_state_update error")
+    #             return
 
-            if member.guild.id == self.bot.latte_guild_id:
+    #         if member.guild.id == self.bot.latte_guild_id:
                                 
-                if str(member.id) in self.bot.auto_kick_user.keys():
+    #             if str(member.id) in self.bot.auto_kick_user.keys():
                 
-                    onlyfans_role = self.bot.latte.get_role(863434675133087746)
-                    if onlyfans_role in member.roles:
-                        return
+    #                 onlyfans_role = self.bot.latte.get_role(863434675133087746)
+    #                 if onlyfans_role in member.roles:
+    #                     return
 
-                    try:
-                        cooldown = self.bot.auto_kick_user[str(member.id)]['time']
-                        current = datetime.timestamp(datetime.utcnow())
-                        if cooldown > current:
-                            await member.move_to(channel=None)
-                        elif cooldown < current:
-                            del self.bot.auto_kick_user[str(member.id)]
-                    except Exception as e:
-                        print(e)
+    #                 try:
+    #                     cooldown = self.bot.auto_kick_user[str(member.id)]['time']
+    #                     current = datetime.timestamp(datetime.utcnow())
+    #                     if cooldown > current:
+    #                         await member.move_to(channel=None)
+    #                     elif cooldown < current:
+    #                         del self.bot.auto_kick_user[str(member.id)]
+    #                 except Exception as e:
+    #                     print(e)
                                 
-                embed = discord.Embed(timestamp=datetime.now(timezone.utc))
-                if member.avatar is not None:
-                    embed.set_footer(text=member , icon_url=member.display_avatar.url)
-                else:
-                    embed.set_footer(text=member)
+    #             embed = discord.Embed(timestamp=datetime.now(timezone.utc))
+    #             if member.avatar is not None:
+    #                 embed.set_footer(text=member , icon_url=member.display_avatar.url)
+    #             else:
+    #                 embed.set_footer(text=member)
 
-                #voice_log
-                if not before.channel and after.channel:
-                    embed.description = f"**JOIN CHANNEL** : `{after.channel.name}`"
-                    embed.color=0x77dd77            
-                    await self.voice_log.send(embed=embed)
+    #             #voice_log
+    #             if not before.channel and after.channel:
+    #                 embed.description = f"**JOIN CHANNEL** : `{after.channel.name}`"
+    #                 embed.color=0x77dd77            
+    #                 await self.voice_log.send(embed=embed)
             
-                if before.channel and not after.channel:
-                    embed.description = f"**LEFT CHANNEL** : `{before.channel.name}`"
-                    embed.color=0xd34e4e
-                    await self.voice_log.send(embed=embed)
+    #             if before.channel and not after.channel:
+    #                 embed.description = f"**LEFT CHANNEL** : `{before.channel.name}`"
+    #                 embed.color=0xd34e4e
+    #                 await self.voice_log.send(embed=embed)
             
-                if before.channel and after.channel: #and before.channel != after.channel
-                    if before.channel.id != after.channel.id:
-                        embed.description = f"**SWITCHED CHANNELS** : `{before.channel.name}` to `{after.channel.name}`"
-                        embed.color=0xfcfc64
-                        await self.voice_log.send(embed=embed)
+    #             if before.channel and after.channel: #and before.channel != after.channel
+    #                 if before.channel.id != after.channel.id:
+    #                     embed.description = f"**SWITCHED CHANNELS** : `{before.channel.name}` to `{after.channel.name}`"
+    #                     embed.color=0xfcfc64
+    #                     await self.voice_log.send(embed=embed)
 
-                # stream_log           
-                if before.self_stream != after.self_stream:
-                    if after.self_stream:
-                        embed.description = f"**STREAMING in `{before.channel.name}`**"
-                        embed.colour=0x8A2BE2
-                        await self.voice_log.send(embed=embed)
-                    if before.self_stream:
-                        embed.description = f"**LEAVE STREAMING**"
-                        embed.colour=0x8A2BE2
-                        await self.voice_log.send(embed=embed)
+    #             # stream_log           
+    #             if before.self_stream != after.self_stream:
+    #                 if after.self_stream:
+    #                     embed.description = f"**STREAMING in `{before.channel.name}`**"
+    #                     embed.colour=0x8A2BE2
+    #                     await self.voice_log.send(embed=embed)
+    #                 if before.self_stream:
+    #                     embed.description = f"**LEAVE STREAMING**"
+    #                     embed.colour=0x8A2BE2
+    #                     await self.voice_log.send(embed=embed)
                 
-                # deaf_log      
-                if before.deaf != after.deaf:
-                    if after.deaf:
-                        embed.description = f"**MEMBER DEAF**"
-                        embed.colour=0xFF7878
-                        await self.voice_log.send(embed=embed)
-                    if before.deaf:
-                        embed.description = f"**MEMBER UNDEAF**"
-                        embed.colour=0x77dd77
-                        await self.voice_log.send(embed=embed)
+    #             # deaf_log      
+    #             if before.deaf != after.deaf:
+    #                 if after.deaf:
+    #                     embed.description = f"**MEMBER DEAF**"
+    #                     embed.colour=0xFF7878
+    #                     await self.voice_log.send(embed=embed)
+    #                 if before.deaf:
+    #                     embed.description = f"**MEMBER UNDEAF**"
+    #                     embed.colour=0x77dd77
+    #                     await self.voice_log.send(embed=embed)
 
-                if before.mute != after.mute:
-                    if after.mute:
-                        embed.description = f"**MEMBER MUTED**"
-                        embed.colour=0xFF7878
-                        await self.voice_log.send(embed=embed)
-                    if before.mute:
-                        embed.description = f"**MEMBER UNMUTED**"
-                        embed.colour=0x77dd77
-                        await self.voice_log.send(embed=embed)
+    #             if before.mute != after.mute:
+    #                 if after.mute:
+    #                     embed.description = f"**MEMBER MUTED**"
+    #                     embed.colour=0xFF7878
+    #                     await self.voice_log.send(embed=embed)
+    #                 if before.mute:
+    #                     embed.description = f"**MEMBER UNMUTED**"
+    #                     embed.colour=0x77dd77
+    #                     await self.voice_log.send(embed=embed)
 
-                if after.channel is not None:
-                    temp_channel = {
-                        '873677543453126676': 873679362082369546,
-                        '875037193196945409': 875038018736644166,
-                        '873696566165250099': 883027485455941712,
-                        '883025077610876958': 883059509810040884
-                    }
-                    with contextlib.suppress(Exception):
-                        channel_move = temp_channel[str(after.channel.id)]
-                        channel_voice =  member.guild.get_channel(channel_move)
-                        return await member.move_to(channel_voice)
+    #             if after.channel is not None:
+    #                 temp_channel = {
+    #                     '873677543453126676': 873679362082369546,
+    #                     '875037193196945409': 875038018736644166,
+    #                     '873696566165250099': 883027485455941712,
+    #                     '883025077610876958': 883059509810040884
+    #                 }
+    #                 with contextlib.suppress(Exception):
+    #                     channel_move = temp_channel[str(after.channel.id)]
+    #                     channel_voice =  member.guild.get_channel(channel_move)
+    #                     return await member.move_to(channel_voice)
 
-                    if after.channel.id == self.secret_channel:
-                        if member.id in self.secret_users:
-                            return
-                        else:
-                            await member.move_to(channel=None)
+    #                 if after.channel.id == self.secret_channel:
+    #                     if member.id in self.secret_users:
+    #                         return
+    #                     else:
+    #                         await member.move_to(channel=None)
                    
-        except TypeError: #if no records found for that guild
-            pass
+    #     except TypeError: #if no records found for that guild
+    #         pass
 
-        except KeyError: # records exist but not set up a logging channel
-            pass
+    #     except KeyError: # records exist but not set up a logging channel
+    #         pass
             
-        except Exception as Ex:
-            print(f'on_voice_state_update - {Ex}')
+    #     except Exception as Ex:
+    #         print(f'on_voice_state_update - {Ex}')
         
-    @commands.Cog.listener()
-    async def on_presence_update(self, before, after):
-        # role = discord.utils.find(lambda r: r.name == 'ᴴ ᴱ ᴸ ᴬ・・ ♡', guild.roles)
+    # @commands.Cog.listener()
+    # async def on_presence_update(self, before, after):
+    #     # role = discord.utils.find(lambda r: r.name == 'ᴴ ᴱ ᴸ ᴬ・・ ♡', guild.roles)
 
-        #add_offline_role
-        if before.guild.id == self.bot.latte_guild_id:
-            try:
-                # role = discord.utils.get(before.guild.roles, id = 886193080997384222)
-                # if str(after.status) == "online" or "dnd" and "idle":
-                #     await before.remove_roles(role)
-                # if str(after.status) == "offline":
-                #     await after.add_roles(role)
+    #     #add_offline_role
+    #     if before.guild.id == self.bot.latte_guild_id:
+    #         try:
+    #             # role = discord.utils.get(before.guild.roles, id = 886193080997384222)
+    #             # if str(after.status) == "online" or "dnd" and "idle":
+    #             #     await before.remove_roles(role)
+    #             # if str(after.status) == "offline":
+    #             #     await after.add_roles(role)
 
-                #server_log
-                self.status_log = self.bot.get_channel(self.json_read["status-log"])
+    #             #server_log
+    #             self.status_log = self.bot.get_channel(self.json_read["status-log"])
 
-                #status
-                if before.status != after.status:
-                    embed = discord.Embed(
-                        colour=after.colour,
-                        timestamp=datetime.now(timezone.utc)
-                    )
-                    if after.avatar is not None:
-                        embed.set_author(name=after, icon_url=after.avatar.url)
-                    else:
-                        embed.set_author(name=after)
-                    embed.set_footer(text=f"{str(after.status)}", icon_url=status_icon(after.status))
-                    await self.status_log.send(embed=embed)
-            except:
-                pass
+    #             #status
+    #             if before.status != after.status:
+    #                 embed = discord.Embed(
+    #                     colour=after.colour,
+    #                     timestamp=datetime.now(timezone.utc)
+    #                 )
+    #                 if after.avatar is not None:
+    #                     embed.set_author(name=after, icon_url=after.avatar.url)
+    #                 else:
+    #                     embed.set_author(name=after)
+    #                 embed.set_footer(text=f"{str(after.status)}", icon_url=status_icon(after.status))
+    #                 await self.status_log.send(embed=embed)
+    #         except:
+    #             pass
     
     @commands.Cog.listener()
     async def on_guild_join(self, guild):

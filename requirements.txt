@@ -5,6 +5,7 @@ colorthief==0.2.1
 discord-ext-menus @ git+https://github.com/Rapptz/discord-ext-menus
 discord.py @ git+https://github.com/iDevision/enhanced-discord.py#egg=discord.py[voice]
 emojis==0.6.0
+genshin==0.3.1
 googletrans==3.1.0a0
 humanize==3.12.0
 jishaku @ git+https://github.com/Gorialis/jishaku@master

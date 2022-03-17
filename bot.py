@@ -136,23 +136,11 @@ class LatteBot(commands.AutoShardedBot):
         print(f"\nName : {self.user}\nActivity : {self.latte_avtivity}\nServers : {len(self.guilds)}\nUsers : {len(set(self.get_all_members()))}")
         print("\nCog loaded\n---------\n")
 
-bot = LatteBot(intents = discord.Intents(
-    guild_reactions=True,  # reaction add/remove/clear
-    guild_messages=True,  # message create/update/delete
-    guilds=True,  # guild/channel join/remove/update
-    integrations=True,  # integrations update
-    voice_states=True,  # voice state update
-    dm_reactions=True,  # reaction add/remove/clear
-    guild_typing=True,  # on typing
-    dm_messages=True,  # message create/update/delete
-    presences=True,  # member/user update for games/activities
-    dm_typing=True,  # on typing
-    webhooks=True,  # webhook update
-    members=True,  # member join/remove/update
-    invites=True,  # invite create/delete
-    emojis=True,  # emoji update
-    bans=True  # member ban/unban
-), help_command = None, case_insensitive = True, owner_id=240059262297047041)
+intents = discord.Intents.all()
+intents.members = False
+intents.presences = False
+
+bot = LatteBot(intents=intents, help_command=None, case_insensitive=True, owner_id=240059262297047041)
 
 @tasks.loop(minutes=30)
 async def get_version():

@@ -169,7 +169,6 @@ class RoboPages(discord.ui.View):
         # The call here is safe because it's guarded by skip_if
         await self.show_page(interaction, self.source.get_max_pages() - 1)
 
-
     @discord.ui.button(label='Skip to page...', style=discord.ButtonStyle.grey)
     async def numbered_page(self, button: discord.ui.Button, interaction: discord.Interaction):
 #        """lets you type a page number to go to"""

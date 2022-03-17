@@ -6,7 +6,7 @@ from utils.formats import format_dt
 
 # Third party
 # Local
-from utils.checks import is_latte_guild
+from utils.checks import is_latte_guild, mystic_role
 from utils.latte_converter import fancy_text
 
 class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
@@ -64,6 +64,35 @@ class No_slash(commands.Cog, command_attrs = dict(slash_command=False)):
 
         if text_list:
             await ctx.send(output)
+    
+    # @commands.command(aliases=['ak'])
+    # @is_latte_guild()
+    # @mystic_role()
+    # async def autokick(self, ctx):
+    #     text = ''
+    #     if self.bot.auto_kick:
+    #         self.bot.auto_kick = False
+    #         text = 'turn off'
+    #     elif not self.bot.auto_kick:
+    #         self.bot.auto_kick = True
+    #         text = 'turn on'
+        
+    #     await ctx.send(text, delete_after=20)
+
+    # @commands.command(aliases=['ak'])
+    # @is_latte_guild()
+    # @mystic_role()
+    # async def autokick(self, ctx):
+    #     text = ''
+    #     if self.bot.auto_kick:
+    #         self.bot.auto_kick = False
+    #         text = 'turn off'
+    #     elif not self.bot.auto_kick:
+    #         self.bot.auto_kick = True
+    #         text = 'turn on'
+        
+    #     await ctx.send(text, delete_after=20)
+    
     
     # @commands.command(name="reactionrole")
     # @commands.guild_only()

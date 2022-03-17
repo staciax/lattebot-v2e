@@ -341,7 +341,7 @@ class Owner(commands.Cog):
         except commands.ExtensionNotLoaded:
             raise UserInputErrors("The extension was not loaded.")
         except commands.ExtensionNotFound:
-            raise UserInputErrors("TExtension Not Found")
+            raise UserInputErrors("The Extension Not Found")
         except commands.NoEntryPointError:
             raise UserInputErrors("The extension does not have a setup function.")
         except commands.ExtensionFailed:

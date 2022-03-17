@@ -14,7 +14,6 @@ async def do_removal(ctx, limit, predicate, *, before=None, after=None):
     def total_remove():
         return len(deleted)
 
-
     if limit > 2000:
         return await ctx.send(f'Too many messages to search given ({limit}/2000)')
 
