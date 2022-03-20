@@ -30,7 +30,7 @@ class Cancel_button(discord.ui.View):
         self.add_item(self.cancel_button_)
 
     async def interaction_check(self, item, interaction: discord.Interaction) -> bool:
-        if interaction.user in (self.ctx.author, self.ctx.bot.renly):
+        if interaction.user.id in (self.ctx.author.id, 240059262297047041):
             return True
         await interaction.response.send_message('This menus cannot be controlled by you, sorry!', ephemeral=True)
         return False
@@ -168,7 +168,7 @@ class Tags(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
 
         #data_user_count
         data_user = await self.bot.latte_tags.find_by_custom({"user_id": ctx.author.id})
-        if len(data_user) >= 50 and ctx.author != self.bot.renly:
+        if len(data_user) >= 50 and ctx.author.id != 240059262297047041:
             raise UserInputErrors("You can't have more than 50 tags at the moment.")
 
         #find_data

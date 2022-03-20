@@ -149,7 +149,7 @@ class Events(commands.Cog):
     @tasks.loop(hours=1)
     async def clear_message_log(self):
         def is_me(m):
-            return m.author != self.bot.renly
+            return m.author.id != 240059262297047041
         guild = self.bot.latte
         message_log = guild.get_channel(self.json_read["message-log"])
         time = (datetime.utcnow() + timedelta(seconds=25200)).strftime("%H")
@@ -169,7 +169,8 @@ class Events(commands.Cog):
     
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        if ctx.author.id in [self.bot.renly.id, 879361086724386837, 834834946832203776]:
+
+        if ctx.author.id in [240059262297047041, 879361086724386837, 834834946832203776]:
             return
 
         self.bot.commands_used = self.bot.commands_used +1

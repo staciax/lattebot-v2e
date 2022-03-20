@@ -38,7 +38,7 @@ class todolist_button(discord.ui.View):
         ctx = self.ctx
         author = ctx.author
         mystic_role = discord.utils.get(interaction.user.roles, id=842304286737956876)
-        if interaction.user == ctx.bot.renly:
+        if interaction.user.id == 240059262297047041:
             return True
         if bool(mystic_role) == True:
             return True

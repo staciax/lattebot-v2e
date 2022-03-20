@@ -104,7 +104,6 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
             view = base_Button_URL(label="Server icon URL", url=guild.icon.url)
             return await ctx.send(embed=embed, view=view)
         raise UserInputErrors('Server icon not found')
-
     
     @server.command(name="banner", help="Shows the server banner.", aliases=["serverbanner","sb","guildbanner"], message_command=False)
     @commands.guild_only()
@@ -132,12 +131,13 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def userinfo(self, ctx, member: discord.Member = commands.Option(default=None, description="Mention member")):
-        member = member or ctx.guild.get_member(ctx.author.id)
-        
+        # member = member or ctx.guild.get_member(ctx.author.id)
+        member = member or ctx.author
+
         #member_status
-        m_mobile = f"{status_converter(str(member.mobile_status))} Moblie"
-        m_desktop = f"{status_converter(str(member.desktop_status))} Desktop"
-        m_Web = f"{status_converter(str(member.web_status))} Web"
+        # m_mobile = f"{status_converter(str(member.mobile_status))} Moblie"
+        # m_desktop = f"{status_converter(str(member.desktop_status))} Desktop"
+        # m_Web = f"{status_converter(str(member.web_status))} Web"
         
         #member_badge
         flags = member.public_flags.all()
@@ -145,7 +145,7 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         if member.bot: badges = f"{badges} {profile_converter('bot')}"
         if member.premium_since: badges = f"{badges} {profile_converter('guildboost')}"
 
-        #member_info
+        # member_info
         member_joined = format_dt(member.joined_at, style='d')
         member_created = format_dt(member.created_at, style='d')
         members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
@@ -185,13 +185,14 @@ class Infomation(commands.Cog, command_attrs = dict(slash_command=True)):
         fields = [("Nickname",f"{member.display_name}", True),
                 ("Is bot?","Yes" if member.bot else "No", True),
                 ("Activity",member_activity, True),
-                ("Join position",f"{str(members.index(member)+1)}/{ctx.guild.member_count}", True),
+                # ("Join position",f"{str(members.index(member)+1)}/{ctx.guild.member_count}", True),
                 ("Joined",f"{member_joined}", True),
                 ("Registered",f"{member_created}", True),
-                ("Status",f"{m_desktop}\n{m_mobile}\n{m_Web}", True),
+                # ("Status",f"{m_desktop}\n{m_mobile}\n{m_Web}", True),
                 ("Badge",f"{badges}** **", True),
                 ("Top Role",member.top_role.mention, False),
-                ("Roles ({})\n".format(len(member.roles)-1), role_string , False)]
+                ("Roles ({})\n".format(len(member.roles)-1), role_string , False)
+            ]
 
         for name, value, inline in fields:
             embed.add_field(name=name , value=value , inline=inline)

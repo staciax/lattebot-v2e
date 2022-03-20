@@ -117,14 +117,17 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         if ctx.interaction is not None:
             await ctx.interaction.response.defer()
 
-        owner_bot = self.bot.renly
+        owner_bot = await self.bot.stacia
         embed = discord.Embed(color=self.bot.white_color)
         embed.set_author(name=f"About Me", icon_url=self.bot.user.avatar.url)
         embed.set_thumbnail(url=owner_bot.avatar.url)
 
         #stats
         serverCount = len(self.bot.guilds)
-        memberCount = len(set(self.bot.get_all_members()))
+        memberCount = 0
+        for guild in self.bot.guilds: memberCount += guild.member_count
+
+        # memberCount = len(set(self.bot.get_all_members()))
         # totalcogs = len(self.bot.cogs)
         totalcommands = len(self.bot.commands)
         
@@ -188,7 +191,8 @@ class Misc(commands.Cog, command_attrs = dict(slash_command=True)):
         embed.description = f"{message}"
         embed.set_footer(text="Reported by", icon_url=ctx.author.avatar or ctx.author.default_avatar)
         try:
-            await self.bot.renly.send(embed=embed)
+            owner = await self.bot.stacia
+            await owner.send(embed=embed)
         except (discord.HTTPException, discord.HTTPException, discord.InvalidArgument):
             raise UserInputErrors('Failed to send message to owner bot')
 

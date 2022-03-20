@@ -180,7 +180,7 @@ class HelpView(discord.ui.View):
         """Only allowing the context author to interact with the view"""
         ctx = self.ctx
         author = ctx.author
-        if interaction.user == ctx.bot.renly:
+        if interaction.user.id == 240059262297047041:
             return True
         if interaction.user != ctx.author:
             if self.is_command:
@@ -284,7 +284,7 @@ class MyHelp(commands.HelpCommand):
         description = command.help
 
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash','SNIPE']
-        if command.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
+        if command.cog_name in ignored_cogs and ctx.author.id != 240059262297047041:
             raise UserInputErrors(f'Command not found')
 
         command_cd = []
@@ -318,7 +318,7 @@ class MyHelp(commands.HelpCommand):
     async def send_cog_help(self, cog):
         ctx = self.context
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash', 'SNIPE']
-        if cog.qualified_name in ignored_cogs and ctx.author != ctx.bot.renly:
+        if cog.qualified_name in ignored_cogs and ctx.author.id != 240059262297047041:
             raise UserInputErrors(f'Command not found')
         
         view = HelpView(self.context)
@@ -353,7 +353,7 @@ class MyHelp(commands.HelpCommand):
         entries = group.commands
 
         ignored_cogs = ['Error', 'Events', 'Jishaku', 'Latte', 'Leveling', 'NSFW', 'Owner', 'Reaction', 'Star', 'Tags', 'Testing', 'Todo', 'No_slash', 'SNIPE']
-        if group.cog_name in ignored_cogs and ctx.author != ctx.bot.renly:
+        if group.cog_name in ignored_cogs and ctx.author.id != 240059262297047041:
             raise UserInputErrors(f'Command not found')
 
         command_signatures = [self.get_minimal_command_signature(c) for c in entries]

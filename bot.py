@@ -34,7 +34,7 @@ async def get_prefix(bot, message):
     prefix = 're'
     if message.guild.id in [bot.latte.id, 937967814889848853, 949987281505255454]:
         prefix = '.'
-    return commands.when_mentioned_or(prefix)(bot,message)
+    return commands.when_mentioned_or(prefix)(bot, message)
 
 class LatteBot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
@@ -84,6 +84,11 @@ class LatteBot(commands.AutoShardedBot):
         # Bot view
         self.latte_verify_view = False
         self.latte_support_view = False
+
+    @property
+    async def stacia(self) -> Optional[discord.User]:
+        """Returns discord.User of the owner"""
+        return await self.fetch_user(self.owner_id)
 
     @property
     def renly(self) -> Optional[discord.User]:
