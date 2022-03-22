@@ -46,7 +46,7 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
 
     @property
     def display_emoji(self) -> discord.PartialEmoji:
-        return discord.PartialEmoji(name='valorant_icon', id=941509459484737566, animated=False)
+        return discord.PartialEmoji(name='valorant_icon', id=955743009138429962, animated=False)
     
     @tasks.loop(time=time(hour=0, minute=0, second=15)) #utc 00:00:15
     async def notifys_skin(self):
@@ -316,8 +316,8 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
             raise commands.UserInputError("Can't fetch point")
 
         embed = discord.Embed(title=f"{data['IGN']} Points:",color=0xfd4554)
-        embed.add_field(name='Valorant Points',value=f"{get_emoji_point_bot(self.bot, 'vp')} {vp}", inline=True)
-        embed.add_field(name='Radianite points',value=f"{get_emoji_point_bot(self.bot, 'rad')} {rad}", inline=True)
+        embed.add_field(name='Valorant Points',value=f"<:ValorantPoint:950365917613817856> {vp}", inline=True)
+        embed.add_field(name='Radianite points',value=f"<:RadianitePoint:950365909636235324> {rad}", inline=True)
 
         await ctx.send(embed=embed)
 
