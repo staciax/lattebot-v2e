@@ -32,7 +32,7 @@ load_dotenv(dotenv_path)
 #get_prefix
 async def get_prefix(bot, message):
     prefix = 're'
-    if message.guild.id in [bot.latte.id, 937967814889848853, 949987281505255454]:
+    if message.guild.id in [bot.latte.id, 937967814889848853, 949987281505255454, 887274968012955679]:
         prefix = '.'
     return commands.when_mentioned_or(prefix)(bot, message)
 
