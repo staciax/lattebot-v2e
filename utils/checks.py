@@ -67,7 +67,7 @@ def is_in_guilds(*guild_ids):
         guild = ctx.guild
         if guild is None:
             return False
-        if ctx.author == ctx.bot.renly:
+        if ctx.author.id == 240059262297047041:
             return True
         return guild.id in guild_ids
     return commands.check(predicate)
@@ -80,7 +80,7 @@ def is_my_friend():
         
         if ctx.author.id in [240350375201341442, 188653422864498688, 371230466319187969, 240137834349068290, 818849641784541234]:
             return True
-        if ctx.author == ctx.bot.renly:
+        if ctx.author.id == 240059262297047041:
             return True
         False
     return commands.check(predicate)
