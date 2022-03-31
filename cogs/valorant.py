@@ -272,6 +272,8 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
             uuid = skin_source['uuid']
 
             embed = discord.Embed(description=f'Successfully set an notify for the {emoji} **{name}**', color=0xfd4554)
+            embed.description += '\n\nNOTE : this is preview command\n It will be available in mid-April and New version\n\nตอนนี้คำสั่งนี้ยังเป็นพรีวิวอยู่ ยังใช้งานจริงไม่ได้\nจะเปิดใช้งานจริงน่าจะช่วงกลาง-ปลายเดือนเมษายน\n\nและบอทจะถูก rework ใหม่ทั่งหมด ขอบคุณครับ'
+            
             embed.set_footer(text='NOTE : this is preview command')
             embed.set_thumbnail(url=icon)
             
