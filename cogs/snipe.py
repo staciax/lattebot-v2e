@@ -147,7 +147,7 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
                 if member.voice is not None:
                     channels.append(member.voice.channel.name)
                     for i in member.voice.channel.members:
-                        members.append(i.mention)
+                        members.append(i.name)
             except:
                 pass
                 
@@ -158,7 +158,8 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
             embed = discord.Embed(color=0xffffff)
             embed.description = f'**channel: **{channel_txt}\n**member: **{members_txt}'
 
-            await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
+            return await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
+        await ctx.send('NOPE')
 
 def setup(bot):
     bot.add_cog(SNIPE(bot))
