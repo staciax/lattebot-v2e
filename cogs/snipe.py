@@ -94,7 +94,48 @@ class SNIPE(commands.Cog, command_attrs = dict(slash_command=False)):
                     embed.description = f"**LEAVE STREAMING**"
                     embed.colour=0x8A2BE2
                     await channel.send(embed=embed)
-    
+            
+            # deaf_log      
+            if before.deaf != after.deaf:
+                if after.deaf:
+                    embed.description = f"**MEMBER DEAF**"
+                    embed.colour=0xFF7878
+                    await channel.send(embed=embed)
+                if before.deaf:
+                    embed.description = f"**MEMBER UNDEAF**"
+                    embed.colour=0x77dd77
+                    await channel.send(embed=embed)
+
+            if before.mute != after.mute:
+                if after.mute:
+                    embed.description = f"**MEMBER MUTED**"
+                    embed.colour=0xFF7878
+                    await channel.send(embed=embed)
+                if before.mute:
+                    embed.description = f"**MEMBER UNMUTED**"
+                    embed.colour=0x77dd77
+                    await channel.send(embed=embed)
+
+            if before.self_deaf != after.self_deaf:
+                if after.self_deaf:
+                    embed.description = f"**SELF DEAF**"
+                    embed.colour=0xFF7878
+                    await channel.send(embed=embed)
+                if before.self_deaf:
+                    embed.description = f"**SELF UNDEAF**"
+                    embed.colour=0x77dd77
+                    await channel.send(embed=embed)
+
+            if before.self_mute != after.self_mute:
+                if after.self_mute:
+                    embed.description = f"**SELF MUTED**"
+                    embed.colour=0xFF7878
+                    await channel.send(embed=embed)
+                if before.self_mute:
+                    embed.description = f"**SELF UNMUTED**"
+                    embed.colour=0x77dd77
+                    await channel.send(embed=embed)
+
     @commands.command(aliases=['wru'])
     @is_snipe_guild()
     async def whareru(self, ctx):
