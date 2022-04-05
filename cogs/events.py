@@ -167,32 +167,32 @@ class Events(commands.Cog):
     async def before_clear_message_log(self):
         await self.bot.wait_until_ready()
     
-    @commands.Cog.listener()
-    async def on_command(self, ctx):
+    # @commands.Cog.listener()
+    # async def on_command(self, ctx):
 
-        if ctx.author.id in [240059262297047041, 879361086724386837, 834834946832203776]:
-            return
+    #     if ctx.author.id in [240059262297047041, 879361086724386837, 834834946832203776]:
+    #         return
 
-        self.bot.commands_used = self.bot.commands_used +1
-        channel_log = self.bot.get_channel(self.bot.latte_log_id)
+    #     self.bot.commands_used = self.bot.commands_used +1
+    #     channel_log = self.bot.get_channel(self.bot.latte_log_id)
         
-        if ctx.guild == self.bot.latte:
-            return
+    #     if ctx.guild == self.bot.latte:
+    #         return
 
-        server = ctx.guild
-        channel = ctx.channel
-        owner = ctx.guild.owner
-        author = ctx.author
-        message = ctx.message
+    #     server = ctx.guild
+    #     channel = ctx.channel
+    #     owner = ctx.guild.owner
+    #     author = ctx.author
+    #     message = ctx.message
                 
-        embed = discord.Embed(color=self.bot.white_color, timestamp=discord.utils.utcnow())
+    #     embed = discord.Embed(color=self.bot.white_color, timestamp=discord.utils.utcnow())
         
 
-        embed.description = f"[**{ctx.command}**](https://discord.gg/hE8x7S2fR5 '{message.content}') - has been used\n"
-        embed.add_field(name="Server:",value=f"Name: {server} | `{server.id}`\nOwner: {owner} | `{owner.id}`", inline=False)
-        embed.add_field(name="User:",value=f"Name: {author} | `{author.id}`", inline=False)
+    #     embed.description = f"[**{ctx.command}**](https://discord.gg/hE8x7S2fR5 '{message.content}') - has been used\n"
+    #     embed.add_field(name="Server:",value=f"Name: {server} | `{server.id}`\nOwner: {owner} | `{owner.id}`", inline=False)
+    #     embed.add_field(name="User:",value=f"Name: {author} | `{author.id}`", inline=False)
         
-        await channel_log.send(embed=embed)
+    #     await channel_log.send(embed=embed)
                 
     @commands.Cog.listener()
     async def on_message(self, message):
