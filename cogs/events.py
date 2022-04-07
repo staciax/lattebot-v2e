@@ -166,34 +166,7 @@ class Events(commands.Cog):
     @clear_message_log.before_loop
     async def before_clear_message_log(self):
         await self.bot.wait_until_ready()
-    
-    # @commands.Cog.listener()
-    # async def on_command(self, ctx):
-
-    #     if ctx.author.id in [240059262297047041, 879361086724386837, 834834946832203776]:
-    #         return
-
-    #     self.bot.commands_used = self.bot.commands_used +1
-    #     channel_log = self.bot.get_channel(self.bot.latte_log_id)
-        
-    #     if ctx.guild == self.bot.latte:
-    #         return
-
-    #     server = ctx.guild
-    #     channel = ctx.channel
-    #     owner = ctx.guild.owner
-    #     author = ctx.author
-    #     message = ctx.message
-                
-    #     embed = discord.Embed(color=self.bot.white_color, timestamp=discord.utils.utcnow())
-        
-
-    #     embed.description = f"[**{ctx.command}**](https://discord.gg/hE8x7S2fR5 '{message.content}') - has been used\n"
-    #     embed.add_field(name="Server:",value=f"Name: {server} | `{server.id}`\nOwner: {owner} | `{owner.id}`", inline=False)
-    #     embed.add_field(name="User:",value=f"Name: {author} | `{author.id}`", inline=False)
-        
-    #     await channel_log.send(embed=embed)
-                
+                    
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
@@ -218,17 +191,6 @@ class Events(commands.Cog):
                 embed = discord.Embed(description=f'**{member.display_name}** is afk for: {self.bot.afk_user[user_id]["reason"]}' , color=self.bot.white_color)
                 await message.channel.send(embed=embed, delete_after=15)
                     
-        # #google_translator
-        # if message.channel.id == self.translatex:
-        #     translator = Translator()
-        #     try:
-        #         result =  translator.translate(f'{message.clean_content}' , dest='th')
-        #     except:
-        #         return await message.channel.send("An unknown error occurred, sorry" , delete_after=10)
-
-        #     await message.channel.send(result.text)
-        #     # await message.reply(result.text)
-
     @commands.Cog.listener()
     async def on_message_edit(self, before , after):   
         if after.author.bot:
@@ -493,123 +455,6 @@ class Events(commands.Cog):
         except Exception as Ex:
             print(f'on_invite_create - {Ex}')
     
-    # @commands.Cog.listener()
-    # async def on_user_update(self, before, after):
-    #     #load_json
-    #         self.server_log = self.bot.get_channel(self.json_read["server-log"])
-
-    #         if self.server_log is None:
-    #             print("on_user_update error")
-    #             return
-            
-    #         if self.bot.latte not in before.mutual_guilds:
-    #             return
-
-    #         #username_log
-    #         if before.name != after.name:
-    #             embed = discord.Embed(title="Username change",colour=after.colour, timestamp=datetime.now(timezone.utc))  
-    #             embed.add_field(name="**Before**", value=f"```{before.name}```", inline=False)
-    #             embed.add_field(name="**After**", value=f"```{after.name}```", inline=False)
-
-    #             if after.avatar is not None:
-    #                 embed.set_thumbnail(url=after.avatar.url)
-    #                 embed.set_footer(text=after, icon_url=after.avatar.url)
-    #             else:
-    #                 embed.set_footer(text=after)
-            
-    #             await self.server_log.send(embed=embed)
-
-    #         #discriminator_log
-    #         if before.discriminator != after.discriminator:
-    #             embed = discord.Embed(title="Discriminator change",
-    #                                 colour=0xffffff, #after.colour
-    #                                 timestamp=datetime.now(timezone.utc))
-
-    #             embed.add_field(name="**Before**", value=f"```#{before.discriminator}```", inline=False)
-    #             embed.add_field(name="**After**", value=f"```#{after.discriminator}```", inline=False)
-                
-    #             if after.avatar is not None:
-    #                 embed.set_footer(text=after, icon_url=after.avatar)
-    #             else:
-    #                 embed.set_footer(text=after)
-            
-    #             await self.server_log.send(embed=embed)
-
-    #         #avatar_log
-    #         if before.avatar != after.avatar:
-    #             embed = discord.Embed(title="Avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
-    #             try:
-    #                 embed.set_thumbnail(url=before.avatar.url)
-    #                 embed.description = "New image is below, old to the right."
-    #             except:
-    #                 pass
-    #             embed.set_image(url=after.avatar.url)
-    #             embed.set_footer(text=after, icon_url=after.avatar.url)
-
-    #             await self.server_log.send(embed=embed)
-    
-    # @commands.Cog.listener()
-    # async def on_member_update(self, before, after):
-        
-    #     if before.guild.id == self.bot.latte_guild_id:
-    #         #load_json
-    #         self.server_log = self.bot.get_channel(self.json_read["server-log"])
-    #         self.roles_log = self.bot.get_channel(self.json_read["role-log"])
-
-    #         if self.server_log is None and self.roles_log is None:
-    #             print("on_member_update error")
-    #             return
-
-    #         #nickname_log
-    #         if before.display_name != after.display_name:
-    #             embed = discord.Embed(title="Nickname change",
-    #                                 colour=0xFFDF00, #colour=after.colour,
-	# 					            timestamp=datetime.now(timezone.utc))                               
-                
-    #             embed.add_field(name="**Before**", value=f"```{before.display_name}```", inline=False)
-    #             embed.add_field(name="**After**", value=f"```{after.display_name}```", inline=False)
-
-    #             if after.avatar is not None:    
-    #                 embed.set_thumbnail(url=after.avatar.url)
-    #             # embed.set_footer(text="", icon_url=after.avatar.url)
-
-    #             await self.server_log.send(embed=embed)
-
-    #         #role_log
-    #         elif before.roles != after.roles:
-    #             new_role = [x.mention for x in after.roles if x not in before.roles]
-    #             old_role = [x.mention for x in before.roles if x not in after.roles]
-    #             update_role = new_role[0] if new_role else old_role[0]
-    #             if update_role == '<@&886193080997384222>':
-    #                 return
-    #             member_role = ' '.join(reversed([r.mention for r in after.roles if r.name != '@everyone']))
-                
-    #             values = "**NEW**" if new_role else "**REMOVE**"
-    #             color_embed = discord.Colour.green() if new_role else discord.Colour.red()
-
-    #             embed = discord.Embed(colour=color_embed, timestamp=datetime.now(timezone.utc))
-    #             embed.set_author(name=f"{after.display_name} | Roles update")
-    #             if after.avatar is not None:
-    #                 embed.set_author(name=f"{after.display_name} | Roles update", icon_url=after.avatar.url)
-                
-    #             if update_role and member_role:
-    #                 embed.add_field(name="**ROLE**", value=member_role or '\u200B', inline=False)
-    #                 embed.add_field(name=values, value=update_role, inline=False)
-    #                 await self.roles_log.send(embed=embed)
-
-    #         elif before.display_avatar != after.display_avatar:
-    #             embed = discord.Embed(title="Server avatar change", colour=0xf3d4b4, timestamp=datetime.now(timezone.utc))
-    #             embed.description = "New image is below, old to the right."
-                
-    #             if before.display_avatar is not None:
-    #                 embed.set_thumbnail(url=before.display_avatar.url)
-                
-    #             if after.display_avatar is not None:
-    #                 embed.set_image(url=after.display_avatar.url)
-    #                 embed.set_footer(text=after, icon_url=after.display_avatar.url)
-        
-    #             await self.server_log.send(embed=embed)
-
     @commands.Cog.listener()
     async def on_voice_state_update(self, member:discord.Member, before, after):
         self.voice_log = self.bot.get_channel(self.json_read["voice-log"])
@@ -719,38 +564,7 @@ class Events(commands.Cog):
             
         except Exception as Ex:
             print(f'on_voice_state_update - {Ex}')
-        
-    # @commands.Cog.listener()
-    # async def on_presence_update(self, before, after):
-    #     # role = discord.utils.find(lambda r: r.name == 'ᴴ ᴱ ᴸ ᴬ・・ ♡', guild.roles)
-
-    #     #add_offline_role
-    #     if before.guild.id == self.bot.latte_guild_id:
-    #         try:
-    #             # role = discord.utils.get(before.guild.roles, id = 886193080997384222)
-    #             # if str(after.status) == "online" or "dnd" and "idle":
-    #             #     await before.remove_roles(role)
-    #             # if str(after.status) == "offline":
-    #             #     await after.add_roles(role)
-
-    #             #server_log
-    #             self.status_log = self.bot.get_channel(self.json_read["status-log"])
-
-    #             #status
-    #             if before.status != after.status:
-    #                 embed = discord.Embed(
-    #                     colour=after.colour,
-    #                     timestamp=datetime.now(timezone.utc)
-    #                 )
-    #                 if after.avatar is not None:
-    #                     embed.set_author(name=after, icon_url=after.avatar.url)
-    #                 else:
-    #                     embed.set_author(name=after)
-    #                 embed.set_footer(text=f"{str(after.status)}", icon_url=status_icon(after.status))
-    #                 await self.status_log.send(embed=embed)
-    #         except:
-    #             pass
-    
+          
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         channels = [channel for channel in guild.channels]
