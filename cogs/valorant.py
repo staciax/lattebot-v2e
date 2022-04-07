@@ -366,10 +366,10 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
             embed5 = await night_embed(skin5['uuid'],skin5['name'], skin5['price'], skin5['disprice'])
             embed6 = await night_embed(skin6['uuid'],skin6['name'], skin6['price'], skin6['disprice'])
             
-            await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4, embed5, embed6])
-          except Exception as e:
-              print(e)
-              raise commands.CommandError("An unknown error occurred, sorry")
+            await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4, embed5,         
+        except Exception as e:
+            print(e)
+            raise commands.CommandError("An unknown error occurred, sorry")
 
 def setup(bot):
     bot.add_cog(Valorant(bot))
