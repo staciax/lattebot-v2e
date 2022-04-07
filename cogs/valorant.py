@@ -344,7 +344,7 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
         
         async def night_embed(uuid, name, price, dpice):
             embed = discord.Embed(color=0x0F1923)
-            embed.description = f"{get_emoji_tier_by_uuid(uuid)} **{name}**\n{get_emoji_point_bot(self.bot, 'vp')} {dpice} ~~{price}~~"
+            embed.description = f"{get_emoji_tier_by_uuid(uuid)} **{name}**\n<:ValorantPoint:950365917613817856> {dpice} ~~{price}~~"
             embed.set_thumbnail(url=get_skin_icon(uuid))
             return embed
         

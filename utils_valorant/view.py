@@ -102,7 +102,8 @@ class Notify_list(discord.ui.View):
     def main_embed(self) -> discord.Embed:        
         embed = discord.Embed(description='', title='Your Notify:',color=0xfd4554)
         skin_list = self.skin_source
-        vlr_point = discord.utils.get(self.ctx.bot.emojis, name='ValorantPoint') or discord.utils.get(self.ctx.guild.emojis, name='ValorantPoint')
+        vlr_point = '<:ValorantPoint:950365917613817856>'
+
 
         if len(skin_list) == 0:
             embed.description = f"You don't have skin notify"
