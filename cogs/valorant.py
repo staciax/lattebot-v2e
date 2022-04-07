@@ -348,7 +348,6 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
             embed.set_thumbnail(url=get_skin_icon(uuid))
             return embed
         
-        
         embed = discord.Embed(color=0xfd4554)
         embed.description = f"**NightMarket for {riot_name}** | Remaining {format_dt((datetime.utcnow() + timedelta(seconds=duration)), 'R')}"
 
