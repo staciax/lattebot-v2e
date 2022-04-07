@@ -323,53 +323,53 @@ class Valorant(commands.Cog, command_attrs = dict(slash_command=True)):
 
         await ctx.send(embed=embed)
 
-    # @commands.command(name="nightmarket", help="Shows your nightmarket in your account")
-    # async def night(self, ctx, username = commands.Option(None, description="Input username (temp login)"), password= commands.Option(None, description="Input password (temp login)")):
+    @commands.command(name="nightmarket", help="Shows your nightmarket in your account")
+    async def night(self, ctx, username = commands.Option(None, description="Input username (temp login)"), password= commands.Option(None, description="Input password (temp login)")):
         
-    #     is_private = False
-    #     if username is not None or password is not None:
-    #         is_private = True
-    #     await ctx.defer(ephemeral=is_private)
+        is_private = False
+        if username is not None or password is not None:
+            is_private = True
+        await ctx.defer(ephemeral=is_private)
 
-    #     if username and password:
-    #         puuid, headers, region, ign = Auth(username, password).temp_auth()
-    #         nightmarket, duration = VALORANT_API().temp_night(puuid, headers, region)
-    #         riot_name = ign
-    #     elif username or password:
-    #         raise commands.CommandError("An unknown error occurred, sorry")
-    #     else:
-    #         data = Auth(user_id=ctx.author.id).get_users()
-    #         riot_name = data['IGN']
-    #         nightmarket, duration = VALORANT_API(str(ctx.author.id)).store_fetch_nightmarket()
+        if username and password:
+            puuid, headers, region, ign = Auth(username, password).temp_auth()
+            nightmarket, duration = VALORANT_API().temp_night(puuid, headers, region)
+            riot_name = ign
+        elif username or password:
+            raise commands.CommandError("An unknown error occurred, sorry")
+        else:
+            data = Auth(user_id=ctx.author.id).get_users()
+            riot_name = data['IGN']
+            nightmarket, duration = VALORANT_API(str(ctx.author.id)).store_fetch_nightmarket()
         
-    #     async def night_embed(uuid, name, price, dpice):
-    #         embed = discord.Embed(color=0x0F1923)
-    #         embed.description = f"{get_emoji_tier_by_uuid(uuid)} **{name}**\n{get_emoji_point_bot(self.bot, 'vp')} {dpice} ~~{price}~~"
-    #         embed.set_thumbnail(url=get_skin_icon(uuid))
-    #         return embed
+        async def night_embed(uuid, name, price, dpice):
+            embed = discord.Embed(color=0x0F1923)
+            embed.description = f"{get_emoji_tier_by_uuid(uuid)} **{name}**\n{get_emoji_point_bot(self.bot, 'vp')} {dpice} ~~{price}~~"
+            embed.set_thumbnail(url=get_skin_icon(uuid))
+            return embed
         
-    #     try:
-    #         embed = discord.Embed(color=0xfd4554)
-    #         embed.description = f"**NightMarket for {riot_name}** | Remaining {format_dt((datetime.utcnow() + timedelta(seconds=duration)), 'R')}"
+        try:
+            embed = discord.Embed(color=0xfd4554)
+            embed.description = f"**NightMarket for {riot_name}** | Remaining {format_dt((datetime.utcnow() + timedelta(seconds=duration)), 'R')}"
 
-    #         skin1 = nightmarket['skin1']
-    #         skin2 = nightmarket['skin2']
-    #         skin3 = nightmarket['skin3']
-    #         skin4 = nightmarket['skin4']
-    #         skin5 = nightmarket['skin5']
-    #         skin6 = nightmarket['skin6']
+            skin1 = nightmarket['skin1']
+            skin2 = nightmarket['skin2']
+            skin3 = nightmarket['skin3']
+            skin4 = nightmarket['skin4']
+            skin5 = nightmarket['skin5']
+            skin6 = nightmarket['skin6']
             
-    #         embed1 = await night_embed(skin1['uuid'],skin1['name'], skin1['price'], skin1['disprice'])
-    #         embed2 = await night_embed(skin2['uuid'],skin2['name'], skin2['price'], skin2['disprice'])
-    #         embed3 = await night_embed(skin3['uuid'],skin3['name'], skin3['price'], skin3['disprice'])
-    #         embed4 = await night_embed(skin4['uuid'],skin4['name'], skin4['price'], skin4['disprice'])
-    #         embed5 = await night_embed(skin5['uuid'],skin5['name'], skin5['price'], skin5['disprice'])
-    #         embed6 = await night_embed(skin6['uuid'],skin6['name'], skin6['price'], skin6['disprice'])
+            embed1 = await night_embed(skin1['uuid'],skin1['name'], skin1['price'], skin1['disprice'])
+            embed2 = await night_embed(skin2['uuid'],skin2['name'], skin2['price'], skin2['disprice'])
+            embed3 = await night_embed(skin3['uuid'],skin3['name'], skin3['price'], skin3['disprice'])
+            embed4 = await night_embed(skin4['uuid'],skin4['name'], skin4['price'], skin4['disprice'])
+            embed5 = await night_embed(skin5['uuid'],skin5['name'], skin5['price'], skin5['disprice'])
+            embed6 = await night_embed(skin6['uuid'],skin6['name'], skin6['price'], skin6['disprice'])
             
-    #         await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4, embed5, embed6])
-    #     except Exception as e:
-    #         print(e)
-    #         raise commands.CommandError("An unknown error occurred, sorry")
+            await ctx.send(embeds=[embed, embed1, embed2, embed3, embed4, embed5, embed6])
+        except Exception as e:
+            print(e)
+            raise commands.CommandError("An unknown error occurred, sorry")
 
 def setup(bot):
     bot.add_cog(Valorant(bot))
