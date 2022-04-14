@@ -108,7 +108,7 @@ class Todo(commands.Cog, command_attrs = dict(slash_command=True, slash_command_
 
         #data_user_count
         user_count = await self.bot.latte_todo.find_many_by_custom({"user_id": ctx.author.id})
-        if len(user_count) >= 50 and ctx.author != self.bot.renly:
+        if len(user_count) >= 50 and ctx.author.id != 240059262297047041:
             raise UserInputErrors("You can't have more than 50 todo at the moment.")
 
         #data_count
