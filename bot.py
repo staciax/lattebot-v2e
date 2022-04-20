@@ -244,8 +244,8 @@ if __name__ == "__main__":
     
     for file in os.listdir("./cogs"):
         if file.endswith(".py") and not file.startswith("_"):
-            if not file == 'snipe.py':
-                bot.load_extension(f'cogs.{file[:-3]}')
+            # if not file == 'snipe.py':
+            bot.load_extension(f'cogs.{file[:-3]}')
         
     bot.loop.run_until_complete(create_db_pool())
     bot.loop.create_task(run_once_when_ready())
